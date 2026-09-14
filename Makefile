@@ -2,7 +2,7 @@ NAME = PROJECT
 VERSION = 0.1.0
 VENV = .venv
 SRC_DIR = src/
-MAIN = app/main.py
+MAIN = main.py
 
 
 all: install
