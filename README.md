@@ -1,4 +1,4 @@
-_This project has been created as part of the 42 curriculum by marberge._
+_This project has been created as part of the 42 curriculum by marberge , gchmilew._
 
 <div align="center">
 <br>
