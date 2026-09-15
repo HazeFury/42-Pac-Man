@@ -1,6 +1,7 @@
 import pygame
 
 from ui.button import Button
+from ui.sprite import Sprite
 from utils import game_config
 from views.base_view import BaseView
 
@@ -13,7 +14,6 @@ class GameView(BaseView):
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
 
-        # A simple back button to test the view switching
         self.back_button = Button(
             pos_y="top",
             pos_x="left",
@@ -25,8 +25,20 @@ class GameView(BaseView):
 
         self.player_x: int = game_config.WINDOW_WIDTH // 2
         self.player_y: int = game_config.WINDOW_HEIGHT // 2
-        self.player_size: int = 20
         self.player_speed: int = 4
+
+        # Using kwargs (pos_y=..., pos_x=...) prevents mixing up coordinates!
+        self.pacman_sprite = Sprite(
+            pos_y=self.player_y,
+            pos_x=self.player_x,
+            image_paths=[
+                "assets/pacman-up/1.png",
+                "assets/pacman-up/2.png",
+                "assets/pacman-up/3.png",
+                "assets/pacman-up/2.png",
+            ],
+            animation_speed=0.1,
+        )
 
     def go_back(self) -> None:
         """Callback to return to the menu."""
@@ -36,8 +48,17 @@ class GameView(BaseView):
         for event in events:
             self.back_button.handle_event(event)
 
-    def update(self) -> None:
+    def update(self, dt: float = 0.012) -> None:
+        """
+        Update the game logic.
+        dt (delta_time) is the elapsed time in seconds since the last frame.
+        """
+        # 1. Update the animation properly with a realistic delta time
+        self.pacman_sprite.update_animation(dt)
+
         keys = pygame.key.get_pressed()
+
+        # 2. Update the actual variables tracking the player's position
         if keys[pygame.K_UP]:
             self.player_y -= self.player_speed
         if keys[pygame.K_DOWN]:
@@ -47,14 +68,10 @@ class GameView(BaseView):
         if keys[pygame.K_RIGHT]:
             self.player_x += self.player_speed
 
+        # 3. Apply the new variables to the sprite's position
+        self.pacman_sprite.update_position(self.player_x, self.player_y)
+
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
-
-        # Just drawing a placeholder for the game
-        pygame.draw.circle(
-            self.screen,
-            game_config.YELLOW,
-            (self.player_x, self.player_y),
-            self.player_size,
-        )
+        self.pacman_sprite.draw(self.screen)

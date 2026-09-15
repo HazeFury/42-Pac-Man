@@ -4,7 +4,7 @@ import pygame
 
 from ui.box import Box
 from ui.button import Button
-from ui.text import Text
+from ui.sprite import Sprite
 from utils import game_config
 from views.base_view import BaseView
 
@@ -19,12 +19,10 @@ class MenuView(BaseView):
 
         self.menu_box = Box(pos_y="center", pos_x="center", spacing=30)
 
-        self.title_text = Text(
-            pos_y="0",
-            pos_x="0",
-            text="PAC MAN",
-            color="YELLOW",
-            font_size=80,
+        self.title_text = Sprite(
+            800,
+            400,
+            ["assets/pac-man_title.png"],
         )
         self.play_btn = Button(
             pos_y="0",
