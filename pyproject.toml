@@ -1,11 +1,17 @@
 [project]
-name = "template-42-project"
+name = "Pac-Man"
 version = "0.1.0"
-description = "A standard 42 Python project template"
+description = "The famous arcade game Pac-Man with a modern Python codebase, a clean project structure, and a deployable build."
 readme = "README.md"
 requires-python = ">=3.10"
+
+authors = [
+    { name = "marberge", email = "marberge@student.42lyon.fr" },
+    { name = "gchmilew", email = "gchmilew@student.42lyon.fr" }
+]
 dependencies = [
-    "mazegenerator",
+    "pygame>=2.6.1",
+    "mazegenerator"
 ]
 
 [dependency-groups]
@@ -35,3 +41,18 @@ testpaths = ["tests"]
 
 [tool.uv.sources]
 mazegenerator = { path = "mazegenerator-2.1.0-py3-none-any.whl" }
+
+[tool.ruff]
+# Set the maximum line length to 80 characters.
+line-length = 79
+
+[tool.ruff.lint]
+# Enable specific rule sets.
+# "E" and "W" are for pycodestyle (equivalent to Flake8 base rules)
+# "F" is for Pyflakes
+select = ["E", "F", "W"]
+
+[tool.ruff.format]
+# Standardize formatting
+quote-style = "double"
+indent-style = "space"
