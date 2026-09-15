@@ -34,7 +34,9 @@ class Text:
         self.update_text(text)
 
     def _resolve_x(self) -> int:
-        """Calculate the absolute X coordinate based on the current surface width."""
+        """
+        Calculate the absolute X coordinate based on the current surface width.
+        """
         if self._pos_x_keyword == "left":
             return 50
         elif self._pos_x_keyword == "right":
@@ -43,7 +45,10 @@ class Text:
             return (game_config.WINDOW_WIDTH - self.width) // 2
 
     def _resolve_y(self) -> int:
-        """Calculate the absolute Y coordinate based on the current surface height."""
+        """
+        Calculate the absolute Y coordinate based on the current surface
+        height.
+        """
         if self._pos_y_keyword == "top":
             return 50
         elif self._pos_y_keyword == "bottom":
@@ -66,6 +71,13 @@ class Text:
         # 3. Recalculate X and Y so it remains properly aligned/centered
         self.x = self._resolve_x()
         self.y = self._resolve_y()
+
+    def handle_event(self, event: pygame.event.Event) -> None:
+        """
+        Text components do not interact with events, but must implement the
+        interface.
+        """
+        pass
 
     def draw(self, screen: pygame.Surface) -> None:
         """

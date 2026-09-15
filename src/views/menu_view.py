@@ -1,5 +1,8 @@
+import sys
+
 import pygame
 
+from ui.box import Box
 from ui.button import Button
 from ui.text import Text
 from utils import game_config
@@ -14,33 +17,44 @@ class MenuView(BaseView):
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
 
-        self.menu_title = Text(
-            pos_y="top",
-            pos_x="center",
+        self.menu_box = Box(pos_y="center", pos_x="center", spacing=30)
+
+        self.title_text = Text(
+            pos_y="0",
+            pos_x="0",
             text="PAC MAN",
             color="YELLOW",
-            font_size=42,
+            font_size=80,
         )
-
-        # Instantiate our custom button
-        self.play_button = Button(
-            pos_y="center",
-            pos_x="center",
+        self.play_btn = Button(
+            pos_y="0",
+            pos_x="0",
             text="START GAME",
             func=self.start_game,
             color="BLUE",
-            size="large",
         )
+        self.quit_btn = Button(
+            pos_y="0", pos_x="0", text="QUIT", func=self.exit_game, color="RED"
+        )
+
+        # We add them to the box. The pos_y and pos_x of the elements are
+        # ignored and overwritten by the Box layout logic!
+        self.menu_box.add_child(self.title_text)
+        self.menu_box.add_child(self.play_btn)
+        self.menu_box.add_child(self.quit_btn)
 
     def start_game(self) -> None:
         """Callback function assigned to the play button."""
-        print("Play button clicked! Transitioning to GAME state.")
         self.next_view = "GAME"
+
+    def exit_game(self) -> None:
+        """Callback function assigned to the play button."""
+        pygame.quit()
+        sys.exit()
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         for event in events:
-            # The button handles its own click detection!
-            self.play_button.handle_event(event)
+            self.menu_box.handle_event(event)
 
     def update(self) -> None:
         # No specific background logic to update in the menu for now
@@ -48,7 +62,4 @@ class MenuView(BaseView):
 
     def draw(self) -> None:
         self.screen.fill(game_config.BACKGROUND_COLOR)
-
-        # The button draws itself and handles its hover state!
-        self.play_button.draw(self.screen)
-        self.menu_title.draw(self.screen)
+        self.menu_box.draw(self.screen)
