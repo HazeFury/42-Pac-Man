@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "A standard 42 Python project template"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "mazegenerator",
+]
 
 [dependency-groups]
 dev = [
@@ -30,3 +32,6 @@ check_untyped_defs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.uv.sources]
+mazegenerator = { path = "mazegenerator-2.1.0-py3-none-any.whl" }
