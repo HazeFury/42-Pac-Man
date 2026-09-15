@@ -1,11 +1,8 @@
 {
 	"highscore_filename": "highscore.json",
-	"level": [
-		1,
-		10
-	],
-	"width": 30,
-	"height": 30,
+	"level": 10,
+	"width": 20,
+	"height": 300,
 	"lives": 3,
 	"pacgum": 42,
 	"points_per_pacgum": 10,
@@ -14,3 +11,4 @@
 	"seed": 42,
 	"level_max_time": 90
 }
+#dfsdf
