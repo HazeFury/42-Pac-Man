@@ -1,10 +1,16 @@
 [project]
-name = "template-42-project"
+name = "Pac-Man"
 version = "0.1.0"
-description = "A standard 42 Python project template"
+description = "The famous arcade game Pac-Man with a modern Python codebase, a clean project structure, and a deployable build."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+authors = [
+    { name = "marberge", email = "marberge@student.42lyon.fr" },
+    { name = "gchmilew", email = "gchmilew@student.42lyon.fr" }
+]
+dependencies = [
+    "pygame>=2.6.1",
+]
 
 [dependency-groups]
 dev = [
