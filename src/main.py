@@ -52,8 +52,8 @@ def main() -> None:
             current_state = active_view.next_view
             active_view = views[current_state]
 
-            # Reset the next_view property of the OLD view so it doesn't instantly
-            # trigger a change next time we come back to it.
+            # Reset the next_view property of the OLD view so it doesn't
+            # instantly trigger a change next time we come back to it.
             for view in views.values():
                 view.next_view = None
 

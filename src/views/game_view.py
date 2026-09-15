@@ -26,7 +26,7 @@ class GameView(BaseView):
         self.player_x: int = game_config.WINDOW_WIDTH // 2
         self.player_y: int = game_config.WINDOW_HEIGHT // 2
         self.player_size: int = 20
-        self.player_speed: int = 10
+        self.player_speed: int = 4
 
     def go_back(self) -> None:
         """Callback to return to the menu."""

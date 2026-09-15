@@ -1,6 +1,7 @@
 import pygame
 
 from ui.button import Button
+from ui.text import Text
 from utils import game_config
 from views.base_view import BaseView
 
@@ -12,6 +13,14 @@ class MenuView(BaseView):
 
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
+
+        self.menu_title = Text(
+            pos_y="top",
+            pos_x="center",
+            text="PAC MAN",
+            color="YELLOW",
+            font_size=42,
+        )
 
         # Instantiate our custom button
         self.play_button = Button(
@@ -42,3 +51,4 @@ class MenuView(BaseView):
 
         # The button draws itself and handles its hover state!
         self.play_button.draw(self.screen)
+        self.menu_title.draw(self.screen)
