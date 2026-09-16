@@ -130,7 +130,7 @@ class GameView(BaseView):
                 elif cell.pacgum:
                     screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
 
-    def maze_centering(self) -> tuple:
+    def maze_centering(self) -> tuple[int, int]:
         maze_pixel_w = self.maze.w * 32
         maze_pixel_h = self.maze.h * 32
         x_offset = (game_config.WINDOW_WIDTH - maze_pixel_w) // 2
