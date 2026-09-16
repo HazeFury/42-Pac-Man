@@ -35,14 +35,14 @@ class Maze:
             for cell in line:
                 print(f"x:{cell.x} y:{cell.y} pacgum:{cell.pacgum}")
 
-    def maze_cell_init(self):
+    def maze_cell_init(self) -> None:
         for pos_y, row_y in enumerate(self.maze.maze):
             row: list[Cell] = []
             for pos_x, col_x in enumerate(row_y):
                 row.append((Cell(x=pos_x, y=pos_y, wall=self.wall(col_x))))
             self.grid.append(row)
 
-    def wall(self, bit: int) -> dict:
+    def wall(self, bit: int) -> dict[str, bool]:
         walls = {
             "N": bool(bit & 1),
             "E": bool(bit & 2),
@@ -51,7 +51,7 @@ class Maze:
         }
         return walls
 
-    def pacgum_placement(self, nb_pacgum) -> None:
+    def pacgum_placement(self, nb_pacgum: int) -> None:
 
         if nb_pacgum > self.total_nb_cell():
             print("more pacgum than available Cell filling the whole maze")
@@ -82,7 +82,7 @@ class Maze:
                     total_cell += 1
         return total_cell - 4
 
-    def Super_pacgum_placement(self):
+    def Super_pacgum_placement(self) -> None:
         self.grid[0][0].super_pacgum = True
         self.grid[0][self.w - 1].super_pacgum = True
         self.grid[self.h - 1][0].super_pacgum = True
