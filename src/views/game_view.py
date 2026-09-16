@@ -1,6 +1,6 @@
 import pygame
 
-from core.cell import Maze
+from core.maze import Maze
 from ui.button import Button
 from ui.sprite import Sprite
 from utils import game_config
@@ -23,8 +23,9 @@ class GameView(BaseView):
             "S": pygame.image.load("assets/walls/bottom.png").convert_alpha(),
             "E": pygame.image.load("assets/walls/right.png").convert_alpha(),
             "W": pygame.image.load("assets/walls/left.png").convert_alpha(),
-            "F": pygame.image.load("assets/walls/coner_fixe.png").convert_alpha(),
-
+            "F": pygame.image.load(
+                "assets/walls/coner_fixe.png"
+            ).convert_alpha(),
         }
 
         self.PACGUM_SPRITE = pygame.image.load(
@@ -117,8 +118,10 @@ class GameView(BaseView):
                     screen.blit(self.WALL_SPRITES["E"], (px_x, px_y))
                 if cell.y == self.maze.h - 1:
                     screen.blit(self.WALL_SPRITES["S"], (px_x, px_y))
-                if self.maze.grid[(
-                        cell.y - 1)][cell.x].wall["W"] and self.maze.grid[cell.y][cell.x - 1].wall["N"]:
+                if (
+                    self.maze.grid[(cell.y - 1)][cell.x].wall["W"]
+                    and self.maze.grid[cell.y][cell.x - 1].wall["N"]
+                ):
                     screen.blit(self.WALL_SPRITES["F"], (px_x, px_y))
 
                     # 3. Draw consumables in the center of the cell
@@ -126,7 +129,8 @@ class GameView(BaseView):
                     # You might need an offset here to perfectly center
                     #  the pacgum sprite
                     screen.blit(
-                        self.SUPER_PACGUM_SPRITE, (px_x + 10, px_y + 10))
+                        self.SUPER_PACGUM_SPRITE, (px_x + 10, px_y + 10)
+                    )
                 elif cell.pacgum:
                     screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
 
