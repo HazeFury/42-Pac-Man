@@ -1,6 +1,13 @@
 from pathlib import Path
-from pydantic import BaseModel, Field, field_validator, ValidationError
-from json import JSONDecodeError
+from pydantic import (
+    BaseModel,
+    Field,
+    ValidationError,
+    ValidationInfo,
+    ValidatorFunctionWrapHandler,
+    field_validator,
+)
+from typing import Any, cast
 import sys
 
 ERROR_MESSAGE = {
@@ -32,7 +39,7 @@ class Setup(BaseModel):
 
     @field_validator("highscore_filename", mode="before")
     @classmethod
-    def highscore_file_check(cls, value: str):
+    def highscore_file_check(cls, value: Any) -> str:
         if not isinstance(value, str) or not value.endswith(".json"):
             print(
                 "invalid data for highscore_filename using default path",
@@ -45,12 +52,15 @@ class Setup(BaseModel):
                      "points_per_ghost", "seed", "level_max_time",
                      mode="wrap")
     @classmethod
-    def validate_field(cls, value: int, handler, info):
+    def validate_field(cls, value: Any,
+                       handler: ValidatorFunctionWrapHandler,
+                       info: ValidationInfo) -> int:
+        field_name = info.field_name or ""
         try:
-            return handler(value)
+            return cast(int, handler(value))
         except ValidationError:
-            print(ERROR_MESSAGE[info.field_name])
-            return cls.model_fields[info.field_name].default
+            print(ERROR_MESSAGE[field_name])
+            return cast(int, cls.model_fields[field_name].default)
 
 
 class JsonCleaning:
