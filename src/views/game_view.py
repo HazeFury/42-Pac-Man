@@ -23,9 +23,7 @@ class GameView(BaseView):
             "S": pygame.image.load("assets/walls/bottom.png").convert_alpha(),
             "E": pygame.image.load("assets/walls/right.png").convert_alpha(),
             "W": pygame.image.load("assets/walls/left.png").convert_alpha(),
-            "F": pygame.image.load(
-                "assets/walls/coner_fixe.png"
-            ).convert_alpha(),
+            "F": pygame.image.load("assets/walls/fix.png").convert_alpha(),
         }
 
         self.PACGUM_SPRITE = pygame.image.load(
@@ -97,12 +95,13 @@ class GameView(BaseView):
         Iterates through the maze grid and draws walls and items.
         cell_size is the dimension of one square cell in pixels.
         """
+        x_offset, y_offset = self.maze_centering()
         for row in self.maze.grid:
             for cell in row:
                 # 1. Calculate absolute pixel coordinates for the top-left
                 # corner of the cell
-                px_x = cell.x * cell_size
-                px_y = cell.y * cell_size
+                px_x = cell.x * cell_size + x_offset
+                px_y = cell.y * cell_size + y_offset
 
                 # 2. Draw walls based on the boolean dictionary
                 if cell.wall["N"]:
@@ -133,6 +132,13 @@ class GameView(BaseView):
                     )
                 elif cell.pacgum:
                     screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
+
+    def maze_centering(self) -> tuple[int, int]:
+        maze_pixel_w = self.maze.w * 32
+        maze_pixel_h = self.maze.h * 32
+        x_offset = (game_config.WINDOW_WIDTH - maze_pixel_w) // 2
+        y_offset = (game_config.WINDOW_HEIGHT - maze_pixel_h) // 2
+        return (x_offset, y_offset)
 
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
