@@ -20,8 +20,8 @@ class GameView(BaseView):
         # This dictionary maps the wall direction to the loaded Pygame Surface
         self.WALL_SPRITES = {
             "N": pygame.image.load("assets/walls/top.png").convert_alpha(),
-            # "S": pygame.image.load("assets/walls/bottom.png").convert_alpha(),
-            # "E": pygame.image.load("assets/walls/right.png").convert_alpha(),
+            "S": pygame.image.load("assets/walls/bottom.png").convert_alpha(),
+            "E": pygame.image.load("assets/walls/right.png").convert_alpha(),
             "W": pygame.image.load("assets/walls/left.png").convert_alpha(),
         }
 
@@ -111,13 +111,18 @@ class GameView(BaseView):
                 if cell.wall["W"]:
                     screen.blit(self.WALL_SPRITES["W"], (px_x, px_y))
 
+                if cell.x == self.maze.w - 1:
+                    screen.blit(self.WALL_SPRITES["E"], (px_x, px_y))
+                if cell.y == self.maze.h - 1:
+                    screen.blit(self.WALL_SPRITES["S"], (px_x, px_y))
                 # 3. Draw consumables in the center of the cell
                 if cell.super_pacgum:
                     # You might need an offset here to perfectly center
                     #  the pacgum sprite
-                    screen.blit(self.SUPER_PACGUM_SPRITE, (px_x, px_y))
+                    screen.blit(
+                        self.SUPER_PACGUM_SPRITE, (px_x + 10, px_y + 10))
                 elif cell.pacgum:
-                    screen.blit(self.PACGUM_SPRITE, (px_x, px_y))
+                    screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
 
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)

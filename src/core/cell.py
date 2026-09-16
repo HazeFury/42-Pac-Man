@@ -30,10 +30,10 @@ class Maze:
         self.Super_pacgum_placement()
         self.pacgum_placement(pacgum)
 
-        for line in self.grid:
-            print()
-            for cell in line:
-                print(f"x:{cell.x} y:{cell.y} pacgum:{cell.pacgum}")
+        # for line in self.grid:
+        #     print()
+        #     for cell in line:
+        #         print(f"x:{cell.x} y:{cell.y} pacgum:{cell.pacgum}")
 
     def maze_cell_init(self) -> None:
         for pos_y, row_y in enumerate(self.maze.maze):
