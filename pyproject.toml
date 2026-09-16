@@ -11,7 +11,8 @@ authors = [
 ]
 dependencies = [
     "pygame>=2.6.1",
-    "mazegenerator"
+    "mazegenerator",
+    "pydantic>=2.13.5",
 ]
 
 [dependency-groups]
