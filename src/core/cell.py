@@ -58,7 +58,8 @@ class Maze:
             for line in self.grid:
                 for cell in line:
                     if cell.super_pacgum is False:
-                        cell.pacgum = True
+                        if not all(cell.wall.values()):
+                            cell.pacgum = True
 
         else:
             for i in range(nb_pacgum):
