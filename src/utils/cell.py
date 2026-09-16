@@ -16,15 +16,16 @@ class Cell:
 
 
 class Maze:
-    def __init__(self, seed: int = 42, w: int = 15, h: int = 15) -> None:
+    def __init__(self, seed: int = 42, w: int = 3, h: int = 3) -> None:
         maze = MazeGenerator(size=(w, h), seed=seed)
-        maze_layout: list[list[Cell]] = []
+        self.grid: list[list[Cell]] = []
 
         for pos_y, row_y in enumerate(maze.maze):
             row: list[Cell] = []
             for pos_x, col_x in enumerate(row_y):
                 row.append((Cell(x=pos_x, y=pos_y, wall=self.wall(col_x))))
-            maze_layout.append(row)
+            self.grid.append(row)
+        print(self.grid)
 
     def wall(self, bit: int):
         walls = {
