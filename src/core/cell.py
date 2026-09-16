@@ -1,6 +1,7 @@
-from mazegenerator import MazeGenerator
-from dataclasses import dataclass, field
 import random
+from dataclasses import dataclass, field
+
+from mazegenerator import MazeGenerator
 
 
 @dataclass
@@ -17,8 +18,9 @@ class Cell:
 
 
 class Maze:
-    def __init__(self, seed: int = 42, w: int = 5,
-                 h: int = 5, pacgum: int = 42) -> None:
+    def __init__(
+        self, seed: int = 42, w: int = 5, h: int = 5, pacgum: int = 42
+    ) -> None:
         self.maze = MazeGenerator(size=(w, h), seed=seed)
         self.w = w
         self.h = h
@@ -45,7 +47,7 @@ class Maze:
             "N": bool(bit & 1),
             "E": bool(bit & 2),
             "S": bool(bit & 4),
-            "W": bool(bit & 8)
+            "W": bool(bit & 8),
         }
         return walls
 
@@ -56,7 +58,8 @@ class Maze:
             for line in self.grid:
                 for cell in line:
                     if cell.super_pacgum is False:
-                        cell.pacgum = True
+                        if not all(cell.wall.values()):
+                            cell.pacgum = True
 
         else:
             for i in range(nb_pacgum):
@@ -64,8 +67,10 @@ class Maze:
                 while pacgum_assign is False:
                     x, y = (random.randrange(self.w), random.randrange(self.h))
                     self.grid[y][x]
-                    if (self.grid[y][x].pacgum is False
-                            and self.grid[y][x].super_pacgum is False):
+                    if (
+                        self.grid[y][x].pacgum is False
+                        and self.grid[y][x].super_pacgum is False
+                    ):
                         self.grid[y][x].pacgum = True
                         pacgum_assign = True
 
@@ -81,7 +86,7 @@ class Maze:
         self.grid[0][0].super_pacgum = True
         self.grid[0][self.w - 1].super_pacgum = True
         self.grid[self.h - 1][0].super_pacgum = True
-        self.grid[self.w - 1][self.h - 1].super_pacgum = True
+        self.grid[self.h - 1][self.w - 1].super_pacgum = True
 
 
 if __name__ == "__main__":
