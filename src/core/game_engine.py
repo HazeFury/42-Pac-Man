@@ -12,8 +12,7 @@ class GameEngine:
     def __init__(self, level_seed: int = 42) -> None:
         self.running = True
         # Composition: The engine owns the maze and the entities
-        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=150)
-
+        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1000)
         # Hardcoded spawn points for the skeleton (should be dynamic later)
         self.player = Player(
             start_x=self.maze.w // 2, start_y=self.maze.h // 2
@@ -27,7 +26,7 @@ class GameEngine:
         """
         Updates logic for all entities.
         """
-        self.player.update_position(dt, key)
+        self.player.update_position(dt, key, self.maze)
 
         # Tick timer management
         self.tick_timer: float = 0.0
