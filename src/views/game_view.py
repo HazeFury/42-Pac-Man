@@ -78,22 +78,27 @@ class GameView(BaseView):
         dt (delta_time) is the elapsed time in seconds since the last frame.
         """
         # 1. Update the animation properly with a realistic delta time
+        self.game_engin.update(dt)
         self.pacman_sprite.update_animation(dt)
+        x_offset, y_offset = self.maze_centering()
+        px = self.pacman.x * 32 + x_offset + 9
+        py = self.pacman.y * 32 + y_offset + 8
+        self.pacman_sprite.update_position(px, py)
 
-        keys = pygame.key.get_pressed()
+        # keys = pygame.key.get_pressed()
 
-        # 2. Update the actual variables tracking the player's position
-        if keys[pygame.K_UP]:
-            self.player_y -= self.player_speed
-        if keys[pygame.K_DOWN]:
-            self.player_y += self.player_speed
-        if keys[pygame.K_LEFT]:
-            self.player_x -= self.player_speed
-        if keys[pygame.K_RIGHT]:
-            self.player_x += self.player_speed
+        # # 2. Update the actual variables tracking the player's position
+        # if keys[pygame.K_UP]:
+        #     self.player_y -= self.player_speed
+        # if keys[pygame.K_DOWN]:
+        #     self.player_y += self.player_speed
+        # if keys[pygame.K_LEFT]:
+        #     self.player_x -= self.player_speed
+        # if keys[pygame.K_RIGHT]:
+        #     self.player_x += self.player_speed
 
-        # 3. Apply the new variables to the sprite's position
-        self.pacman_sprite.update_position(self.player_x, self.player_y)
+        # # 3. Apply the new variables to the sprite's position
+        # self.pacman_sprite.update_position(self.player_x, self.player_y)
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """
@@ -148,5 +153,5 @@ class GameView(BaseView):
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
-        self.pacman_sprite.draw(self.screen)
         self.draw_maze(self.screen)
+        self.pacman_sprite.draw(self.screen)
