@@ -23,11 +23,11 @@ class GameEngine:
             Ghost(start_x=19, start_y=0, ghost_type="PINKY"),
         ]
 
-    def update(self, dt: float) -> None:
+    def update(self, dt: float, key) -> None:
         """
         Updates logic for all entities.
         """
-        self.player.update_position(dt)
+        self.player.update_position(dt, key)
 
     #     # Tick timer management
     #     self.tick_timer: float = 0.0

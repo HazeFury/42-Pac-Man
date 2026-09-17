@@ -31,14 +31,16 @@ class Player:
         """
         pass
 
-    def update_position(self, dt: float) -> None:
+    def update_position(self, dt: float, key: str) -> None:
         """
         Teleports the player to the new grid coordinates.
         """
+        movement = {"UP": (0, -1), "RIGHT": (1, 0),
+                    "DOWN": (0, 1), "LEFT": (-1, 0), "": (0, 0)}
         self.timer += dt
         if self.timer >= self.move_delay:
-            self.x += 1
-            self.y += 1
+            self.x += movement[key][0]
+            self.y += movement[key][1]
             self.timer -= self.move_delay
 
     def lose_life(self) -> None:
