@@ -25,6 +25,9 @@ ERROR_MESSAGE = {
 
 
 class Setup(BaseModel):
+    """
+    Configuration schema and validation for game settings.
+    """
     highscore_filename: str = Field(default="highscore.json")
     level: int = Field(default=10, ge=10)
     width: int = Field(default=30, ge=10)
@@ -40,6 +43,9 @@ class Setup(BaseModel):
     @field_validator("highscore_filename", mode="before")
     @classmethod
     def highscore_file_check(cls, value: Any) -> str:
+        """
+        Validates the highscore file path, falling back to default if invalid.
+        """
         if not isinstance(value, str) or not value.endswith(".json"):
             print(
                 "invalid data for highscore_filename using default path",
@@ -55,6 +61,9 @@ class Setup(BaseModel):
     def validate_field(cls, value: Any,
                        handler: ValidatorFunctionWrapHandler,
                        info: ValidationInfo) -> int:
+        """
+        Validates integer fields and falls back to the default value upon error.
+        """
         field_name = info.field_name or ""
         try:
             return cast(int, handler(value))
@@ -64,11 +73,21 @@ class Setup(BaseModel):
 
 
 class JsonCleaning:
+    """
+    Handles reading, comment removal, and validation of JSON configuration files.
+    """
+
     def __init__(self, filename: str) -> None:
+        """
+        Initializes the parser and processes the configuration file.
+        """
         self.path = Path(filename)
         self.open_file()
 
     def open_file(self) -> None:
+        """
+        Reads the configuration file, filters comments, validates settings, and writes sanitized output.
+        """
         forbiden_char = ("#", "//", "*/", "/*")
         clean_json = []
         output = Path("test.json")
@@ -103,6 +122,9 @@ class JsonCleaning:
 
 
 def main() -> None:
+    """
+    Entry point to parse and validate the default configuration file.
+    """
     JsonCleaning("config.json")
     print("ok")
 
