@@ -17,7 +17,7 @@
 - Création de composant ui réutilisable et de vues pour simplifier le developpement (marberge)
 - Découverte et prise en main du MazeGenerator (gchmilew)
 
-### Day 3 
+### Day 3
 
 - Création de la classe Cell symbolisant chaque cellule du labyrinthe (gchmilew)
 - Création de la classe Maze pour générer une matrice de Cell formant le labyrinthe (gchmilew)
@@ -25,3 +25,9 @@
 - affichage visuel du labyrinthe, des pac-gums et super pac-gums (marberge)
 
 ### Day 4
+
+- Alignement du pacman sur la grille et déplacement dans les cellules plutôt que déplacement libre (gchmilew)
+- rajout des collisions dans les murs (gchmilew)
+- rajout du score lorsque pacman mange des pacgums (et les pacgums disparaissent de l'écran) (gchmilew)
+- refacto du code pour le GameEngine soit au coeur de la logique (marberge)
+- affichage des ghosts (pas encore de déplacement) (gchmilew)
