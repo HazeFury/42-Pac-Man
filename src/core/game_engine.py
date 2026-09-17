@@ -2,6 +2,7 @@ from core.ghost import Ghost
 from utils.input_manager import InputManager
 from core.maze import Maze
 from core.player import Player
+import pygame
 
 
 class GameEngine:
@@ -11,7 +12,7 @@ class GameEngine:
     """
 
     def __init__(self, level_seed: int = 42) -> None:
-        self.running = True
+        self.clock = pygame.time.Clock()
         self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1000)
 
         self.player = Player(
@@ -29,7 +30,7 @@ class GameEngine:
         # Tick timer management
         self.tick_timer: float = 0.0
         # Reduced to 0.25s for a more playable Pac-Man speed
-        self.tick_threshold: float = 0.25
+        self.tick_threshold: float = 0.05
 
         self.is_game_over: bool = False
 
@@ -40,11 +41,13 @@ class GameEngine:
         direction: str = self.input_manager.get_movement_intention()
         self.player.queue_direction(direction)
 
-    def update(self, dt: float) -> None:
+    def update(self) -> None:
         """
         Accumulates delta time and triggers a game tick when the
         threshold is met.
         """
+        raw_dt = self.clock.tick() / 1000.0
+        dt = min(raw_dt, 0.1)
         if self.is_game_over:
             return
 
