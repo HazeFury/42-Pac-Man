@@ -15,9 +15,15 @@ class GameEngine:
         self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1000)
 
         self.player = Player(
-            start_x=self.maze.w // 2, start_y=self.maze.h // 2
-        )
-        self.ghosts: list[Ghost] = []
+            start_x=self.maze.w // 2,
+            start_y=self.maze.h // 2)
+        self.ghosts: list[Ghost] = [
+            Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
+            Ghost(start_x=self.maze.w - 1, start_y=0, ghost_type="PINKY"),
+            Ghost(start_x=0, start_y=self.maze.h - 1, ghost_type="INKY"),
+            Ghost(start_x=self.maze.w - 1, start_y=self.maze.h - 1,
+                  ghost_type="CLYDE"),
+        ]
         self.input_manager = InputManager()
 
         # Tick timer management

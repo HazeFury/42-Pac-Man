@@ -5,6 +5,7 @@ from ui.button import Button
 from ui.sprite import Sprite
 from utils import game_config
 from views.base_view import BaseView
+from core.ghost import Ghost
 
 
 class GameView(BaseView):
@@ -16,6 +17,7 @@ class GameView(BaseView):
         super().__init__(screen)
         self.game_engine = GameEngine()
         self.pacman = self.game_engine.player
+        self.ghost = self.game_engine.ghosts
 
         # Assuming you load your images somewhere in your initialization
         # This dictionary maps the wall direction to the loaded Pygame Surface
@@ -52,16 +54,8 @@ class GameView(BaseView):
         )
         x_offset, y_offset = self.maze_centering()
 
-        self.player_x: int = (
-            self.game_engine.maze.grid[self.pacman.y][self.pacman.x].x * 32
-            + x_offset
-            + 9
-        )
-        self.player_y: int = (
-            self.game_engine.maze.grid[self.pacman.y][self.pacman.x].y * 32
-            + y_offset
-            + 8
-        )
+        self.player_x: int = self.pacman.x * 32 + x_offset + 9
+        self.player_y: int = self.pacman.y * 32 + y_offset + 8
 
         # Using kwargs (pos_y=..., pos_x=...) prevents mixing up coordinates!
         self.pacman_sprite = Sprite(
@@ -75,6 +69,20 @@ class GameView(BaseView):
             ],
             animation_speed=0.1,
         )
+        ghost_assets = {
+            "BLINKY": "assets/ghosts/blinky.png",
+            "PINKY": "assets/ghosts/pinky.png",
+            "INKY": "assets/ghosts/inky.png",
+            "CLYDE": "assets/ghosts/clyde.png"
+        }
+        self.ghost_sprite: list[tuple[Ghost, Sprite]] = []
+        for ghost in self.game_engine.ghosts:
+            sprite = Sprite(
+                pos_y=ghost.y * 32 + y_offset + 9,
+                pos_x=ghost.x * 32 + x_offset + 8,
+                image_paths=[ghost_assets[ghost.ghost_type]],
+                animation_speed=0.1)
+            self.ghost_sprite.append((ghost, sprite))
 
     def go_back(self) -> None:
         """Callback to return to the menu."""
@@ -168,4 +176,6 @@ class GameView(BaseView):
         self.back_button.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
+        for _, sprint in self.ghost_sprite:
+            sprint.draw(self.screen)
         self.score_button.draw(self.screen)
