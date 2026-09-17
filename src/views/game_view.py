@@ -105,7 +105,7 @@ class GameView(BaseView):
         self.game_engine.handle_input()
 
         # 2. Let the Engine resolve all the logic and ticks (The Model part)
-        self.game_engine.update(dt)
+        self.game_engine.update()
 
         # 3. Synchronize visuals with the Engine's truth (The View part)
         self.pacman_sprite.update_animation(dt)
