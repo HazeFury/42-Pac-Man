@@ -58,7 +58,16 @@ class Player:
             self.x += movement[key][0]
             self.y += movement[key][1]
             self.timer -= self.move_delay
+            self.score_calc(self.x, self.y, maze)
             maze_cells[self.y][self.x].pacgum = False
+            maze_cells[self.y][self.x].super_pacgum = False
+
+    def score_calc(self, x: int, y: int, maze: Maze):
+        maze_cells = maze.grid
+        if maze_cells[y][x].pacgum is True:
+            self.score += 10
+        if maze_cells[y][x].super_pacgum is True:
+            self.score += 50
 
     def lose_life(self) -> None:
         """

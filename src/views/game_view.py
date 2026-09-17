@@ -43,6 +43,14 @@ class GameView(BaseView):
             color="RED",
             size="small",
         )
+        self.score_button = Button(
+            pos_y="top",
+            pos_x="right",
+            text=str(self.pacman.score),
+            func=self.go_back,
+            color="RED",
+            size="small",
+        )
         x_offset, y_offset = self.maze_centering()
 
         self.player_x: int = self.game_engin.maze.grid[self.pacman.y][self.pacman.x].x * \
@@ -94,6 +102,7 @@ class GameView(BaseView):
         px = self.pacman.x * 32 + x_offset + 9
         py = self.pacman.y * 32 + y_offset + 8
         self.pacman_sprite.update_position(px, py)
+        self.score_button.text = str(self.pacman.score)
 
         # 2. Update the actual variables tracking the player's position
 
@@ -155,3 +164,4 @@ class GameView(BaseView):
         self.back_button.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
+        self.score_button.draw(self.screen)
