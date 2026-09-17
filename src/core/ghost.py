@@ -16,9 +16,13 @@ class Ghost:
         # "BLINKY", "PINKY", etc. Determines the AI behavior
         self.ghost_type: str = ghost_type
 
+        # Speed expressed in engine ticks required to move
+        self.ticks_per_move: int = 2
+        self.current_tick_wait: int = 0
+
         # States could be: "CHASE", "SCATTER", "FRIGHTENED", "DEAD"
         self.state: str = "CHASE"
-        self.current_dir: str = "STOP"
+        self.direction: str = "STOP"
 
     def update_position(self, new_x: int, new_y: int) -> None:
         """
