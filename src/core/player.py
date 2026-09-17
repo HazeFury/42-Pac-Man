@@ -1,3 +1,6 @@
+from core.maze import Maze
+
+
 class Player:
     """
     Represents the Pac-Man entity in the grid.
@@ -9,7 +12,7 @@ class Player:
         self.x: int = start_x
         self.y: int = start_y
         self.timer = 0
-        self.move_delay = 0.2
+        self.move_delay = 0.02
 
         # Spawn coordinates to reset after dying
         self.spawn_x: int = start_x
@@ -31,7 +34,7 @@ class Player:
         """
         pass
 
-    def update_position(self, dt: float, key: str) -> None:
+    def update_position(self, dt: float, key: str, maze: Maze) -> None:
         """
         Teleports the player to the new grid coordinates.
         """
@@ -39,9 +42,23 @@ class Player:
                     "DOWN": (0, 1), "LEFT": (-1, 0), "": (0, 0)}
         self.timer += dt
         if self.timer >= self.move_delay:
+            maze_cells = maze.grid
+            if key == "UP":
+                if maze_cells[self.y][self.x].wall["N"] == True:
+                    key = ""
+            if key == "DOWN":
+                if maze_cells[self.y][self.x].wall["S"] == True:
+                    key = ""
+            if key == "RIGHT":
+                if maze_cells[self.y][self.x].wall["E"] == True:
+                    key = ""
+            if key == "LEFT":
+                if maze_cells[self.y][self.x].wall["W"] == True:
+                    key = ""
             self.x += movement[key][0]
             self.y += movement[key][1]
             self.timer -= self.move_delay
+            maze_cells[self.y][self.x].pacgum = False
 
     def lose_life(self) -> None:
         """
