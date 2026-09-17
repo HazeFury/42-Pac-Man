@@ -17,26 +17,31 @@ class Player:
 
         # Movement tracking
 
-        self.current_dir: str = "STOP"
+        self.direction: str = "RIGHT"
         # Stores the player's input until the next engine tick
-        self.next_dir: str = "STOP"
 
         # Game stats
         self.lives: int = 3
         self.score: int = 0
 
-    def queue_direction(self, direction: str) -> None:
+    def update_direction(self, direction: str) -> None:
         """
         Saves the direction the player wants to take at the next tick.
         """
-        pass
+        if direction in ("UP", "RIGHT", "DOWN", "LEFT"):
+            self.direction = direction
 
     def update_position(self, dt: float, key: str) -> None:
         """
         Teleports the player to the new grid coordinates.
         """
-        movement = {"UP": (0, -1), "RIGHT": (1, 0),
-                    "DOWN": (0, 1), "LEFT": (-1, 0), "": (0, 0)}
+        movement = {
+            "UP": (0, -1),
+            "RIGHT": (1, 0),
+            "DOWN": (0, 1),
+            "LEFT": (-1, 0),
+            "NONE": (0, 0),
+        }
         self.timer += dt
         if self.timer >= self.move_delay:
             self.x += movement[key][0]

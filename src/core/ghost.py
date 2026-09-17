@@ -18,7 +18,7 @@ class Ghost:
 
         # States could be: "CHASE", "SCATTER", "FRIGHTENED", "DEAD"
         self.state: str = "CHASE"
-        self.current_dir: str = "STOP"
+        self.direction: str = "STOP"
 
     def update_position(self, new_x: int, new_y: int) -> None:
         """

@@ -1,5 +1,5 @@
-from core.maze import Maze
 from core.ghost import Ghost
+from core.maze import Maze
 from core.player import Player
 
 
@@ -16,8 +16,8 @@ class GameEngine:
 
         # Hardcoded spawn points for the skeleton (should be dynamic later)
         self.player = Player(
-            start_x=self.maze.w // 2,
-            start_y=self.maze.h // 2)
+            start_x=self.maze.w // 2, start_y=self.maze.h // 2
+        )
         self.ghosts: list[Ghost] = [
             Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
             Ghost(start_x=19, start_y=0, ghost_type="PINKY"),
@@ -29,13 +29,13 @@ class GameEngine:
         """
         self.player.update_position(dt, key)
 
-    #     # Tick timer management
-    #     self.tick_timer: float = 0.0
-    #     # 0.7 seconds between each grid movement
-    #     self.tick_threshold: float = 0.7
+        # Tick timer management
+        self.tick_timer: float = 0.0
+        # 0.7 seconds between each grid movement
+        self.tick_threshold: float = 0.7
 
-    #     # Game states
-    #     self.is_game_over: bool = False
+        # Game states
+        self.is_game_over: bool = False
     #     self.is_victory: bool = False
 
     # def handle_input(self, direction: str) -> None:
