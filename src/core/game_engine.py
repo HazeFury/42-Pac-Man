@@ -11,10 +11,12 @@ class GameEngine:
 
     def __init__(self, level_seed: int = 42) -> None:
         # Composition: The engine owns the maze and the entities
-        self.maze = Maze(seed=level_seed, w=20, h=20, pacgum=150)
+        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=150)
 
         # Hardcoded spawn points for the skeleton (should be dynamic later)
-        self.player = Player(start_x=10, start_y=10)
+        self.player = Player(
+            start_x=self.maze.w // 2,
+            start_y=self.maze.h // 2)
         self.ghosts: list[Ghost] = [
             Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
             Ghost(start_x=19, start_y=0, ghost_type="PINKY"),
