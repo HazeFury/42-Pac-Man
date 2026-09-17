@@ -1,6 +1,7 @@
 import pygame
 
 from core.maze import Maze
+from core.game_engine import GameEngine
 from ui.button import Button
 from ui.sprite import Sprite
 from utils import game_config
@@ -14,7 +15,8 @@ class GameView(BaseView):
 
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
-        self.maze = Maze(seed=42, w=20, h=20, pacgum=400)
+        self.game_engin = GameEngine()
+        self.pacman = self.game_engin.player
 
         # Assuming you load your images somewhere in your initialization
         # This dictionary maps the wall direction to the loaded Pygame Surface
@@ -41,9 +43,12 @@ class GameView(BaseView):
             color="RED",
             size="small",
         )
+        x_offset, y_offset = self.maze_centering()
 
-        self.player_x: int = game_config.WINDOW_WIDTH // 2
-        self.player_y: int = game_config.WINDOW_HEIGHT // 2
+        self.player_x: int = self.game_engin.maze.grid[self.pacman.y][self.pacman.x].x * \
+            32 + x_offset + 9
+        self.player_y: int = self.game_engin.maze.grid[self.pacman.y][self.pacman.x].y * \
+            32 + y_offset + 8
         self.player_speed: int = 4
 
         # Using kwargs (pos_y=..., pos_x=...) prevents mixing up coordinates!
@@ -73,22 +78,27 @@ class GameView(BaseView):
         dt (delta_time) is the elapsed time in seconds since the last frame.
         """
         # 1. Update the animation properly with a realistic delta time
-        self.pacman_sprite.update_animation(dt)
-
+        move = ""
         keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            move = "UP"
+        if keys[pygame.K_DOWN]:
+            move = "DOWN"
+        if keys[pygame.K_LEFT]:
+            move = "LEFT"
+        if keys[pygame.K_RIGHT]:
+            move = "RIGHT"
+        self.game_engin.update(dt, move)
+        self.pacman_sprite.update_animation(dt)
+        x_offset, y_offset = self.maze_centering()
+        px = self.pacman.x * 32 + x_offset + 9
+        py = self.pacman.y * 32 + y_offset + 8
+        self.pacman_sprite.update_position(px, py)
 
         # 2. Update the actual variables tracking the player's position
-        if keys[pygame.K_UP]:
-            self.player_y -= self.player_speed
-        if keys[pygame.K_DOWN]:
-            self.player_y += self.player_speed
-        if keys[pygame.K_LEFT]:
-            self.player_x -= self.player_speed
-        if keys[pygame.K_RIGHT]:
-            self.player_x += self.player_speed
 
-        # 3. Apply the new variables to the sprite's position
-        self.pacman_sprite.update_position(self.player_x, self.player_y)
+        # # 3. Apply the new variables to the sprite's position
+        # self.pacman_sprite.update_position(self.player_x, self.player_y)
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """
@@ -96,7 +106,7 @@ class GameView(BaseView):
         cell_size is the dimension of one square cell in pixels.
         """
         x_offset, y_offset = self.maze_centering()
-        for row in self.maze.grid:
+        for row in self.game_engin.maze.grid:
             for cell in row:
                 # 1. Calculate absolute pixel coordinates for the top-left
                 # corner of the cell
@@ -113,13 +123,13 @@ class GameView(BaseView):
                 if cell.wall["W"]:
                     screen.blit(self.WALL_SPRITES["W"], (px_x, px_y))
 
-                if cell.x == self.maze.w - 1:
+                if cell.x == self.game_engin.maze.w - 1:
                     screen.blit(self.WALL_SPRITES["E"], (px_x, px_y))
-                if cell.y == self.maze.h - 1:
+                if cell.y == self.game_engin.maze.h - 1:
                     screen.blit(self.WALL_SPRITES["S"], (px_x, px_y))
                 if (
-                    self.maze.grid[(cell.y - 1)][cell.x].wall["W"]
-                    and self.maze.grid[cell.y][cell.x - 1].wall["N"]
+                    self.game_engin.maze.grid[(cell.y - 1)][cell.x].wall["W"]
+                    and self.game_engin.maze.grid[cell.y][cell.x - 1].wall["N"]
                 ):
                     screen.blit(self.WALL_SPRITES["F"], (px_x, px_y))
 
@@ -134,8 +144,8 @@ class GameView(BaseView):
                     screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
 
     def maze_centering(self) -> tuple[int, int]:
-        maze_pixel_w = self.maze.w * 32
-        maze_pixel_h = self.maze.h * 32
+        maze_pixel_w = self.game_engin.maze.w * 32
+        maze_pixel_h = self.game_engin.maze.h * 32
         x_offset = (game_config.WINDOW_WIDTH - maze_pixel_w) // 2
         y_offset = (game_config.WINDOW_HEIGHT - maze_pixel_h) // 2
         return (x_offset, y_offset)
@@ -143,5 +153,5 @@ class GameView(BaseView):
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
-        self.pacman_sprite.draw(self.screen)
         self.draw_maze(self.screen)
+        self.pacman_sprite.draw(self.screen)

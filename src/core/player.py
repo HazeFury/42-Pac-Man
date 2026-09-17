@@ -8,12 +8,15 @@ class Player:
         # Grid coordinates
         self.x: int = start_x
         self.y: int = start_y
+        self.timer = 0
+        self.move_delay = 0.2
 
         # Spawn coordinates to reset after dying
         self.spawn_x: int = start_x
         self.spawn_y: int = start_y
 
         # Movement tracking
+
         self.current_dir: str = "STOP"
         # Stores the player's input until the next engine tick
         self.next_dir: str = "STOP"
@@ -28,11 +31,17 @@ class Player:
         """
         pass
 
-    def update_position(self, new_x: int, new_y: int) -> None:
+    def update_position(self, dt: float, key: str) -> None:
         """
         Teleports the player to the new grid coordinates.
         """
-        pass
+        movement = {"UP": (0, -1), "RIGHT": (1, 0),
+                    "DOWN": (0, 1), "LEFT": (-1, 0), "": (0, 0)}
+        self.timer += dt
+        if self.timer >= self.move_delay:
+            self.x += movement[key][0]
+            self.y += movement[key][1]
+            self.timer -= self.move_delay
 
     def lose_life(self) -> None:
         """
