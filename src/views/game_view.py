@@ -1,6 +1,5 @@
 import pygame
 
-from core.maze import Maze
 from core.game_engine import GameEngine
 from ui.button import Button
 from ui.sprite import Sprite
@@ -16,9 +15,9 @@ class GameView(BaseView):
 
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
-        self.game_engin = GameEngine()
-        self.pacman = self.game_engin.player
-        self.ghost = self.game_engin.ghosts
+        self.game_engine = GameEngine()
+        self.pacman = self.game_engine.player
+        self.ghost = self.game_engine.ghosts
 
         # Assuming you load your images somewhere in your initialization
         # This dictionary maps the wall direction to the loaded Pygame Surface
@@ -45,11 +44,18 @@ class GameView(BaseView):
             color="RED",
             size="small",
         )
+        self.score_button = Button(
+            pos_y="top",
+            pos_x="right",
+            text=str(self.pacman.score),
+            func=self.go_back,
+            color="RED",
+            size="small",
+        )
         x_offset, y_offset = self.maze_centering()
 
         self.player_x: int = self.pacman.x * 32 + x_offset + 9
         self.player_y: int = self.pacman.y * 32 + y_offset + 8
-        self.player_speed: int = 4
 
         # Using kwargs (pos_y=..., pos_x=...) prevents mixing up coordinates!
         self.pacman_sprite = Sprite(
@@ -70,7 +76,7 @@ class GameView(BaseView):
             "CLYDE": "assets/ghosts/clyde.png"
         }
         self.ghost_sprite: list[tuple[Ghost, Sprite]] = []
-        for ghost in self.game_engin.ghosts:
+        for ghost in self.game_engine.ghosts:
             sprite = Sprite(
                 pos_y=ghost.y * 32 + y_offset + 9,
                 pos_x=ghost.x * 32 + x_offset + 8,
@@ -83,36 +89,35 @@ class GameView(BaseView):
         self.next_view = "MENU"
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """
+        Process standard UI events (like button clicks).
+        Continuous keyboard state is handled in update().
+        """
         for event in events:
             self.back_button.handle_event(event)
 
-    def update(self, dt: float = 0.012) -> None:
+    def update(self, dt: float = 0.024) -> None:
         """
-        Update the game logic.
-        dt (delta_time) is the elapsed time in seconds since the last frame.
+        Acts as a bridge between the user inputs, the Game Engine, and the
+        visual Sprites.
         """
-        # 1. Update the animation properly with a realistic delta time
-        move = ""
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-            move = "UP"
-        if keys[pygame.K_DOWN]:
-            move = "DOWN"
-        if keys[pygame.K_LEFT]:
-            move = "LEFT"
-        if keys[pygame.K_RIGHT]:
-            move = "RIGHT"
-        self.game_engin.update(dt, move)
+        # 1. the Engine capture user inputs (via the Controller Manager)
+        self.game_engine.handle_input()
+
+        # 2. Let the Engine resolve all the logic and ticks (The Model part)
+        self.game_engine.update(dt)
+
+        # 3. Synchronize visuals with the Engine's truth (The View part)
         self.pacman_sprite.update_animation(dt)
+
+        # Calculate new pixel position based on grid coordinates
         x_offset, y_offset = self.maze_centering()
         px = self.pacman.x * 32 + x_offset + 9
         py = self.pacman.y * 32 + y_offset + 8
         self.pacman_sprite.update_position(px, py)
 
-        # 2. Update the actual variables tracking the player's position
-
-        # # 3. Apply the new variables to the sprite's position
-        # self.pacman_sprite.update_position(self.player_x, self.player_y)
+        # Update the UI score
+        self.score_button.text = str(self.pacman.score)
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """
@@ -120,7 +125,7 @@ class GameView(BaseView):
         cell_size is the dimension of one square cell in pixels.
         """
         x_offset, y_offset = self.maze_centering()
-        for row in self.game_engin.maze.grid:
+        for row in self.game_engine.maze.grid:
             for cell in row:
                 # 1. Calculate absolute pixel coordinates for the top-left
                 # corner of the cell
@@ -137,13 +142,15 @@ class GameView(BaseView):
                 if cell.wall["W"]:
                     screen.blit(self.WALL_SPRITES["W"], (px_x, px_y))
 
-                if cell.x == self.game_engin.maze.w - 1:
+                if cell.x == self.game_engine.maze.w - 1:
                     screen.blit(self.WALL_SPRITES["E"], (px_x, px_y))
-                if cell.y == self.game_engin.maze.h - 1:
+                if cell.y == self.game_engine.maze.h - 1:
                     screen.blit(self.WALL_SPRITES["S"], (px_x, px_y))
                 if (
-                    self.game_engin.maze.grid[(cell.y - 1)][cell.x].wall["W"]
-                    and self.game_engin.maze.grid[cell.y][cell.x - 1].wall["N"]
+                    self.game_engine.maze.grid[(cell.y - 1)][cell.x].wall["W"]
+                    and self.game_engine.maze.grid[cell.y][cell.x - 1].wall[
+                        "N"
+                    ]
                 ):
                     screen.blit(self.WALL_SPRITES["F"], (px_x, px_y))
 
@@ -158,8 +165,8 @@ class GameView(BaseView):
                     screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
 
     def maze_centering(self) -> tuple[int, int]:
-        maze_pixel_w = self.game_engin.maze.w * 32
-        maze_pixel_h = self.game_engin.maze.h * 32
+        maze_pixel_w = self.game_engine.maze.w * 32
+        maze_pixel_h = self.game_engine.maze.h * 32
         x_offset = (game_config.WINDOW_WIDTH - maze_pixel_w) // 2
         y_offset = (game_config.WINDOW_HEIGHT - maze_pixel_h) // 2
         return (x_offset, y_offset)
@@ -171,3 +178,4 @@ class GameView(BaseView):
         self.pacman_sprite.draw(self.screen)
         for _, sprint in self.ghost_sprite:
             sprint.draw(self.screen)
+        self.score_button.draw(self.screen)
