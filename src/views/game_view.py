@@ -1,6 +1,6 @@
 import pygame
-from core.game_engine import GameEngine
 
+from core.game_engine import GameEngine
 from ui.button import Button
 from ui.sprite import Sprite
 from utils import game_config
@@ -62,7 +62,6 @@ class GameView(BaseView):
             + y_offset
             + 8
         )
-        self.player_speed: int = 4
 
         # Using kwargs (pos_y=..., pos_x=...) prevents mixing up coordinates!
         self.pacman_sprite = Sprite(
@@ -82,37 +81,35 @@ class GameView(BaseView):
         self.next_view = "MENU"
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """
+        Process standard UI events (like button clicks).
+        Continuous keyboard state is handled in update().
+        """
         for event in events:
             self.back_button.handle_event(event)
 
-    def update(self, dt: float = 0.012) -> None:
+    def update(self, dt: float = 0.024) -> None:
         """
-        Update the game logic.
-        dt (delta_time) is the elapsed time in seconds since the last frame.
+        Acts as a bridge between the user inputs, the Game Engine, and the
+        visual Sprites.
         """
-        # 1. Update the animation properly with a realistic delta time
-        move = "NONE"
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP]:
-            move = "UP"
-        if keys[pygame.K_DOWN]:
-            move = "DOWN"
-        if keys[pygame.K_LEFT]:
-            move = "LEFT"
-        if keys[pygame.K_RIGHT]:
-            move = "RIGHT"
-        self.game_engine.update(dt, move)
+        # 1. the Engine capture user inputs (via the Controller Manager)
+        self.game_engine.handle_input()
+
+        # 2. Let the Engine resolve all the logic and ticks (The Model part)
+        self.game_engine.update(dt)
+
+        # 3. Synchronize visuals with the Engine's truth (The View part)
         self.pacman_sprite.update_animation(dt)
+
+        # Calculate new pixel position based on grid coordinates
         x_offset, y_offset = self.maze_centering()
         px = self.pacman.x * 32 + x_offset + 9
         py = self.pacman.y * 32 + y_offset + 8
         self.pacman_sprite.update_position(px, py)
+
+        # Update the UI score
         self.score_button.text = str(self.pacman.score)
-
-        # 2. Update the actual variables tracking the player's position
-
-        # # 3. Apply the new variables to the sprite's position
-        # self.pacman_sprite.update_position(self.player_x, self.player_y)
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """

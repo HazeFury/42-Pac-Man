@@ -1,87 +1,35 @@
-from core.maze import Maze
-
-
 class Player:
     """
     Represents the Pac-Man entity in the grid.
-    Stores grid coordinates, movement intentions, and player stats.
+    Only stores coordinates, intended direction, and stats.
+    Does NOT handle game logic or maze interaction.
     """
 
     def __init__(self, start_x: int, start_y: int) -> None:
-        # Grid coordinates
         self.x: int = start_x
         self.y: int = start_y
-        self.timer = 0
-        self.move_delay = 0.02
 
-        # Spawn coordinates to reset after dying
         self.spawn_x: int = start_x
         self.spawn_y: int = start_y
 
-        # Movement tracking
+        # Movement tracking (Buffer logic)
+        self.current_dir: str = "NONE"
+        self.next_dir: str = "NONE"
 
-        self.direction: str = "RIGHT"
-        # Stores the player's input until the next engine tick
+        # Speed expressed in engine ticks required to move
+        self.ticks_per_move: int = 1
+        self.current_tick_wait: int = 0
 
-        # Game stats
         self.lives: int = 3
         self.score: int = 0
 
-    def update_direction(self, direction: str) -> None:
+    def queue_direction(self, direction: str) -> None:
         """
-        Saves the direction the player wants to take at the next tick.
+        Saves the intended direction for the next game engine tick.
         """
-        if direction in ("UP", "RIGHT", "DOWN", "LEFT"):
-            self.direction = direction
+        if direction in ("UP", "DOWN", "LEFT", "RIGHT"):
+            self.next_dir = direction
 
-    def update_position(self, dt: float, key: str, maze: Maze) -> None:
-        """
-        Teleports the player to the new grid coordinates.
-        """
-        movement = {
-            "UP": (0, -1),
-            "RIGHT": (1, 0),
-            "DOWN": (0, 1),
-            "LEFT": (-1, 0),
-            "NONE": (0, 0),
-        }
-        self.timer += dt
-        if self.timer >= self.move_delay:
-            maze_cells = maze.grid
-            if key == "UP":
-                if maze_cells[self.y][self.x].wall["N"] == True:
-                    key = ""
-            if key == "DOWN":
-                if maze_cells[self.y][self.x].wall["S"] == True:
-                    key = ""
-            if key == "RIGHT":
-                if maze_cells[self.y][self.x].wall["E"] == True:
-                    key = ""
-            if key == "LEFT":
-                if maze_cells[self.y][self.x].wall["W"] == True:
-                    key = ""
-            self.x += movement[key][0]
-            self.y += movement[key][1]
-            self.timer -= self.move_delay
-            self.score_calc(self.x, self.y, maze)
-            maze_cells[self.y][self.x].pacgum = False
-            maze_cells[self.y][self.x].super_pacgum = False
-
-    def score_calc(self, x: int, y: int, maze: Maze):
-        maze_cells = maze.grid
-        if maze_cells[y][x].pacgum is True:
-            self.score += 10
-        if maze_cells[y][x].super_pacgum is True:
-            self.score += 50
-
-    def lose_life(self) -> None:
-        """
-        Decrements the life counter.
-        """
-        pass
-
-    def reset_position(self) -> None:
-        """
-        Resets the player's coordinates to the initial spawn point.
-        """
-        pass
+    def enable_cheat_speed(self) -> None:
+        """Cheat mode: Pac-Man moves every single engine tick!"""
+        self.ticks_per_move = 1
