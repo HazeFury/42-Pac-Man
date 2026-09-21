@@ -195,6 +195,7 @@ class GameEngine:
         for ghost in self.ghosts:
             start = (ghost.x, ghost.y)
             if ghost.ghost_type == "PINKY":
+                target_x, target_y = self.player.x, self.player.y
                 p_dir = self.player.current_dir
                 if p_dir == "UP":
                     target_y = max(0, target_y - 2)
@@ -204,7 +205,27 @@ class GameEngine:
                     target_x = max(0, target_x - 2)
                 elif p_dir == "RIGHT":
                     target_x = min(maze.w - 1, target_x + 2)
-            end = (self.player.x, self.player.y)
+            if ghost.ghost_type == "INKY":
+                target_x, target_y = self.player.x, self.player.y
+                p_dir = self.player.current_dir
+                g_x = self.ghosts[0].x
+                g_y = self.ghosts[0].y
+                pivot_x = target_x
+                pivot_y = target_y
+                if p_dir == "UP":
+                    pivot_y = target_y - 2
+                elif p_dir == "DOWN":
+                    pivot_y = target_y + 2
+                elif p_dir == "LEFT":
+                    pivot_x = target_x - 2
+                elif p_dir == "RIGHT":
+                    pivot_x = target_x + 2
+                raw_target_x = 2 * pivot_x - g_x
+                raw_target_y = 2 * pivot_y - g_y
+                target_x = max(0, min(maze.w - 1, raw_target_x))
+                target_y = max(0, min(maze.h - 1, raw_target_y))
+
+            end = (target_x, target_y)
             queue = deque([start])
             visited: dict[tuple[int, int],
                           tuple[int, int]] = {start: start}
