@@ -26,6 +26,7 @@ class GameEngine:
                   ghost_type="CLYDE"),
         ]
         self.input_manager = InputManager()
+        self.nb_of_death = 0
 
         # Tick timer management
         self.tick_timer: float = 0.0
@@ -56,6 +57,8 @@ class GameEngine:
             self._tick()
             self.tick_timer -= self.tick_threshold
         self.pacman_vs_ghost()
+        if self.player.lives == 0:
+            print("game over man")
 
     def _tick(self) -> None:
         """
@@ -144,4 +147,6 @@ class GameEngine:
             g_x, g_y = ghost.x, ghost.y
             if p_x == g_x and p_y == g_y:
                 # if flagsuperpacgum
-                print("T MORT")
+                self.player.lives -= 1
+                self.nb_of_death += 1
+                print(f"you died {self.nb_of_death} time")
