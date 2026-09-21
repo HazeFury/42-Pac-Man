@@ -12,6 +12,7 @@ class Cell:
     Tracks its coordinates, wall configuration (N, E, S, W),
     and whether it contains entities or items (pacgum, super pacgum).
     """
+
     x: int
     y: int
     wall: dict[str, bool] = field(

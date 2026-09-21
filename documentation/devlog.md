@@ -31,3 +31,12 @@
 - rajout du score lorsque pacman mange des pacgums (et les pacgums disparaissent de l'écran) (gchmilew)
 - refacto du code pour le GameEngine soit au coeur de la logique (marberge)
 - affichage des ghosts (pas encore de déplacement) (gchmilew)
+
+
+### Day 5
+
+- Détection de collision entre pacman et ghost (print uniquement pour l'instant) (gchmilew)
+- IA des ghost => algorithme BFS pour chaque ghost (gchmilew)
+- remplacement des valeurs en dure par celles du fichier de config (gchmilew)
+- ajout du EndGameView pour la fin de la partie (marberge)
+- ajout du HighScoreView pour afficher le top 10 des scores (marberge)

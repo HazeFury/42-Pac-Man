@@ -1,14 +1,15 @@
 import sys
-import pygame
-from core.ghost import Ghost
-from core.maze import Maze, Cell
-from core.player import Player
-from utils.input_manager import InputManager
-from utils.parsing import Setup, Highscore, Player_score
 from collections import deque
 from pathlib import Path
-import json
+
+import pygame
 from pydantic import ValidationError
+
+from core.ghost import Ghost
+from core.maze import Cell, Maze
+from core.player import Player
+from utils.input_manager import InputManager
+from utils.parsing import Highscore, Player_score, Setup
 
 
 class GameEngine:
@@ -189,8 +190,7 @@ class GameEngine:
             print("you win")
 
     def ghost_ai(self) -> None:
-        moves = [(0, -1, 'N'), (1, 0, 'E'),
-                 (0, 1, 'S'), (-1, 0, 'W')]
+        moves = [(0, -1, "N"), (1, 0, "E"), (0, 1, "S"), (-1, 0, "W")]
         maze = self.maze
         target_x, target_y = self.player.x, self.player.y
         for ghost in self.ghosts:
@@ -230,23 +230,27 @@ class GameEngine:
 
             if ghost.ghost_type == "CLYDE":
                 target_x, target_y = self.player.x, self.player.y
-                distance = (ghost.x - target_x) ** 2 + (ghost.y - target_y)**2
+                distance = (ghost.x - target_x) ** 2 + (
+                    ghost.y - target_y
+                ) ** 2
                 if distance < 64:
                     target_x = 0
                     target_y = maze.h - 1
 
             end = (target_x, target_y)
             queue = deque([start])
-            visited: dict[tuple[int, int],
-                          tuple[int, int]] = {start: start}
+            visited: dict[tuple[int, int], tuple[int, int]] = {start: start}
             while queue:
                 x, y = queue.popleft()
                 for dx, dy, direction in moves:
                     nx = x + dx
                     ny = y + dy
-                    if (0 <= nx < maze.w and 0 <= ny < maze.h
+                    if (
+                        0 <= nx < maze.w
+                        and 0 <= ny < maze.h
                         and not (maze.grid[y][x].wall[direction])
-                            and (nx, ny) not in visited):
+                        and (nx, ny) not in visited
+                    ):
                         visited[(nx, ny)] = (x, y)
                         if (nx, ny) == end:
                             break
