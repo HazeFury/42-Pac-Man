@@ -13,7 +13,7 @@ class GameEngine:
 
     def __init__(self, level_seed: int = 42) -> None:
         self.clock = pygame.time.Clock()
-        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1000)
+        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1)
 
         self.player = Player(
             start_x=self.maze.w // 2,
@@ -59,6 +59,7 @@ class GameEngine:
         self.pacman_vs_ghost()
         if self.player.lives == 0:
             print("game over man")
+        self.level_end()
 
     def _tick(self) -> None:
         """
@@ -150,3 +151,12 @@ class GameEngine:
                 self.player.lives -= 1
                 self.nb_of_death += 1
                 print(f"you died {self.nb_of_death} time")
+
+    def level_end(self):
+        count = 0
+        for colum in self.maze.grid:
+            for cell in colum:
+                if cell.pacgum is True:
+                    count += 1
+        if count == 0:
+            print("you win")
