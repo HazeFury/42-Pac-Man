@@ -3,10 +3,11 @@ import sys
 import pygame
 
 from core.ghost import Ghost
-from core.maze import Maze
+from core.maze import Maze, Cell
 from core.player import Player
 from utils.input_manager import InputManager
 from utils.parsing import Setup
+from collections import deque
 
 
 class GameEngine:
@@ -19,7 +20,7 @@ class GameEngine:
         if len(sys.argv) > 1:
             config = Setup.from_json_file()
         else:
-            config: Setup = Setup()
+            config = Setup()
         self.clock = pygame.time.Clock()
         self.maze = Maze(
             seed=config.seed,
@@ -52,7 +53,7 @@ class GameEngine:
         # Tick timer management
         self.tick_timer: float = 0.0
         # Reduced to 0.25s for a more playable Pac-Man speed
-        self.tick_threshold: float = 0.05
+        self.tick_threshold: float = 0.2
 
         self.is_game_over: bool = False
 
@@ -80,6 +81,7 @@ class GameEngine:
         self.pacman_vs_ghost()
         if self.player.lives == 0:
             print("game over man")
+
         self.level_end()
 
     def _tick(self) -> None:
@@ -96,6 +98,9 @@ class GameEngine:
             self.player.current_tick_wait -= 1
 
         # --- Handle Ghosts ---
+
+        self.ghost_ai()
+
         # for ghost in self.ghosts:
         #     if ghost.current_tick_wait <= 0:
         #         self._resolve_ghost_movement(ghost)
@@ -125,7 +130,7 @@ class GameEngine:
         else:
             self.player.current_dir = "NONE"
 
-    def _is_path_clear(self, cell, direction: str) -> bool:
+    def _is_path_clear(self, cell: Cell, direction: str) -> bool:
         """
         Checks if the movement is blocked by a wall in the given direction.
         """
@@ -163,7 +168,7 @@ class GameEngine:
             self.player.score += 50
             cell.super_pacgum = False
 
-    def pacman_vs_ghost(self):
+    def pacman_vs_ghost(self) -> None:
         p_x, p_y = self.player.x, self.player.y
         for ghost in self.ghosts:
             g_x, g_y = ghost.x, ghost.y
@@ -173,7 +178,7 @@ class GameEngine:
                 self.nb_of_death += 1
                 print(f"you died {self.nb_of_death} time")
 
-    def level_end(self):
+    def level_end(self) -> None:
         count = 0
         for colum in self.maze.grid:
             for cell in colum:
@@ -181,3 +186,72 @@ class GameEngine:
                     count += 1
         if count == 0:
             print("you win")
+
+    def ghost_ai(self) -> None:
+        moves = [(0, -1, 'N'), (1, 0, 'E'),
+                 (0, 1, 'S'), (-1, 0, 'W')]
+        maze = self.maze
+        target_x, target_y = self.player.x, self.player.y
+        for ghost in self.ghosts:
+            start = (ghost.x, ghost.y)
+
+            if ghost.ghost_type == "PINKY":
+                target_x, target_y = self.player.x, self.player.y
+                p_dir = self.player.current_dir
+                if p_dir == "UP":
+                    target_y = max(0, target_y - 2)
+                elif p_dir == "DOWN":
+                    target_y = min(maze.h - 1, target_y + 2)
+                elif p_dir == "LEFT":
+                    target_x = max(0, target_x - 2)
+                elif p_dir == "RIGHT":
+                    target_x = min(maze.w - 1, target_x + 2)
+
+            if ghost.ghost_type == "INKY":
+                target_x, target_y = self.player.x, self.player.y
+                p_dir = self.player.current_dir
+                g_x = self.ghosts[0].x
+                g_y = self.ghosts[0].y
+                pivot_x = target_x
+                pivot_y = target_y
+                if p_dir == "UP":
+                    pivot_y = target_y - 2
+                elif p_dir == "DOWN":
+                    pivot_y = target_y + 2
+                elif p_dir == "LEFT":
+                    pivot_x = target_x - 2
+                elif p_dir == "RIGHT":
+                    pivot_x = target_x + 2
+                raw_target_x = 2 * pivot_x - g_x
+                raw_target_y = 2 * pivot_y - g_y
+                target_x = max(0, min(maze.w - 1, raw_target_x))
+                target_y = max(0, min(maze.h - 1, raw_target_y))
+
+            if ghost.ghost_type == "CLYDE":
+                target_x, target_y = self.player.x, self.player.y
+                distance = (ghost.x - target_x) ** 2 + (ghost.y - target_y)**2
+                if distance < 64:
+                    target_x = 0
+                    target_y = maze.h - 1
+
+            end = (target_x, target_y)
+            queue = deque([start])
+            visited: dict[tuple[int, int],
+                          tuple[int, int]] = {start: start}
+            while queue:
+                x, y = queue.popleft()
+                for dx, dy, direction in moves:
+                    nx = x + dx
+                    ny = y + dy
+                    if (0 <= nx < maze.w and 0 <= ny < maze.h
+                        and not (maze.grid[y][x].wall[direction])
+                            and (nx, ny) not in visited):
+                        visited[(nx, ny)] = (x, y)
+                        if (nx, ny) == end:
+                            break
+                        queue.append((nx, ny))
+            if end in visited:
+                curr: tuple[int, int] = end
+                while visited[curr] != start:
+                    curr = visited[curr]
+                ghost.x, ghost.y = curr

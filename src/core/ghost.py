@@ -44,7 +44,7 @@ class Ghost:
 
     def calculate_next_move(
         self, target_x: int, target_y: int
-    ) -> tuple[int, int]:
+    ) -> None:
         """
         AI Logic: Based on its current state and the target coordinates,
         determines which adjacent cell to move to next.
