@@ -55,6 +55,7 @@ class GameEngine:
         if self.tick_timer >= self.tick_threshold:
             self._tick()
             self.tick_timer -= self.tick_threshold
+        self.pacman_vs_ghost()
 
     def _tick(self) -> None:
         """
@@ -136,3 +137,11 @@ class GameEngine:
         elif cell.super_pacgum:
             self.player.score += 50
             cell.super_pacgum = False
+
+    def pacman_vs_ghost(self):
+        p_x, p_y = self.player.x, self.player.y
+        for ghost in self.ghosts:
+            g_x, g_y = ghost.x, ghost.y
+            if p_x == g_x and p_y == g_y:
+                # if flagsuperpacgum
+                print("T MORT")
