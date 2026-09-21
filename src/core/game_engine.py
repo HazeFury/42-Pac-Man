@@ -3,7 +3,7 @@ import sys
 import pygame
 
 from core.ghost import Ghost
-from core.maze import Maze
+from core.maze import Maze, Cell
 from core.player import Player
 from utils.input_manager import InputManager
 from utils.parsing import Setup
@@ -20,7 +20,7 @@ class GameEngine:
         if len(sys.argv) > 1:
             config = Setup.from_json_file()
         else:
-            config: Setup = Setup()
+            config = Setup()
         self.clock = pygame.time.Clock()
         self.maze = Maze(
             seed=config.seed,
@@ -130,7 +130,7 @@ class GameEngine:
         else:
             self.player.current_dir = "NONE"
 
-    def _is_path_clear(self, cell, direction: str) -> bool:
+    def _is_path_clear(self, cell: Cell, direction: str) -> bool:
         """
         Checks if the movement is blocked by a wall in the given direction.
         """
@@ -168,7 +168,7 @@ class GameEngine:
             self.player.score += 50
             cell.super_pacgum = False
 
-    def pacman_vs_ghost(self):
+    def pacman_vs_ghost(self) -> None:
         p_x, p_y = self.player.x, self.player.y
         for ghost in self.ghosts:
             g_x, g_y = ghost.x, ghost.y
@@ -178,7 +178,7 @@ class GameEngine:
                 self.nb_of_death += 1
                 print(f"you died {self.nb_of_death} time")
 
-    def level_end(self):
+    def level_end(self) -> None:
         count = 0
         for colum in self.maze.grid:
             for cell in colum:
@@ -187,7 +187,7 @@ class GameEngine:
         if count == 0:
             print("you win")
 
-    def ghost_ai(self):
+    def ghost_ai(self) -> None:
         moves = [(0, -1, 'N'), (1, 0, 'E'),
                  (0, 1, 'S'), (-1, 0, 'W')]
         maze = self.maze
@@ -251,7 +251,7 @@ class GameEngine:
                             break
                         queue.append((nx, ny))
             if end in visited:
-                curr: tuple = end
+                curr: tuple[int, int] = end
                 while visited[curr] != start:
                     curr = visited[curr]
                 ghost.x, ghost.y = curr
