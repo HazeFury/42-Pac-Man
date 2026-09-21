@@ -26,7 +26,9 @@ class GameEngine:
             pacgum=config.pacgum)
 
         self.player = Player(
-            start_x=self.maze.w // 2,
+            start_x=(
+                (self.maze.w // 2)if (self.maze.w % 2) != 0
+                else ((self.maze.w // 2) - 1)),
             start_y=self.maze.h // 2)
         self.ghosts: list[Ghost] = [
             Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
