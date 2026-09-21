@@ -1,13 +1,14 @@
 import sys
-
 import pygame
-
 from core.ghost import Ghost
 from core.maze import Maze, Cell
 from core.player import Player
 from utils.input_manager import InputManager
-from utils.parsing import Setup
+from utils.parsing import Setup, Highscore, Player_score
 from collections import deque
+from pathlib import Path
+import json
+from pydantic import ValidationError
 
 
 class GameEngine:
@@ -18,15 +19,15 @@ class GameEngine:
 
     def __init__(self, level_seed: int = 42) -> None:
         if len(sys.argv) > 1:
-            config = Setup.from_json_file()
+            self.config = Setup.from_json_file()
         else:
-            config = Setup()
+            self.config = Setup()
         self.clock = pygame.time.Clock()
         self.maze = Maze(
-            seed=config.seed,
-            w=config.width,
-            h=config.height,
-            pacgum=config.pacgum,
+            seed=self.config.seed,
+            w=self.config.width,
+            h=self.config.height,
+            pacgum=self.config.pacgum,
         )
 
         self.player = Player(
@@ -255,3 +256,21 @@ class GameEngine:
                 while visited[curr] != start:
                     curr = visited[curr]
                 ghost.x, ghost.y = curr
+
+    def read_highscore(self) -> Highscore:
+        score_path = Path(self.config.highscore_filename)
+        if not score_path.exists():
+            return Highscore()
+        try:
+            content = score_path.read_text(encoding="utf-8")
+            return Highscore.model_validate_json(content)
+        except (ValidationError, ValueError):
+            return Highscore()
+
+    def write_highscore(self, name: str, score: int):
+        score_path = Path(self.config.highscore_filename)
+        highscore = self.read_highscore()
+        new_score = Player_score(name=name, score=score)
+        highscore = Highscore(scores=[new_score])
+        json_data = highscore.model_dump_json(indent=2)
+        score_path.write_text(json_data, encoding="utf-8")

@@ -101,3 +101,12 @@ class Setup(BaseModel):
         else:
             data = cls()
         return data
+
+
+class Player_score(BaseModel):
+    name: str = Field(max_length=10, default="AAA")
+    score: int = Field(ge=0, le=9999, default=0)
+
+
+class Highscore(BaseModel):
+    scores: list[Player_score] = Field(default_factory=list)
