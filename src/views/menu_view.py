@@ -17,33 +17,51 @@ class MenuView(BaseView):
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
 
-        self.menu_box = Box(pos_y="center", pos_x="center", spacing=30)
+        self.menu_box = Box(pos_y="center", pos_x="center", spacing=50)
 
-        self.title_text = Sprite(
-            800,
-            400,
-            ["assets/pac-man_title.png"],
+        self.menu_box.add_child(
+            Sprite(
+                800,
+                400,
+                ["assets/pac-man_title.png"],
+            )
         )
-        self.play_btn = Button(
-            pos_y="0",
-            pos_x="0",
-            text="START GAME",
-            func=self.start_game,
-            color="BLUE",
+        self.menu_box.add_child(
+            Button(
+                pos_y="0",
+                pos_x="0",
+                text="START GAME",
+                func=self.start_game,
+                color="BLUE",
+            )
         )
-        self.quit_btn = Button(
-            pos_y="0", pos_x="0", text="QUIT", func=self.exit_game, color="RED"
+        self.menu_box.add_child(
+            Button(
+                pos_y="0",
+                pos_x="0",
+                text="HIGH SCORES",
+                func=self.show_high_score,
+                color="VIOLET",
+            )
         )
 
-        # We add them to the box. The pos_y and pos_x of the elements are
-        # ignored and overwritten by the Box layout logic!
-        self.menu_box.add_child(self.title_text)
-        self.menu_box.add_child(self.play_btn)
-        self.menu_box.add_child(self.quit_btn)
+        self.menu_box.add_child(
+            Button(
+                pos_y="0",
+                pos_x="0",
+                text="QUIT",
+                func=self.exit_game,
+                color="RED",
+            )
+        )
 
     def start_game(self) -> None:
         """Callback function assigned to the play button."""
         self.next_view = "GAME"
+
+    def show_high_score(self) -> None:
+        """Callback function assigned to the play button."""
+        self.next_view = "SCORE"
 
     def exit_game(self) -> None:
         """Callback function assigned to the play button."""

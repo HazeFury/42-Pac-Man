@@ -1,7 +1,11 @@
 import sys
+
 import pygame
+
 from utils import game_config
+from views.end_game_view import WinView
 from views.game_view import GameView
+from views.highscore_view import HighScoreView
 from views.menu_view import MenuView
 
 
@@ -23,7 +27,12 @@ def main() -> None:
 
         # 3. Instantiate all our views (The Painters)
         # We pass the shared 'screen' to all of them.
-        views = {"MENU": MenuView(screen), "GAME": GameView(screen)}
+        views = {
+            "MENU": MenuView(screen),
+            "GAME": GameView(screen),
+            "WIN": WinView(screen),
+            "SCORE": HighScoreView(screen),
+        }
 
         # Set the initial state
         current_state = "MENU"
@@ -32,6 +41,7 @@ def main() -> None:
         # 4. Main Loop
         running = True
         while running:
+            print(current_state)
             # --- A. Retrieve all events once ---
             # We fetch events here and pass the list to the view.
             # This prevents bugs where multiple views consume events
