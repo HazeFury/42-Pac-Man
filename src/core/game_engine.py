@@ -194,6 +194,7 @@ class GameEngine:
         target_x, target_y = self.player.x, self.player.y
         for ghost in self.ghosts:
             start = (ghost.x, ghost.y)
+
             if ghost.ghost_type == "PINKY":
                 target_x, target_y = self.player.x, self.player.y
                 p_dir = self.player.current_dir
@@ -205,6 +206,7 @@ class GameEngine:
                     target_x = max(0, target_x - 2)
                 elif p_dir == "RIGHT":
                     target_x = min(maze.w - 1, target_x + 2)
+
             if ghost.ghost_type == "INKY":
                 target_x, target_y = self.player.x, self.player.y
                 p_dir = self.player.current_dir
@@ -224,6 +226,13 @@ class GameEngine:
                 raw_target_y = 2 * pivot_y - g_y
                 target_x = max(0, min(maze.w - 1, raw_target_x))
                 target_y = max(0, min(maze.h - 1, raw_target_y))
+
+            if ghost.ghost_type == "CLYDE":
+                target_x, target_y = self.player.x, self.player.y
+                distance = (ghost.x - target_x) ** 2 + (ghost.y - target_y)**2
+                if distance < 64:
+                    target_x = 0
+                    target_y = maze.h - 1
 
             end = (target_x, target_y)
             queue = deque([start])
