@@ -1,4 +1,8 @@
+import json
+import sys
 from pathlib import Path
+from typing import Any, cast
+
 from pydantic import (
     BaseModel,
     Field,
@@ -7,9 +11,6 @@ from pydantic import (
     ValidatorFunctionWrapHandler,
     field_validator,
 )
-from typing import Any, cast
-import sys
-import json
 
 ERROR_MESSAGE = {
     "level": "[Error] level value wrong",
@@ -21,7 +22,7 @@ ERROR_MESSAGE = {
     "points_per_super_pacgum": "[Error] points_per_super_pacgum value wrong",
     "points_per_ghost": "[Error] points_per_ghost value wrong",
     "seed": "[Error] seed value wrong",
-    "level_max_time": "[Error] level_max_time value wrong"
+    "level_max_time": "[Error] level_max_time value wrong",
 }
 
 
@@ -29,6 +30,7 @@ class Setup(BaseModel):
     """
     Configuration schema and validation for game settings.
     """
+
     highscore_filename: str = Field(default="highscore.json")
     level: int = Field(default=10, ge=10)
     width: int = Field(default=30, ge=10)
@@ -50,20 +52,34 @@ class Setup(BaseModel):
         if not isinstance(value, str) or not value.endswith(".json"):
             print(
                 "invalid data for highscore_filename using default path",
-                file=sys.stderr)
+                file=sys.stderr,
+            )
             return "highscore.json"
         return value
 
-    @field_validator("level", "width", "height", "lives", "pacgum",
-                     "points_per_pacgum", "points_per_super_pacgum",
-                     "points_per_ghost", "seed", "level_max_time",
-                     mode="wrap")
+    @field_validator(
+        "level",
+        "width",
+        "height",
+        "lives",
+        "pacgum",
+        "points_per_pacgum",
+        "points_per_super_pacgum",
+        "points_per_ghost",
+        "seed",
+        "level_max_time",
+        mode="wrap",
+    )
     @classmethod
-    def validate_field(cls, value: Any,
-                       handler: ValidatorFunctionWrapHandler,
-                       info: ValidationInfo) -> int:
+    def validate_field(
+        cls,
+        value: Any,
+        handler: ValidatorFunctionWrapHandler,
+        info: ValidationInfo,
+    ) -> int:
         """
-        Validates integer fields and falls back to the default value upon error.
+        Validates integer fields and falls back to the default value upon
+        error.
         """
         field_name = info.field_name or ""
         try:
