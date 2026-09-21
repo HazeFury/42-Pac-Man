@@ -53,7 +53,7 @@ class GameEngine:
         # Tick timer management
         self.tick_timer: float = 0.0
         # Reduced to 0.25s for a more playable Pac-Man speed
-        self.tick_threshold: float = 0.05
+        self.tick_threshold: float = 0.2
 
         self.is_game_over: bool = False
 
@@ -98,6 +98,7 @@ class GameEngine:
             self.player.current_tick_wait -= 1
 
         # --- Handle Ghosts ---
+
         self.ghost_ai()
 
         # for ghost in self.ghosts:
@@ -190,12 +191,23 @@ class GameEngine:
         moves = [(0, -1, 'N'), (1, 0, 'E'),
                  (0, 1, 'S'), (-1, 0, 'W')]
         maze = self.maze
+        target_x, target_y = self.player.x, self.player.y
         for ghost in self.ghosts:
             start = (ghost.x, ghost.y)
+            if ghost.ghost_type == "PINKY":
+                p_dir = self.player.current_dir
+                if p_dir == "UP":
+                    target_y = max(0, target_y - 2)
+                elif p_dir == "DOWN":
+                    target_y = min(maze.h - 1, target_y + 2)
+                elif p_dir == "LEFT":
+                    target_x = max(0, target_x - 2)
+                elif p_dir == "RIGHT":
+                    target_x = min(maze.w - 1, target_x + 2)
             end = (self.player.x, self.player.y)
             queue = deque([start])
             visited: dict[tuple[int, int],
-                          tuple[int, int] | None] = {start: None}
+                          tuple[int, int]] = {start: start}
             while queue:
                 x, y = queue.popleft()
                 for dx, dy, direction in moves:
@@ -209,7 +221,7 @@ class GameEngine:
                             break
                         queue.append((nx, ny))
             if end in visited:
-                curr = end
+                curr: tuple = end
                 while visited[curr] != start:
                     curr = visited[curr]
                 ghost.x, ghost.y = curr
