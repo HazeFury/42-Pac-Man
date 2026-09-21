@@ -1,7 +1,5 @@
 import sys
-
 import pygame
-
 from utils import game_config
 from views.game_view import GameView
 from views.menu_view import MenuView
