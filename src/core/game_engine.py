@@ -1,9 +1,11 @@
+import sys
+
+import pygame
+
 from core.ghost import Ghost
-from utils.input_manager import InputManager
 from core.maze import Maze
 from core.player import Player
-import pygame
-import sys
+from utils.input_manager import InputManager
 from utils.parsing import Setup
 
 
@@ -23,21 +25,29 @@ class GameEngine:
             seed=config.seed,
             w=config.width,
             h=config.height,
-            pacgum=config.pacgum)
+            pacgum=config.pacgum,
+        )
 
         self.player = Player(
             start_x=(
-                (self.maze.w // 2)if (self.maze.w % 2) != 0
-                else ((self.maze.w // 2) - 1)),
-            start_y=self.maze.h // 2)
+                (self.maze.w // 2)
+                if (self.maze.w % 2) != 0
+                else ((self.maze.w // 2) - 1)
+            ),
+            start_y=self.maze.h // 2,
+        )
         self.ghosts: list[Ghost] = [
             Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
             Ghost(start_x=self.maze.w - 1, start_y=0, ghost_type="PINKY"),
             Ghost(start_x=0, start_y=self.maze.h - 1, ghost_type="INKY"),
-            Ghost(start_x=self.maze.w - 1, start_y=self.maze.h - 1,
-                  ghost_type="CLYDE"),
+            Ghost(
+                start_x=self.maze.w - 1,
+                start_y=self.maze.h - 1,
+                ghost_type="CLYDE",
+            ),
         ]
         self.input_manager = InputManager()
+        self.nb_of_death = 0
 
         # Tick timer management
         self.tick_timer: float = 0.0
@@ -67,6 +77,10 @@ class GameEngine:
         if self.tick_timer >= self.tick_threshold:
             self._tick()
             self.tick_timer -= self.tick_threshold
+        self.pacman_vs_ghost()
+        if self.player.lives == 0:
+            print("game over man")
+        self.level_end()
 
     def _tick(self) -> None:
         """
@@ -148,3 +162,22 @@ class GameEngine:
         elif cell.super_pacgum:
             self.player.score += 50
             cell.super_pacgum = False
+
+    def pacman_vs_ghost(self):
+        p_x, p_y = self.player.x, self.player.y
+        for ghost in self.ghosts:
+            g_x, g_y = ghost.x, ghost.y
+            if p_x == g_x and p_y == g_y:
+                # if flagsuperpacgum
+                self.player.lives -= 1
+                self.nb_of_death += 1
+                print(f"you died {self.nb_of_death} time")
+
+    def level_end(self):
+        count = 0
+        for colum in self.maze.grid:
+            for cell in colum:
+                if cell.pacgum is True:
+                    count += 1
+        if count == 0:
+            print("you win")
