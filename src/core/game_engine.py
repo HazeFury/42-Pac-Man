@@ -7,6 +7,7 @@ from core.maze import Maze
 from core.player import Player
 from utils.input_manager import InputManager
 from utils.parsing import Setup
+from collections import deque
 
 
 class GameEngine:
@@ -80,6 +81,7 @@ class GameEngine:
         self.pacman_vs_ghost()
         if self.player.lives == 0:
             print("game over man")
+
         self.level_end()
 
     def _tick(self) -> None:
@@ -96,6 +98,8 @@ class GameEngine:
             self.player.current_tick_wait -= 1
 
         # --- Handle Ghosts ---
+        self.ghost_ai()
+
         # for ghost in self.ghosts:
         #     if ghost.current_tick_wait <= 0:
         #         self._resolve_ghost_movement(ghost)
@@ -181,3 +185,31 @@ class GameEngine:
                     count += 1
         if count == 0:
             print("you win")
+
+    def ghost_ai(self):
+        moves = [(0, -1, 'N'), (1, 0, 'E'),
+                 (0, 1, 'S'), (-1, 0, 'W')]
+        maze = self.maze
+        for ghost in self.ghosts:
+            start = (ghost.x, ghost.y)
+            end = (self.player.x, self.player.y)
+            queue = deque([start])
+            visited: dict[tuple[int, int],
+                          tuple[int, int] | None] = {start: None}
+            while queue:
+                x, y = queue.popleft()
+                for dx, dy, direction in moves:
+                    nx = x + dx
+                    ny = y + dy
+                    if (0 <= nx < maze.w and 0 <= ny < maze.h
+                        and not (maze.grid[y][x].wall[direction])
+                            and (nx, ny) not in visited):
+                        visited[(nx, ny)] = (x, y)
+                        if (nx, ny) == end:
+                            break
+                        queue.append((nx, ny))
+            if end in visited:
+                curr = end
+                while visited[curr] != start:
+                    curr = visited[curr]
+                ghost.x, ghost.y = curr

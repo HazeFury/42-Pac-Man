@@ -115,6 +115,10 @@ class GameView(BaseView):
         px = self.pacman.x * 32 + x_offset + 9
         py = self.pacman.y * 32 + y_offset + 8
         self.pacman_sprite.update_position(px, py)
+        for ghost, sprite in self.ghost_sprite:
+            pos_y = ghost.y * 32 + y_offset + 8
+            pos_x = ghost.x * 32 + x_offset + 9
+            sprite.update_position(pos_x, pos_y)
 
         # Update the UI score
         self.score_button.text = str(self.pacman.score)
