@@ -9,6 +9,7 @@ from pydantic import (
 )
 from typing import Any, cast
 import sys
+import json
 
 ERROR_MESSAGE = {
     "level": "[Error] level value wrong",
@@ -71,63 +72,32 @@ class Setup(BaseModel):
             print(ERROR_MESSAGE[field_name])
             return cast(int, cls.model_fields[field_name].default)
 
+    @classmethod
+    def from_json_file(cls) -> "Setup":
 
-class JsonCleaning:
-    """
-    Handles reading, comment removal, and validation of JSON configuration files.
-    """
-
-    def __init__(self, filename: str) -> None:
-        """
-        Initializes the parser and processes the configuration file.
-        """
-        self.path = Path(filename)
-        self.open_file()
-
-    def open_file(self) -> None:
-        """
-        Reads the configuration file, filters comments, validates settings, and writes sanitized output.
-        """
         forbiden_char = ("#", "//", "*/", "/*")
         clean_json = []
-        output = Path("test.json")
-
-        try:
-            with open(self.path, "r", encoding="utf-8") as f:
-                lines = f.read().split("\n")
-                print("read ok")
-                for line in lines:
-                    if line.strip().startswith(forbiden_char):
-                        continue
-                    else:
-                        clean_json.append(line)
-            print("clean ok")
+        if len(sys.argv) > 1:
+            path = Path(sys.argv[1])
             try:
-                conf = "".join(clean_json)
-                final_json = eval(conf)
-                data = Setup(**final_json)
-            except Exception:
-                print("invalide json format using defaults value")
-                data = Setup()
+                with open(path, "r", encoding="utf-8") as f:
+                    lines = f.read().split("\n")
+                    for line in lines:
+                        if line.strip().startswith(forbiden_char):
+                            continue
+                        clean_json.append(line)
 
-            output.write_text(
-                data.model_dump_json(
-                    indent=2), encoding="UTF-8")
-        except FileNotFoundError as e:
-            print(f"File {self.path} not found {e}")
-            data = Setup()
-            output.write_text(
-                data.model_dump_json(
-                    indent=2), encoding="UTF-8")
+                try:
+                    conf = "".join(clean_json)
+                    final_json = json.loads(conf)
+                    data = cls(**final_json)
+                except Exception:
+                    print("invalid json format using defaults value")
+                    data = cls()
 
-
-def main() -> None:
-    """
-    Entry point to parse and validate the default configuration file.
-    """
-    JsonCleaning("config.json")
-    print("ok")
-
-
-if __name__ == "__main__":
-    main()
+            except FileNotFoundError as e:
+                print(f"File {path} not found {e}")
+                data = cls()
+        else:
+            data = cls()
+        return data

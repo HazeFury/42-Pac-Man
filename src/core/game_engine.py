@@ -1,8 +1,12 @@
+import sys
+
+import pygame
+
 from core.ghost import Ghost
-from utils.input_manager import InputManager
 from core.maze import Maze
 from core.player import Player
-import pygame
+from utils.input_manager import InputManager
+from utils.parsing import Setup
 
 
 class GameEngine:
@@ -12,18 +16,35 @@ class GameEngine:
     """
 
     def __init__(self, level_seed: int = 42) -> None:
+        if len(sys.argv) > 1:
+            config = Setup.from_json_file()
+        else:
+            config: Setup = Setup()
         self.clock = pygame.time.Clock()
-        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1)
+        self.maze = Maze(
+            seed=config.seed,
+            w=config.width,
+            h=config.height,
+            pacgum=config.pacgum,
+        )
 
         self.player = Player(
-            start_x=self.maze.w // 2,
-            start_y=self.maze.h // 2)
+            start_x=(
+                (self.maze.w // 2)
+                if (self.maze.w % 2) != 0
+                else ((self.maze.w // 2) - 1)
+            ),
+            start_y=self.maze.h // 2,
+        )
         self.ghosts: list[Ghost] = [
             Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
             Ghost(start_x=self.maze.w - 1, start_y=0, ghost_type="PINKY"),
             Ghost(start_x=0, start_y=self.maze.h - 1, ghost_type="INKY"),
-            Ghost(start_x=self.maze.w - 1, start_y=self.maze.h - 1,
-                  ghost_type="CLYDE"),
+            Ghost(
+                start_x=self.maze.w - 1,
+                start_y=self.maze.h - 1,
+                ghost_type="CLYDE",
+            ),
         ]
         self.input_manager = InputManager()
         self.nb_of_death = 0
