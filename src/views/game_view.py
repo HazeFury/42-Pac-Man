@@ -1,11 +1,11 @@
 import pygame
 
 from core.game_engine import GameEngine
+from core.ghost import Ghost
 from ui.button import Button
 from ui.sprite import Sprite
 from utils import game_config
 from views.base_view import BaseView
-from core.ghost import Ghost
 
 
 class GameView(BaseView):
@@ -44,6 +44,16 @@ class GameView(BaseView):
             color="RED",
             size="small",
         )
+
+        self.test = Button(
+            pos_y="bottom",
+            pos_x="right",
+            text="WIN",
+            func=self.go_to_win_screen,
+            color="GREEN",
+            size="small",
+        )
+
         self.score_button = Button(
             pos_y="top",
             pos_x="right",
@@ -73,7 +83,7 @@ class GameView(BaseView):
             "BLINKY": "assets/ghosts/blinky.png",
             "PINKY": "assets/ghosts/pinky.png",
             "INKY": "assets/ghosts/inky.png",
-            "CLYDE": "assets/ghosts/clyde.png"
+            "CLYDE": "assets/ghosts/clyde.png",
         }
         self.ghost_sprite: list[tuple[Ghost, Sprite]] = []
         for ghost in self.game_engine.ghosts:
@@ -81,12 +91,17 @@ class GameView(BaseView):
                 pos_y=ghost.y * 32 + y_offset + 9,
                 pos_x=ghost.x * 32 + x_offset + 8,
                 image_paths=[ghost_assets[ghost.ghost_type]],
-                animation_speed=0.1)
+                animation_speed=0.1,
+            )
             self.ghost_sprite.append((ghost, sprite))
 
     def go_back(self) -> None:
         """Callback to return to the menu."""
         self.next_view = "MENU"
+
+    def go_to_win_screen(self) -> None:
+        """Callback to go to win screen."""
+        self.next_view = "WIN"
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         """
@@ -95,6 +110,7 @@ class GameView(BaseView):
         """
         for event in events:
             self.back_button.handle_event(event)
+            self.test.handle_event(event)
 
     def update(self, dt: float = 0.024) -> None:
         """
@@ -174,6 +190,7 @@ class GameView(BaseView):
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
+        self.test.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
         for _, sprint in self.ghost_sprite:
