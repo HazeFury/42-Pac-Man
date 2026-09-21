@@ -3,6 +3,8 @@ from utils.input_manager import InputManager
 from core.maze import Maze
 from core.player import Player
 import pygame
+import sys
+from utils.parsing import Setup
 
 
 class GameEngine:
@@ -12,8 +14,16 @@ class GameEngine:
     """
 
     def __init__(self, level_seed: int = 42) -> None:
+        if len(sys.argv) > 1:
+            config = Setup.from_json_file()
+        else:
+            config: Setup = Setup()
         self.clock = pygame.time.Clock()
-        self.maze = Maze(seed=level_seed, w=21, h=21, pacgum=1000)
+        self.maze = Maze(
+            seed=config.seed,
+            w=config.width,
+            h=config.height,
+            pacgum=config.pacgum)
 
         self.player = Player(
             start_x=self.maze.w // 2,
