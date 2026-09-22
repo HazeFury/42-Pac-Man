@@ -61,7 +61,7 @@ class Ghost:
         pass
 
     def ghost_ai(self, map: Maze, x: int, y: int,
-                 blinky: Ghost, direction: str) -> None:
+                 blinky: "Ghost", direction: str) -> None:
         moves = [(0, -1, "N"), (1, 0, "E"), (0, 1, "S"), (-1, 0, "W")]
         maze = map
         target_x, target_y = x, y
@@ -108,26 +108,26 @@ class Ghost:
                 target_x = 0
                 target_y = maze.h - 1
 
-            end = (target_x, target_y)
-            queue = deque([start])
-            visited: dict[tuple[int, int], tuple[int, int]] = {start: start}
-            while queue:
-                x, y = queue.popleft()
-                for dx, dy, direction in moves:
-                    nx = x + dx
-                    ny = y + dy
-                    if (
-                        0 <= nx < maze.w
-                        and 0 <= ny < maze.h
-                        and not (maze.grid[y][x].wall[direction])
-                        and (nx, ny) not in visited
-                    ):
-                        visited[(nx, ny)] = (x, y)
-                        if (nx, ny) == end:
-                            break
-                        queue.append((nx, ny))
-            if end in visited:
-                curr: tuple[int, int] = end
-                while visited[curr] != start:
-                    curr = visited[curr]
-                self.x, self.y = curr
+        end = (target_x, target_y)
+        queue = deque([start])
+        visited: dict[tuple[int, int], tuple[int, int]] = {start: start}
+        while queue:
+            cx, cy = queue.popleft()
+            for dx, dy, direction in moves:
+                nx = cx + dx
+                ny = cy + dy
+                if (
+                    0 <= nx < maze.w
+                    and 0 <= ny < maze.h
+                    and not (maze.grid[cy][cx].wall[direction])
+                    and (nx, ny) not in visited
+                ):
+                    visited[(nx, ny)] = (cx, cy)
+                    if (nx, ny) == end:
+                        break
+                    queue.append((nx, ny))
+        if end in visited:
+            curr: tuple[int, int] = end
+            while visited[curr] != start:
+                curr = visited[curr]
+            self.x, self.y = curr

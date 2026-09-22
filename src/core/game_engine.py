@@ -79,10 +79,6 @@ class GameEngine:
 
         if self.player.update(dt):
             self._resolve_player_movement()
-
-        self.pacman_vs_ghost()
-        if self.player.lives == 0:
-            print("game over man")
         for ghost in self.ghosts:
             if ghost.update_position(dt):
                 ghost.ghost_ai(
@@ -92,6 +88,11 @@ class GameEngine:
                     self.ghosts[0],
                     self.player.next_dir
                 )
+
+        self.pacman_vs_ghost()
+        self._consume_items()
+        if self.player.lives == 0:
+            print("game over man")
         self.level_end()
 
     def _resolve_player_movement(self) -> None:
@@ -155,21 +156,3 @@ class GameEngine:
                     count += 1
         if count == 0:
             print("you win")
-
-    def read_highscore(self) -> Highscore:
-        score_path = Path(self.config.highscore_filename)
-        if not score_path.exists():
-            return Highscore()
-        try:
-            content = score_path.read_text(encoding="utf-8")
-            return Highscore.model_validate_json(content)
-        except (ValidationError, ValueError):
-            return Highscore()
-
-    def write_highscore(self, name: str, score: int) -> None:
-        score_path = Path(self.config.highscore_filename)
-        highscore = self.read_highscore()
-        new_score = Player_score(name=name, score=score)
-        highscore = Highscore(scores=[new_score])
-        json_data = highscore.model_dump_json(indent=2)
-        score_path.write_text(json_data, encoding="utf-8")
