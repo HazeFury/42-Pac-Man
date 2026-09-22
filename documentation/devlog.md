@@ -40,3 +40,10 @@
 - remplacement des valeurs en dure par celles du fichier de config (gchmilew)
 - ajout du EndGameView pour la fin de la partie (marberge)
 - ajout du HighScoreView pour afficher le top 10 des scores (marberge)
+
+
+### Day 6
+
+- refacto du GameEngine (réattribution d'une partie du code dans les classes concernés (Ghost, Player, HighScore)) (gchmilew)
+- merge du la GameOverView et la WinView en un seul fichier : EndGameView (marberge)
+- ajout du score du joueur au fichier des scores. (marberge)
