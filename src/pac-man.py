@@ -41,7 +41,6 @@ def main() -> None:
         # 4. Main Loop
         running = True
         while running:
-            print(current_state)
             # --- A. Retrieve all events once ---
             # We fetch events here and pass the list to the view.
             # This prevents bugs where multiple views consume events
