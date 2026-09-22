@@ -3,7 +3,7 @@ import sys
 import pygame
 
 from utils import game_config
-from views.end_game_view import WinView
+from views.end_game_view import EndGameView
 from views.game_view import GameView
 from views.highscore_view import HighScoreView
 from views.menu_view import MenuView
@@ -30,7 +30,8 @@ def main() -> None:
         views = {
             "MENU": MenuView(screen),
             "GAME": GameView(screen),
-            "WIN": WinView(screen),
+            "WIN": EndGameView(screen, is_victory=True),
+            "GAMEOVER": EndGameView(screen, is_victory=False),
             "SCORE": HighScoreView(screen),
         }
 

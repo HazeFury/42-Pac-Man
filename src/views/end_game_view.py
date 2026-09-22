@@ -7,34 +7,48 @@ from utils import game_config
 from views.base_view import BaseView
 
 
-class WinView(BaseView):
+class EndGameView(BaseView):
     """
     The main menu view displaying the title and a start button.
     """
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(self, screen: pygame.Surface, is_victory: bool) -> None:
         super().__init__(screen)
 
-        self.menu_box = Box(pos_y="center", pos_x="center", spacing=30)
+        self.menu_box = Box(pos_y="center", pos_x="center", spacing=60)
 
-        self.win_text = Text(
-            pos_y="0",
-            pos_x="0",
-            text="Congrats !! You win :)",
-            color="GREEN",
-        )
-        self.quit_btn = Button(
-            pos_y="0",
-            pos_x="0",
-            text="Go back to menu",
-            func=self.return_to_menu,
-            color="RED",
+        end_msg = "VICTORY" if is_victory is True else "GAME OVER"
+
+        self.menu_box.add_child(
+            Text(
+                pos_y="0",
+                pos_x="0",
+                text=f"{end_msg}",
+                color=f"{'GREEN' if is_victory is True else 'RED'}",
+                font_size=96,
+            )
         )
 
-        # We add them to the box. The pos_y and pos_x of the elements are
-        # ignored and overwritten by the Box layout logic!
-        self.menu_box.add_child(self.win_text)
-        self.menu_box.add_child(self.quit_btn)
+        if is_victory is True:
+            self.menu_box.add_child(
+                Text(
+                    pos_y="0",
+                    pos_x="0",
+                    text="Congrats !! You win this level :)",
+                    color="WHITE",
+                    font_size=48,
+                )
+            )
+
+        self.menu_box.add_child(
+            Button(
+                pos_y="0",
+                pos_x="0",
+                text="Go back to menu",
+                func=self.return_to_menu,
+                color="RED",
+            )
+        )
 
     def return_to_menu(self) -> None:
         """Callback function assigned to the play button."""
