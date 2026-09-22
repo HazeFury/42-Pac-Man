@@ -15,7 +15,7 @@ class GameEngine:
     Manages the grid, entities, score, collisions, and the tick-based timeline.
     """
 
-    def __init__(self, level_seed: int = 42) -> None:
+    def __init__(self) -> None:
         if len(sys.argv) > 1:
             self.config = config.from_json_file()
         else:

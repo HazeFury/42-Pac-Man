@@ -1,13 +1,20 @@
 {
 	"highscore_filename": "highscore.json",
-	"level": 10,
-	"width": 20,
-	"height": 20,
 	"lives": 3,
-	"pacgum": 420,
 	"points_per_pacgum": 10,
 	"points_per_super_pacgum": 50,
 	"points_per_ghost": 200,
-	"seed": 42,
-	"level_max_time": 90
+	"level_max_time": 90,
+	"levels": {
+		"1": {"width": 20, "height": 20,"pacgum": 10,"seed": 42},
+		"2": {"width": 20, "height": 20,"pacgum": 20,"seed": 43},
+		"3": {"width": 20, "height": 20,"pacgum": 30,"seed": 44},
+		"4": {"width": 20, "height": 20,"pacgum": 40,"seed": 45},
+		"5": {"width": 20, "height": 20,"pacgum": 50,"seed": 46},
+		"6": {"width": 20, "height": 20,"pacgum": 60,"seed": 47},
+		"7": {"width": 20, "height": 20,"pacgum": 70,"seed": 48},
+		"8": {"width": 20, "height": 20,"pacgum": 80,"seed": 49},
+		"9": {"width": 20, "height": 20,"pacgum": 90,"seed": 50},
+		"10": {"width": 20, "height": 20,"pacgum": 100,"seed": 60}
+	}
 }
