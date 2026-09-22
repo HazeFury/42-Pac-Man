@@ -120,8 +120,18 @@ class Setup(BaseModel):
 
 
 class Player_score(BaseModel):
-    name: str = Field(max_length=10, default="AAA")
-    score: int = Field(ge=0, le=9999, default=0)
+    name: str = Field(max_length=10)
+    score: int = Field(ge=0, le=9999, default=123)
+
+    @field_validator("name", "score", mode="wrap")
+    @classmethod
+    def score_checker(cls, value: Any, handler: Any, info: ValidationInfo):
+        try:
+            return handler(value)
+        except Exception:
+            if info.field_name:
+                return cls.model_fields[info.field_name].default
+            return value
 
 
 class Highscore(BaseModel):
