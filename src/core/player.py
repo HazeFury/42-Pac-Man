@@ -17,11 +17,19 @@ class Player:
         self.next_dir: str = "NONE"
 
         # Speed expressed in engine ticks required to move
-        self.ticks_per_move: int = 1
-        self.current_tick_wait: int = 0
+        self.move_delay: float = 0.1
+        self.timer: float = 0
 
         self.lives: int = 3
         self.score: int = 0
+
+    def update(self, dt: float) -> bool:
+        self.timer += dt
+        if self.timer >= self.move_delay:
+            self.timer -= self.move_delay
+            return True
+        else:
+            return False
 
     def queue_direction(self, direction: str) -> None:
         """
@@ -33,3 +41,16 @@ class Player:
     def enable_cheat_speed(self) -> None:
         """Cheat mode: Pac-Man moves every single engine tick!"""
         self.ticks_per_move = 1
+
+    def next_move(self, direction: str) -> None:
+        if direction == "UP":
+            self.y -= 1
+        elif direction == "DOWN":
+            self.y += 1
+        elif direction == "LEFT":
+            self.x -= 1
+        elif direction == "RIGHT":
+            self.x += 1
+
+    def add_score(self, score: int) -> None:
+        self.score += score
