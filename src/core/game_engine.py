@@ -1,14 +1,12 @@
 import sys
-from pathlib import Path
 
 import pygame
-from pydantic import ValidationError
 
 from core.ghost import Ghost
 from core.maze import Cell, Maze
 from core.player import Player
 from utils.input_manager import InputManager
-from utils.parsing import Highscore, Player_score, Setup
+from utils.parsing import config
 
 
 class GameEngine:
@@ -19,15 +17,15 @@ class GameEngine:
 
     def __init__(self, level_seed: int = 42) -> None:
         if len(sys.argv) > 1:
-            self.config = Setup.from_json_file()
+            self.config = config.from_json_file()
         else:
-            self.config = Setup()
+            self.config = config
         self.clock = pygame.time.Clock()
         self.maze = Maze(
             seed=self.config.seed,
             w=self.config.width,
             h=self.config.height,
-            pacgum=self.config.pacgum
+            pacgum=self.config.pacgum,
         )
         self.player = Player(
             start_x=(
@@ -39,19 +37,13 @@ class GameEngine:
         )
         self.ghosts: list[Ghost] = [
             Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
-            Ghost(
-                start_x=self.maze.w - 1, start_y=0, ghost_type="PINKY"
-            ),
-            Ghost(
-                start_x=0,
-                start_y=self.maze.h - 1,
-                ghost_type="INKY"
-            ),
+            Ghost(start_x=self.maze.w - 1, start_y=0, ghost_type="PINKY"),
+            Ghost(start_x=0, start_y=self.maze.h - 1, ghost_type="INKY"),
             Ghost(
                 start_x=self.maze.w - 1,
                 start_y=self.maze.h - 1,
-                ghost_type="CLYDE"
-            )
+                ghost_type="CLYDE",
+            ),
         ]
         self.input_manager = InputManager()
         self.nb_of_death = 0
@@ -86,7 +78,7 @@ class GameEngine:
                     self.player.x,
                     self.player.y,
                     self.ghosts[0],
-                    self.player.next_dir
+                    self.player.next_dir,
                 )
 
         self.pacman_vs_ghost()
@@ -156,3 +148,6 @@ class GameEngine:
                     count += 1
         if count == 0:
             print("you win")
+
+    def get_player_score(self) -> int:
+        return self.player.score

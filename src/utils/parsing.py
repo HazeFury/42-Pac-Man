@@ -126,3 +126,6 @@ class Player_score(BaseModel):
 
 class Highscore(BaseModel):
     scores: list[Player_score] = Field(default_factory=list)
+
+
+config = Setup()
