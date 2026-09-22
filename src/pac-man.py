@@ -2,6 +2,7 @@ import sys
 
 import pygame
 
+from core.game_engine import GameEngine
 from utils import game_config
 from views.end_game_view import EndGameView
 from views.game_view import GameView
@@ -27,11 +28,13 @@ def main() -> None:
 
         # 3. Instantiate all our views (The Painters)
         # We pass the shared 'screen' to all of them.
+        game_engine = GameEngine()
+
         views = {
             "MENU": MenuView(screen),
-            "GAME": GameView(screen),
-            "WIN": EndGameView(screen, is_victory=True),
-            "GAMEOVER": EndGameView(screen, is_victory=False),
+            "GAME": GameView(screen, game_engine),
+            "WIN": EndGameView(screen, game_engine, is_victory=True),
+            "GAMEOVER": EndGameView(screen, game_engine, is_victory=False),
             "SCORE": HighScoreView(screen),
         }
 

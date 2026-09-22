@@ -1,12 +1,15 @@
+from pathlib import Path
+
 from parsing import Highscore, Player_score
 from pydantic import ValidationError
-from pathlib import Path
-import json
+
+from utils.parsing import config
 
 
 class HighscoreManager:
     def __init__(self, score_file: str) -> None:
-        self.score_path = Path(score_file)
+
+        self.score_path = Path(config.highscore_filename)
 
     def read_highscore(self) -> Highscore:
         if not self.score_path.exists():
