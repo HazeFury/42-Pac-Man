@@ -84,9 +84,9 @@ class Maze:
                     x, y = (random.randrange(self.w), random.randrange(self.h))
                     self.grid[y][x]
                     if (
-                        self.grid[y][x].pacgum is False
-                        and self.grid[y][x].super_pacgum is False
-                    ):
+                            self.grid[y][x].pacgum is False
+                            and self.grid[y][x].super_pacgum is False
+                            and not all(self.grid[y][x].wall.values())):
                         self.grid[y][x].pacgum = True
                         pacgum_assign = True
 
