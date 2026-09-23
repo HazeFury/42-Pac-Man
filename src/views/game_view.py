@@ -90,16 +90,23 @@ class GameView(BaseView):
             "PINKY": "assets/ghosts/pinky.png",
             "INKY": "assets/ghosts/inky.png",
             "CLYDE": "assets/ghosts/clyde.png",
+            "FRIGHTENED": "assets/ghosts/blue_ghost.png",
         }
-        self.ghost_sprite: list[tuple[Ghost, Sprite]] = []
+        self.ghost_sprite: list[tuple[Ghost, Sprite, Sprite]] = []
         for ghost in self.game_engine.ghosts:
-            sprite = Sprite(
-                pos_y=ghost.y * 32 + y_offset + 9,
-                pos_x=ghost.x * 32 + x_offset + 8,
+            normal_sprite = Sprite(
+                pos_y=ghost.y * 32 + y_offset + 8,
+                pos_x=ghost.x * 32 + x_offset + 9,
                 image_paths=[ghost_assets[ghost.ghost_type]],
                 animation_speed=0.1,
             )
-            self.ghost_sprite.append((ghost, sprite))
+            frightened_sprite = Sprite(
+                pos_y=ghost.y * 32 + y_offset + 8,
+                pos_x=ghost.x * 32 + x_offset + 9,
+                image_paths=[ghost_assets["FRIGHTENED"]],
+                animation_speed=0.1,
+            )
+            self.ghost_sprite.append((ghost, normal_sprite, frightened_sprite))
 
     def go_back(self) -> None:
         """Callback to return to the menu."""
@@ -137,10 +144,11 @@ class GameView(BaseView):
         px = self.pacman.x * 32 + x_offset + 9
         py = self.pacman.y * 32 + y_offset + 8
         self.pacman_sprite.update_position(px, py)
-        for ghost, sprite in self.ghost_sprite:
+        for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
             pos_y = ghost.y * 32 + y_offset + 8
             pos_x = ghost.x * 32 + x_offset + 9
-            sprite.update_position(pos_x, pos_y)
+            normal_sprite.update_position(pos_x, pos_y)
+            frightened_sprite.update_position(pos_x, pos_y)
 
         # Update the UI score
         self.score_button.update_text(str(self.pacman.score))
@@ -206,7 +214,10 @@ class GameView(BaseView):
         self.back_btn.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
-        for ghost, sprint in self.ghost_sprite:
+        for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
             if ghost.state != "DEAD":
-                sprint.draw(self.screen)
+                if ghost.state == "FRIGHTENED":
+                    frightened_sprite.draw(self.screen)
+                else:
+                    normal_sprite.draw(self.screen)
         self.score_button.draw(self.screen)
