@@ -16,8 +16,8 @@ class GameEngine:
     def __init__(self) -> None:
 
         self.clock = pygame.time.Clock()
-        self.level = 1
-        self.lvl_cfg = config.get_level(self.level)
+        self.curr_level = 1
+        self.lvl_cfg = config.get_level(self.curr_level)
         self.maze = Maze(
             seed=self.lvl_cfg.seed,
             w=self.lvl_cfg.width,
@@ -48,7 +48,7 @@ class GameEngine:
         self.super_pacgum = False
         self.super_pacgum_time = 0
         self.pause_timer: float = 1.0
-        self.game_countdown = config.level_max_time
+        self.countdown = config.level_max_time
 
     def handle_input(self) -> None:
         """
@@ -185,7 +185,7 @@ class GameEngine:
                     ghost.state = "CHASE"
 
     def next_level(self):
-        self.level += 1
+        self.curr_level += 1
         self.maze = Maze(
             seed=self.lvl_cfg.seed,
             w=self.lvl_cfg.width,

@@ -53,21 +53,38 @@ class GameView(BaseView):
             size="small",
         )
 
-        self.back_btn = Button(
-            pos_y="bottom",
-            pos_x="right",
-            text="WIN",
-            func=self.go_to_win_screen,
-            color="GREEN",
-            size="small",
+        self.level_txt = Text(
+            pos_y="top",
+            pos_x="center",
+            text=f"LEVEL : {str(self.game_engine.curr_level)}",
+            color="WHITE",
         )
 
-        self.score_button = Text(
-            pos_y="top",
-            pos_x="right",
-            text=str(self.pacman.score),
-            color="RED",
+        self.life_txt = Text(
+            pos_y="0",
+            pos_x="0",
+            text=f"LIFE : {str(self.game_engine.player.lives)}",
+            color="WHITE",
         )
+
+        self.time_txt = Text(
+            pos_y="0",
+            pos_x="0",
+            text=f"TIME : {str(self.game_engine.countdown)}",
+            color=f"{'RED' if self.game_engine.countdown < 10 else 'WHITE'}",
+        )
+
+        self.score_txt = Text(
+            pos_y="0",
+            pos_x="0",
+            text=f"SCORE : {str(self.pacman.score)}",
+            color="GREEN",
+        )
+
+        self.data_box.add_child(self.life_txt)
+        self.data_box.add_child(self.time_txt)
+        self.data_box.add_child(self.score_txt)
+
         x_offset, y_offset = self.maze_centering()
 
         self.player_x: int = self.pacman.x * 32 + x_offset + 9
@@ -123,7 +140,6 @@ class GameView(BaseView):
         """
         for event in events:
             self.back_button.handle_event(event)
-            self.back_btn.handle_event(event)
 
     def update(self, dt: float = 0.024) -> None:
         """
@@ -151,7 +167,11 @@ class GameView(BaseView):
             frightened_sprite.update_position(pos_x, pos_y)
 
         # Update the UI score
-        self.score_button.update_text(str(self.pacman.score))
+        self.score_txt.update_text(f"SCORE : {str(self.pacman.score)}")
+        self.life_txt.update_text(
+            f"LIFE : {str(self.game_engine.player.lives)}"
+        )
+        self.data_box.update_layout()
 
         if self.game_engine.player.lives == 0:
             self.next_view = "GAMEOVER"
@@ -211,7 +231,8 @@ class GameView(BaseView):
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
-        self.back_btn.draw(self.screen)
+        self.data_box.draw(self.screen)
+        self.level_txt.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
         for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
@@ -220,4 +241,3 @@ class GameView(BaseView):
                     frightened_sprite.draw(self.screen)
                 else:
                     normal_sprite.draw(self.screen)
-        self.score_button.draw(self.screen)
