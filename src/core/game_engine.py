@@ -46,10 +46,11 @@ class GameEngine:
             ),
         ]
         self.input_manager = InputManager()
-        self.nb_of_death = 0
+        self.death = False
         self.is_game_over: bool = False
         self.super_pacgum = False
         self.super_pacgum_time = 0
+        self.pause_timer: float = 1.0
 
     def handle_input(self) -> None:
         """
@@ -65,6 +66,9 @@ class GameEngine:
         """
         raw_dt = self.clock.tick() / 1000.0
         dt = min(raw_dt, 0.1)
+        if self.pause_timer > 0:
+            self.pause_timer -= dt
+            return
 
         if self.player.update(dt):
             self._resolve_player_movement()
@@ -130,20 +134,22 @@ class GameEngine:
             self.player.add_score(self.config.points_per_super_pacgum)
             cell.super_pacgum = False
             self.super_pacgum = True
+            for ghost in self.ghosts:
+                if ghost.state != "DEAD":
+                    ghost.state = "FRIGHTENED"
 
     def pacman_vs_ghost(self) -> None:
         p_x, p_y = self.player.x, self.player.y
         for ghost in self.ghosts:
             g_x, g_y = ghost.x, ghost.y
             if p_x == g_x and p_y == g_y:
-                if self.super_pacgum is False:
+                if ghost.state == "FRIGHTENED":
+                    self.player.add_score(self.config.points_per_ghost)
+                    ghost.state = "DEAD"
+                elif ghost.state == "CHASE":
                     self.player.lives -= 1
                     self.reset_position()
-                else:
-                    self.player.add_score(self.config.points_per_ghost)
-                    ghost.visible = False
-
-                # print(f"you died {self.nb_of_death} time")
+                    self.pause_timer = 1.0
 
     def level_end(self) -> None:
         count = 0
@@ -174,3 +180,6 @@ class GameEngine:
         else:
             self.super_pacgum = False
             self.super_pacgum_time = 0
+            for ghost in self.ghosts:
+                if ghost.state == "FRIGHTENED":
+                    ghost.state = "CHASE"

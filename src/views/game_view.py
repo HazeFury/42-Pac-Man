@@ -198,6 +198,6 @@ class GameView(BaseView):
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
         for ghost, sprint in self.ghost_sprite:
-            if ghost.visible:
+            if ghost.state != "DEAD":
                 sprint.draw(self.screen)
         self.score_button.draw(self.screen)

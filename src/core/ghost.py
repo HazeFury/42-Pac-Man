@@ -30,14 +30,13 @@ class Ghost:
         # States could be: "CHASE", "SCATTER", "FRIGHTENED", "DEAD"
         self.state: str = "CHASE"
         self.direction: str = "STOP"
-        self.visible = True
 
     def update_position(self, dt: float) -> bool:
         """
         Teleports the ghost to the new grid coordinates.
         """
         self.respawn(dt)
-        if self.visible:
+        if self.state != "DEAD":
             self.timer += dt
             if self.timer >= self.move_delay:
                 self.timer -= self.move_delay
@@ -46,17 +45,14 @@ class Ghost:
                 return False
         return False
 
-    def respawn(self, dt) -> bool:
-        if self.visible is False:
+    def respawn(self, dt: float) -> bool:
+        if self.state == "DEAD":
             self.respawn_timer += dt
-            if self.respawn_cooldown < self.respawn_timer:
-                self.visible = True
+            if self.respawn_timer >= self.respawn_cooldown:
+                self.state = "CHASE"
                 self.respawn_timer = 0
                 self.reset_position()
-
                 return True
-            else:
-                self.respawn_timer += dt
         return False
 
     def change_state(self, new_state: str) -> None:
