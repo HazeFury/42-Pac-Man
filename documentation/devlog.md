@@ -47,3 +47,14 @@
 - refacto du GameEngine (réattribution d'une partie du code dans les classes concernés (Ghost, Player, HighScore)) (gchmilew)
 - merge du la GameOverView et la WinView en un seul fichier : EndGameView (marberge)
 - ajout du score du joueur au fichier des scores. (marberge)
+
+
+### DAY 7
+
+- affichage du score en fin de partie (marberge)
+- affichage du top 10 score en lisant le fichier " highscore.json" (marberge)
+- mise à jour du fichier de config pour avoir des niveaux (marberge, gchmilew)
+- mise à jour du parser pour s'adapter à la config (gchmilew)
+- ghost mangable lorsqu'on mange un super pacgum / réapparition des ghosts après le cooldown (gchmilew)
+- reset des positions de tout les movable lorsqu'on perd une vie (gchmilew)
+- algo des fuite des ghosts (gchmilew)
