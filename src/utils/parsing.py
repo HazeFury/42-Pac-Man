@@ -1,4 +1,5 @@
 import json
+import random
 import sys
 from pathlib import Path
 from typing import Any, cast
@@ -26,22 +27,52 @@ ERROR_MESSAGE = {
 }
 
 
+class LevelConfig(BaseModel):
+    width: int = Field(default_factory=lambda: random.randint(10, 35), ge=10)
+    height: int = Field(default_factory=lambda: random.randint(10, 35), ge=10)
+    pacgum: int = Field(default_factory=lambda: random.randint(1, 1), ge=0)
+    seed: int = Field(default_factory=lambda: random.randint(0, 1000), ge=0)
+
+    @field_validator("width", "height", "pacgum", "seed", mode="wrap")
+    @classmethod
+    def validate_level_field(
+        cls,
+        value: Any,
+        handler: ValidatorFunctionWrapHandler,
+        info: ValidationInfo,
+    ) -> int:
+        field_name = info.field_name or ""
+        try:
+            return cast(int, handler(value))
+        except ValidationError:
+            if field_name in ERROR_MESSAGE:
+                print(ERROR_MESSAGE[field_name])
+            field = cls.model_fields[field_name]
+            return cast(int, field.get_default(call_default_factory=True))
+
+
+def default_levels() -> dict[str, LevelConfig]:
+    return {str(i): LevelConfig() for i in range(1, 11)}
+
+
 class Setup(BaseModel):
     """
     Configuration schema and validation for game settings.
     """
 
     highscore_filename: str = Field(default="highscore.json")
-    level: int = Field(default=10, ge=10)
-    width: int = Field(default=30, ge=10)
-    height: int = Field(default=30, ge=10)
     lives: int = Field(default=3, ge=1)
-    pacgum: int = Field(default=4200, ge=10)
     points_per_pacgum: int = Field(default=10, ge=10)
     points_per_super_pacgum: int = Field(default=50, ge=10)
     points_per_ghost: int = Field(default=200, ge=10)
-    seed: int = Field(default=42, ge=0)
     level_max_time: int = Field(default=90, ge=10)
+    levels: dict[str, LevelConfig] = Field(default_factory=default_levels)
+
+    def get_level(self, level: int = 1) -> LevelConfig:
+        """
+        Returns the configuration for a specific level, falling back to default.
+        """
+        return self.levels.get(str(level), LevelConfig())
 
     @field_validator("highscore_filename", mode="before")
     @classmethod
@@ -58,15 +89,10 @@ class Setup(BaseModel):
         return value
 
     @field_validator(
-        "level",
-        "width",
-        "height",
         "lives",
-        "pacgum",
         "points_per_pacgum",
         "points_per_super_pacgum",
         "points_per_ghost",
-        "seed",
         "level_max_time",
         mode="wrap",
     )
@@ -138,4 +164,4 @@ class Highscore(BaseModel):
     scores: list[Player_score] = Field(default_factory=list)
 
 
-config = Setup()
+config = Setup.from_json_file()

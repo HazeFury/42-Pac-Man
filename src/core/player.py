@@ -20,6 +20,10 @@ class Player:
         self.move_delay: float = 0.1
         self.timer: float = 0
 
+        self.death = False
+        self.death_timer = 0
+        self.death_pause = 1
+
         self.lives: int = 3
         self.score: int = 0
 
@@ -54,3 +58,14 @@ class Player:
 
     def add_score(self, score: int) -> None:
         self.score += score
+
+    def respawn(self, dt) -> bool:
+        if self.visible is False:
+            self.respawn_timer += dt
+            if self.death_pause < self.death_timer:
+                self.respawn_timer = 0
+
+                return True
+            else:
+                self.respawn_timer += dt
+        return False

@@ -4,12 +4,16 @@ from collections import deque
 
 class Ghost:
     """
-    Represents an AI ghost enemy in the grid.
-    Tracks its position, its type (behavior), and its current state.
+    Represents a ghost enemy in the maze.
+
+    Tracks its position, spawn point, type, and current state.
     """
 
     def __init__(self, start_x: int, start_y: int,
                  ghost_type: str) -> None:
+        """
+        Initialize the ghost with its spawn position and type.
+        """
         # Grid coordinates
         self.x: int = start_x
         self.y: int = start_y
@@ -24,6 +28,8 @@ class Ghost:
         # Speed expressed in engine ticks required to move
         self.move_delay: float = 0.3
         self.timer: float = 0
+        self.respawn_timer = 0
+        self.respawn_cooldown = 2
 
         # States could be: "CHASE", "SCATTER", "FRIGHTENED", "DEAD"
         self.state: str = "CHASE"
@@ -31,37 +37,60 @@ class Ghost:
 
     def update_position(self, dt: float) -> bool:
         """
-        Teleports the ghost to the new grid coordinates.
+        Update the movement and respawn timers.
+
+        Returns True if the ghost is ready to move, False otherwise.
         """
-        self.timer += dt
-        if self.timer >= self.move_delay:
-            self.timer -= self.move_delay
-            return True
-        else:
-            return False
+        self.respawn(dt)
+        if self.state != "DEAD":
+            self.timer += dt
+            if self.timer >= self.move_delay:
+                self.timer -= self.move_delay
+                return True
+            else:
+                return False
+        return False
+
+    def respawn(self, dt: float) -> bool:
+        """
+        Handle the respawn timer when the ghost is dead.
+
+        Returns True when the ghost respawns, False otherwise.
+        """
+        if self.state == "DEAD":
+            self.respawn_timer += dt
+            if self.respawn_timer >= self.respawn_cooldown:
+                self.state = "CHASE"
+                self.respawn_timer = 0
+                self.reset_position()
+                return True
+        return False
 
     def change_state(self, new_state: str) -> None:
         """
-        Updates the ghost's behavior state (e.g., becomes edible).
+        Change the current state of the ghost (e.g. CHASE, DEAD).
         """
         pass
 
     def reset_position(self) -> None:
         """
-        Teleports the ghost back to its spawn corner.
+        Reset the ghost back to its initial spawn position.
         """
-        pass
+        self.x, self.y = self.spawn_x, self.spawn_y
 
     def calculate_next_move(self, target_x: int, target_y: int) -> None:
         """
-        AI Logic: Based on its current state and the target coordinates,
-        determines which adjacent cell to move to next.
-        Returns a tuple (next_x, next_y).
+        Calculate the next position towards the target coordinates.
         """
         pass
 
     def ghost_ai(self, map: Maze, x: int, y: int,
                  blinky: "Ghost", direction: str) -> None:
+        """
+        Find and move to the next cell using BFS pathfinding.
+
+        Computes a target based on the ghost type and player position.
+        """
         moves = [(0, -1, "N"), (1, 0, "E"), (0, 1, "S"), (-1, 0, "W")]
         maze = map
         target_x, target_y = x, y

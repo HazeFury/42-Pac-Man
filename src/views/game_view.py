@@ -141,6 +141,9 @@ class GameView(BaseView):
         # Update the UI score
         self.score_button.text = str(self.pacman.score)
 
+        if self.game_engine.player.lives == 0:
+            self.next_view = "GAMEOVER"
+
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """
         Iterates through the maze grid and draws walls and items.
@@ -199,6 +202,7 @@ class GameView(BaseView):
         self.test.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
-        for _, sprint in self.ghost_sprite:
-            sprint.draw(self.screen)
+        for ghost, sprint in self.ghost_sprite:
+            if ghost.state != "DEAD":
+                sprint.draw(self.screen)
         self.score_button.draw(self.screen)

@@ -16,16 +16,15 @@ class GameEngine:
     """
 
     def __init__(self) -> None:
-        if len(sys.argv) > 1:
-            self.config = config.from_json_file()
-        else:
-            self.config = config
+
         self.clock = pygame.time.Clock()
+        self.level = 1
+        self.lvl_cfg = config.get_level(self.level)
         self.maze = Maze(
-            seed=self.config.seed,
-            w=self.config.width,
-            h=self.config.height,
-            pacgum=self.config.pacgum,
+            seed=self.lvl_cfg.seed,
+            w=self.lvl_cfg.width,
+            h=self.lvl_cfg.height,
+            pacgum=self.lvl_cfg.pacgum,
         )
         self.player = Player(
             start_x=(
@@ -46,13 +45,11 @@ class GameEngine:
             ),
         ]
         self.input_manager = InputManager()
-        self.nb_of_death = 0
+        self.death = False
         self.is_game_over: bool = False
-
-        # Tick timer management
-        self.tick_timer: float = 0.0
-        # Reduced to 0.25s for a more playable Pac-Man speed
-        self.tick_threshold: float = 0.2
+        self.super_pacgum = False
+        self.super_pacgum_time = 0
+        self.pause_timer: float = 1.0
 
     def handle_input(self) -> None:
         """
@@ -68,6 +65,9 @@ class GameEngine:
         """
         raw_dt = self.clock.tick() / 1000.0
         dt = min(raw_dt, 0.1)
+        if self.pause_timer > 0:
+            self.pause_timer -= dt
+            return
 
         if self.player.update(dt):
             self._resolve_player_movement()
@@ -82,6 +82,9 @@ class GameEngine:
                 )
 
         self.pacman_vs_ghost()
+        if self.super_pacgum:
+            self.super_pacgum_timer(dt)
+
         self._consume_items()
         if self.player.lives == 0:
             print("game over man")
@@ -124,21 +127,28 @@ class GameEngine:
 
         # We assume subject points for pacgums are 10 and 50 respectively
         if cell.pacgum:
-            self.player.add_score(self.config.points_per_pacgum)
+            self.player.add_score(config.points_per_pacgum)
             cell.pacgum = False
         elif cell.super_pacgum:
-            self.player.add_score(self.config.points_per_super_pacgum)
+            self.player.add_score(config.points_per_super_pacgum)
             cell.super_pacgum = False
+            self.super_pacgum = True
+            for ghost in self.ghosts:
+                if ghost.state != "DEAD":
+                    ghost.state = "FRIGHTENED"
 
     def pacman_vs_ghost(self) -> None:
         p_x, p_y = self.player.x, self.player.y
         for ghost in self.ghosts:
             g_x, g_y = ghost.x, ghost.y
             if p_x == g_x and p_y == g_y:
-                # if flagsuperpacgum
-                self.player.lives -= 1
-                self.nb_of_death += 1
-                # print(f"you died {self.nb_of_death} time")
+                if ghost.state == "FRIGHTENED":
+                    self.player.add_score(config.points_per_ghost)
+                    ghost.state = "DEAD"
+                elif ghost.state == "CHASE":
+                    self.player.lives -= 1
+                    self.reset_position()
+                    self.pause_timer = 1.0
 
     def level_end(self) -> None:
         count = 0
@@ -147,7 +157,38 @@ class GameEngine:
                 if cell.pacgum is True:
                     count += 1
         if count == 0:
+            self.next_level()
             print("you win")
 
     def get_player_score(self) -> int:
         return self.player.score
+
+    def reset_position(self) -> None:
+        self.player.x, self.player.y = self.player.spawn_x, self.player.spawn_y
+        for ghost in self.ghosts:
+            ghost.x, ghost.y = ghost.spawn_x, ghost.spawn_y
+        self.death = True
+
+    def reset_entity_position(
+            self, entity: Player | Ghost, to: tuple[int, int]):
+        entity.x, entity.y = to
+
+    def super_pacgum_timer(self, dt: float) -> None:
+        if self.super_pacgum_time < 5:
+            self.super_pacgum = True
+            self.super_pacgum_time += dt
+        else:
+            self.super_pacgum = False
+            self.super_pacgum_time = 0
+            for ghost in self.ghosts:
+                if ghost.state == "FRIGHTENED":
+                    ghost.state = "CHASE"
+
+    def next_level(self):
+        self.level += 1
+        self.maze = Maze(
+            seed=self.lvl_cfg.seed,
+            w=self.lvl_cfg.width,
+            h=self.lvl_cfg.height,
+            pacgum=self.lvl_cfg.pacgum,
+        )
