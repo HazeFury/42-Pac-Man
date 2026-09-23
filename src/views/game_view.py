@@ -197,6 +197,7 @@ class GameView(BaseView):
         self.test.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
-        for _, sprint in self.ghost_sprite:
-            sprint.draw(self.screen)
+        for ghost, sprint in self.ghost_sprite:
+            if ghost.visible:
+                sprint.draw(self.screen)
         self.score_button.draw(self.screen)

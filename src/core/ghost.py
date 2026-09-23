@@ -24,21 +24,40 @@ class Ghost:
         # Speed expressed in engine ticks required to move
         self.move_delay: float = 0.3
         self.timer: float = 0
+        self.respawn_timer = 0
+        self.respawn_cooldown = 2
 
         # States could be: "CHASE", "SCATTER", "FRIGHTENED", "DEAD"
         self.state: str = "CHASE"
         self.direction: str = "STOP"
+        self.visible = True
 
     def update_position(self, dt: float) -> bool:
         """
         Teleports the ghost to the new grid coordinates.
         """
-        self.timer += dt
-        if self.timer >= self.move_delay:
-            self.timer -= self.move_delay
-            return True
-        else:
-            return False
+        self.respawn(dt)
+        if self.visible:
+            self.timer += dt
+            if self.timer >= self.move_delay:
+                self.timer -= self.move_delay
+                return True
+            else:
+                return False
+        return False
+
+    def respawn(self, dt) -> bool:
+        if self.visible is False:
+            self.respawn_timer += dt
+            if self.respawn_cooldown < self.respawn_timer:
+                self.visible = True
+                self.respawn_timer = 0
+                self.reset_position()
+
+                return True
+            else:
+                self.respawn_timer += dt
+        return False
 
     def change_state(self, new_state: str) -> None:
         """
@@ -50,7 +69,7 @@ class Ghost:
         """
         Teleports the ghost back to its spawn corner.
         """
-        pass
+        self.x, self.y = self.spawn_x, self.spawn_y
 
     def calculate_next_move(self, target_x: int, target_y: int) -> None:
         """
