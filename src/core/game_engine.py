@@ -18,7 +18,9 @@ class GameEngine:
         self.clock = pygame.time.Clock()
         self.curr_level = 1
         self.lvl_cfg = config.get_level(self.curr_level)
-        self.maze = Maze(
+        self.total_levels = config.get_amount_of_level()
+        self.maze = Maze()
+        self.maze.generate_maze(
             seed=self.lvl_cfg.seed,
             w=self.lvl_cfg.width,
             h=self.lvl_cfg.height,
@@ -67,6 +69,13 @@ class GameEngine:
         if self.pause_timer > 0:
             self.pause_timer -= dt
             return
+        # Décrémentation du décompte
+        if self.countdown > 0:
+            self.countdown = max(0.0, self.countdown - dt)
+            if self.countdown == 0:
+                # Optionnel : déclencher la fin du niveau ou le game over
+                # par manque de temps
+                pass
 
         if self.player.update(dt):
             self._resolve_player_movement()
@@ -149,15 +158,16 @@ class GameEngine:
                     self.reset_position()
                     self.pause_timer = 1.0
 
-    def level_end(self) -> None:
+    def level_end(self) -> bool:
         count = 0
         for colum in self.maze.grid:
             for cell in colum:
                 if cell.pacgum is True:
                     count += 1
         if count == 0:
-            self.next_level()
-            print("you win")
+            return True
+        else:
+            return False
 
     def get_player_score(self) -> int:
         return self.player.score
@@ -184,11 +194,30 @@ class GameEngine:
                 if ghost.state == "FRIGHTENED":
                     ghost.state = "CHASE"
 
+    def check_is_game_finished(self) -> None:
+        if self.level_end() is True and self.curr_level != self.total_levels:
+            self.next_level()
+
     def next_level(self):
         self.curr_level += 1
-        self.maze = Maze(
+        self.launch_new_game(is_from_menu=False)
+
+    def launch_new_game(self, is_from_menu: bool) -> None:
+        if is_from_menu is True:
+            self.curr_level = 1
+            self.player.score = 0
+            self.player.lives = config.lives
+
+        self.lvl_cfg = config.get_level(self.curr_level)
+        self.reset_position()
+        self.maze.generate_maze(
             seed=self.lvl_cfg.seed,
             w=self.lvl_cfg.width,
             h=self.lvl_cfg.height,
             pacgum=self.lvl_cfg.pacgum,
         )
+        self.countdown = config.level_max_time
+        self.player.current_dir = "NONE"
+        self.player.next_dir = "NONE"
+        # self.player.respawn() ## pourquoi pas mettre ca pour pas le prochain
+        # niveau commence tout de suite et qu'il y ai du délai

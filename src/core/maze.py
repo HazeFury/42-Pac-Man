@@ -27,16 +27,25 @@ class Maze:
     Manages the maze generation, grid representation, and item placement.
     """
 
-    def __init__(
+    def __init__(self) -> None:
+        """
+        Initializes an empty maze without parameters.
+        """
+        self.maze: MazeGenerator | None = None
+        self.w: int = 0
+        self.h: int = 0
+        self.grid: list[list[Cell]] = []
+
+    def generate_maze(
         self, seed: int = 42, w: int = 5, h: int = 5, pacgum: int = 42
     ) -> None:
         """
-        Initializes the maze with given dimensions, seed, and pacgum count.
+        Generates the maze with given dimensions, seed, and pacgum count.
         """
-        self.maze = MazeGenerator(size=(w, h), seed=seed)
         self.w = w
         self.h = h
-        self.grid: list[list[Cell]] = []
+        self.grid = []
+        self.maze = MazeGenerator(size=(w, h), seed=seed)
 
         self.maze_cell_init()
         self.Super_pacgum_placement()
@@ -84,9 +93,10 @@ class Maze:
                     x, y = (random.randrange(self.w), random.randrange(self.h))
                     self.grid[y][x]
                     if (
-                            self.grid[y][x].pacgum is False
-                            and self.grid[y][x].super_pacgum is False
-                            and not all(self.grid[y][x].wall.values())):
+                        self.grid[y][x].pacgum is False
+                        and self.grid[y][x].super_pacgum is False
+                        and not all(self.grid[y][x].wall.values())
+                    ):
                         self.grid[y][x].pacgum = True
                         pacgum_assign = True
 

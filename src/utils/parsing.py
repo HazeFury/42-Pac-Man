@@ -70,9 +70,13 @@ class Setup(BaseModel):
 
     def get_level(self, level: int = 1) -> LevelConfig:
         """
-        Returns the configuration for a specific level, falling back to default.
+        Returns the configuration for a specific level, falling back to
+        default.
         """
         return self.levels.get(str(level), LevelConfig())
+
+    def get_amount_of_level(self) -> int:
+        return len(self.levels)
 
     @field_validator("highscore_filename", mode="before")
     @classmethod

@@ -166,15 +166,31 @@ class GameView(BaseView):
             normal_sprite.update_position(pos_x, pos_y)
             frightened_sprite.update_position(pos_x, pos_y)
 
-        # Update the UI score
+        # Update the UI data
+        self.level_txt.update_text(
+            f"LEVEL : {str(self.game_engine.curr_level)}"
+        )
         self.score_txt.update_text(f"SCORE : {str(self.pacman.score)}")
         self.life_txt.update_text(
             f"LIFE : {str(self.game_engine.player.lives)}"
         )
+        self.time_txt.update_text(
+            f"TIME : {str(int(self.game_engine.countdown))}"
+        )
         self.data_box.update_layout()
 
-        if self.game_engine.player.lives == 0:
+        if (
+            self.game_engine.player.lives == 0
+            or self.game_engine.countdown <= 0.0
+        ):
             self.next_view = "GAMEOVER"
+        elif (
+            self.game_engine.level_end() is True
+            and self.game_engine.curr_level == self.game_engine.total_levels
+        ):
+            self.next_view = "WIN"
+        else:
+            self.game_engine.check_is_game_finished()
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """

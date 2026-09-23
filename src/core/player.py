@@ -1,3 +1,6 @@
+from utils.parsing import config
+
+
 class Player:
     """
     Represents the Pac-Man entity in the grid.
@@ -6,6 +9,8 @@ class Player:
     """
 
     def __init__(self, start_x: int, start_y: int) -> None:
+        self.config = config
+
         self.x: int = start_x
         self.y: int = start_y
 
@@ -24,7 +29,7 @@ class Player:
         self.death_timer = 0
         self.death_pause = 1
 
-        self.lives: int = 3
+        self.lives: int = config.lives
         self.score: int = 0
 
     def update(self, dt: float) -> bool:

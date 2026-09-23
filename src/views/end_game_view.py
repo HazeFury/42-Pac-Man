@@ -51,7 +51,7 @@ class EndGameView(BaseView):
                 Text(
                     pos_y="0",
                     pos_x="0",
-                    text="Congrats !! You win this level :)",
+                    text="Congrats !! You have completed all level :)",
                     color="BLUE",
                     font_size=96,
                 )
