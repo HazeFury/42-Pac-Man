@@ -16,16 +16,15 @@ class GameEngine:
     """
 
     def __init__(self) -> None:
-        if len(sys.argv) > 1:
-            self.config = config.from_json_file()
-        else:
-            self.config = config
+
         self.clock = pygame.time.Clock()
+        self.level = 1
+        self.lvl_cfg = config.get_level(self.level)
         self.maze = Maze(
-            seed=self.config.seed,
-            w=self.config.width,
-            h=self.config.height,
-            pacgum=self.config.pacgum,
+            seed=self.lvl_cfg.seed,
+            w=self.lvl_cfg.width,
+            h=self.lvl_cfg.height,
+            pacgum=self.lvl_cfg.pacgum,
         )
         self.player = Player(
             start_x=(
@@ -128,10 +127,10 @@ class GameEngine:
 
         # We assume subject points for pacgums are 10 and 50 respectively
         if cell.pacgum:
-            self.player.add_score(self.config.points_per_pacgum)
+            self.player.add_score(config.points_per_pacgum)
             cell.pacgum = False
         elif cell.super_pacgum:
-            self.player.add_score(self.config.points_per_super_pacgum)
+            self.player.add_score(config.points_per_super_pacgum)
             cell.super_pacgum = False
             self.super_pacgum = True
             for ghost in self.ghosts:
@@ -144,7 +143,7 @@ class GameEngine:
             g_x, g_y = ghost.x, ghost.y
             if p_x == g_x and p_y == g_y:
                 if ghost.state == "FRIGHTENED":
-                    self.player.add_score(self.config.points_per_ghost)
+                    self.player.add_score(config.points_per_ghost)
                     ghost.state = "DEAD"
                 elif ghost.state == "CHASE":
                     self.player.lives -= 1
@@ -158,6 +157,7 @@ class GameEngine:
                 if cell.pacgum is True:
                     count += 1
         if count == 0:
+            self.next_level()
             print("you win")
 
     def get_player_score(self) -> int:
@@ -183,3 +183,12 @@ class GameEngine:
             for ghost in self.ghosts:
                 if ghost.state == "FRIGHTENED":
                     ghost.state = "CHASE"
+
+    def next_level(self):
+        self.level += 1
+        self.maze = Maze(
+            seed=self.lvl_cfg.seed,
+            w=self.lvl_cfg.width,
+            h=self.lvl_cfg.height,
+            pacgum=self.lvl_cfg.pacgum,
+        )
