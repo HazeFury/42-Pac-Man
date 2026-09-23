@@ -2,8 +2,10 @@ import pygame
 
 from core.game_engine import GameEngine
 from core.ghost import Ghost
+from ui.box import Box
 from ui.button import Button
 from ui.sprite import Sprite
+from ui.text import Text
 from utils import game_config
 from views.base_view import BaseView
 
@@ -38,6 +40,10 @@ class GameView(BaseView):
             "assets/other/apple.png"
         ).convert_alpha()
 
+        self.data_box = Box(
+            pos_y="top", pos_x="right", spacing=30, layout="horizontal"
+        )
+
         self.back_button = Button(
             pos_y="top",
             pos_x="left",
@@ -47,7 +53,7 @@ class GameView(BaseView):
             size="small",
         )
 
-        self.test = Button(
+        self.back_btn = Button(
             pos_y="bottom",
             pos_x="right",
             text="WIN",
@@ -56,13 +62,11 @@ class GameView(BaseView):
             size="small",
         )
 
-        self.score_button = Button(
+        self.score_button = Text(
             pos_y="top",
             pos_x="right",
             text=str(self.pacman.score),
-            func=self.go_back,
             color="RED",
-            size="small",
         )
         x_offset, y_offset = self.maze_centering()
 
@@ -112,7 +116,7 @@ class GameView(BaseView):
         """
         for event in events:
             self.back_button.handle_event(event)
-            self.test.handle_event(event)
+            self.back_btn.handle_event(event)
 
     def update(self, dt: float = 0.024) -> None:
         """
@@ -139,7 +143,7 @@ class GameView(BaseView):
             sprite.update_position(pos_x, pos_y)
 
         # Update the UI score
-        self.score_button.text = str(self.pacman.score)
+        self.score_button.update_text(str(self.pacman.score))
 
         if self.game_engine.player.lives == 0:
             self.next_view = "GAMEOVER"
@@ -199,7 +203,7 @@ class GameView(BaseView):
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
-        self.test.draw(self.screen)
+        self.back_btn.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
         for ghost, sprint in self.ghost_sprite:

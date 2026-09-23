@@ -1,5 +1,3 @@
-import sys
-
 import pygame
 
 from core.ghost import Ghost
@@ -50,6 +48,7 @@ class GameEngine:
         self.super_pacgum = False
         self.super_pacgum_time = 0
         self.pause_timer: float = 1.0
+        self.game_countdown = config.level_max_time
 
     def handle_input(self) -> None:
         """
@@ -170,7 +169,8 @@ class GameEngine:
         self.death = True
 
     def reset_entity_position(
-            self, entity: Player | Ghost, to: tuple[int, int]):
+        self, entity: Player | Ghost, to: tuple[int, int]
+    ):
         entity.x, entity.y = to
 
     def super_pacgum_timer(self, dt: float) -> None:
