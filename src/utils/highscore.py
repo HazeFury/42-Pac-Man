@@ -1,13 +1,12 @@
 from pathlib import Path
 
-from parsing import Highscore, Player_score
 from pydantic import ValidationError
 
-from utils.parsing import config
+from utils.parsing import Highscore, Player_score, config
 
 
-class HighscoreManager:
-    def __init__(self, score_file: str) -> None:
+class HighScoreManager:
+    def __init__(self) -> None:
 
         self.score_path = Path(config.highscore_filename)
 
