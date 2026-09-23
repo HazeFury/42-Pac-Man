@@ -36,7 +36,7 @@ class Setup(BaseModel):
     width: int = Field(default=30, ge=10)
     height: int = Field(default=30, ge=10)
     lives: int = Field(default=3, ge=1)
-    pacgum: int = Field(default=42, ge=10)
+    pacgum: int = Field(default=4200, ge=10)
     points_per_pacgum: int = Field(default=10, ge=10)
     points_per_super_pacgum: int = Field(default=50, ge=10)
     points_per_ghost: int = Field(default=200, ge=10)

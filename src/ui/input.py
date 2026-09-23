@@ -39,6 +39,7 @@ class TextInput:
         # Colors for focus states
         self.color_active = game_config.BLUE
         self.color_passive = game_config.WHITE
+        self.color_error = game_config.RED
         self.current_color = self.color_passive
 
     def _resolve_x(self) -> int:
@@ -103,6 +104,13 @@ class TextInput:
             self.text_surface = self.font.render(
                 self.text, True, game_config.WHITE
             )
+
+    def change_color(self, is_error: bool) -> None:
+        """Update border color based on error state."""
+        if is_error is True:
+            self.current_color = self.color_error
+        else:
+            self.current_color = self.color_passive
 
     def draw(self, screen: pygame.Surface) -> None:
         """

@@ -6,6 +6,7 @@ from ui.button import Button
 from ui.input import TextInput
 from ui.text import Text
 from utils import game_config
+from utils.highscore import HighScoreManager
 from views.base_view import BaseView
 
 
@@ -19,6 +20,7 @@ class EndGameView(BaseView):
     ) -> None:
         super().__init__(screen)
         self.game_engine = game_engine
+        self.score_manager = HighScoreManager()
         self.menu_box = Box(pos_y="center", pos_x="center", spacing=60)
         self.score: int = self.game_engine.get_player_score()
 
@@ -82,7 +84,7 @@ class EndGameView(BaseView):
             Button(
                 pos_y="0",
                 pos_x="0",
-                text="Go back to menu",
+                text="Exit",
                 func=self.return_to_menu,
                 color="RED",
             )
@@ -98,8 +100,14 @@ class EndGameView(BaseView):
 
     def save_score(self) -> None:
         """Save the current score to the highscore.json file."""
-        print(self.player_name_input.get_value())
-        print(self.score)
+        player_name = self.player_name_input.get_value()
+        if len(player_name) >= 1:
+            self.player_name_input.change_color(is_error=False)
+            print(f"name : {player_name} / score : {str(self.score)}")
+            self.score_manager.write_highscore(player_name, self.score)
+            self.next_view = "SCORE"
+        else:
+            self.player_name_input.change_color(is_error=True)
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         for event in events:

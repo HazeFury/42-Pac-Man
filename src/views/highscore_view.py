@@ -4,19 +4,34 @@ from ui.box import Box
 from ui.button import Button
 from ui.text import Text
 from utils import game_config
+from utils.highscore import HighScoreManager
 from views.base_view import BaseView
 
 
 class HighScoreView(BaseView):
     """
-    The main menu view displaying the title and a start button.
+    The view displaying the top 10 scores dynamically.
     """
 
     def __init__(self, screen: pygame.Surface) -> None:
         super().__init__(screen)
 
         self.menu_box = Box(pos_y="center", pos_x="center", spacing=30)
+        self.score_manager = HighScoreManager()
+        self.scores = self.get_sorted_scores()
 
+        # Build the UI for the first time
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        """
+        Clears the box and reconstructs all UI elements.
+        Called on initialization and whenever the highscore data changes.
+        """
+        # 1. Empty the existing UI components
+        self.menu_box.children.clear()
+
+        # 2. Add the static title
         self.menu_box.add_child(
             Text(
                 pos_y="0",
@@ -27,37 +42,19 @@ class HighScoreView(BaseView):
             )
         )
 
-        score_list = {
-            "Marco": 98,
-            "Guillaume": 86,
-            "stmaire": 42,
-            "Bruno": 852,
-            "Yannick": 36,
-            "Quentin": 72,
-            "Cédric": 50,
-            "Canelle": 1,
-            "Matéo": 31,
-            "Pierre": 65,
-            "Jean": 57,
-            "Pouet": 5,
-        }
-
-        self.sorted_score_list = dict(
-            sorted(score_list.items(), key=lambda item: item[1], reverse=True)[
-                :10
-            ]
-        )
-        for name, score in self.sorted_score_list.items():
+        # 3. Generate new Text components based on the updated data
+        for entry in self.scores:
             self.menu_box.add_child(
                 Text(
                     pos_y="0",
                     pos_x="0",
-                    text=f"{name} : {score}",
+                    text=f"{entry.name} : {entry.score}",
                     color="WHITE",
                     font_size=48,
                 )
             )
 
+        # 4. Add the back button
         self.menu_box.add_child(
             Button(
                 pos_y="0",
@@ -69,17 +66,40 @@ class HighScoreView(BaseView):
             )
         )
 
+        # 5. Force the Box to calculate the layout for these new children
+        self.menu_box.update_layout()
+
     def return_to_menu(self) -> None:
-        """Callback function assigned to the play button."""
+        """Callback function assigned to the back button."""
         self.next_view = "MENU"
+
+    def get_sorted_scores(self) -> list:
+        score_list = self.score_manager.read_highscore()
+        result = self.sort_score_list(score_list.scores)
+        return result
+
+    def sort_score_list(self, score_list: list) -> list:
+        valid_scores = [entry for entry in score_list if entry.name != ""]
+
+        sorted_scores = sorted(
+            valid_scores, key=lambda entry: entry.score, reverse=True
+        )
+
+        return sorted_scores[:10]
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         for event in events:
             self.menu_box.handle_event(event)
 
     def update(self) -> None:
-        # No specific background logic to update in the menu for now
-        pass
+        """
+        Checks for data changes. Rebuilds the UI if a new score was added.
+        """
+        new_score_list = self.get_sorted_scores()
+
+        if self.scores != new_score_list:
+            self.scores = new_score_list
+            self._build_ui()
 
     def draw(self) -> None:
         self.screen.fill(game_config.BACKGROUND_COLOR)
