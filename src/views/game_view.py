@@ -13,9 +13,11 @@ class GameView(BaseView):
     The main game view where the Pac-Man logic will happen.
     """
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(
+        self, screen: pygame.Surface, game_engine: GameEngine
+    ) -> None:
         super().__init__(screen)
-        self.game_engine = GameEngine()
+        self.game_engine = game_engine
         self.pacman = self.game_engine.player
         self.ghost = self.game_engine.ghosts
 
@@ -138,6 +140,9 @@ class GameView(BaseView):
 
         # Update the UI score
         self.score_button.text = str(self.pacman.score)
+
+        if self.game_engine.player.lives == 0:
+            self.next_view = "GAMEOVER"
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """
