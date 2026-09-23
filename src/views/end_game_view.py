@@ -51,7 +51,7 @@ class EndGameView(BaseView):
                 Text(
                     pos_y="0",
                     pos_x="0",
-                    text="Congrats !! You win this level :)",
+                    text="Congrats !! You have completed all level :)",
                     color="BLUE",
                     font_size=96,
                 )
@@ -103,7 +103,6 @@ class EndGameView(BaseView):
         player_name = self.player_name_input.get_value()
         if len(player_name) >= 1:
             self.player_name_input.change_color(is_error=False)
-            print(f"name : {player_name} / score : {str(self.score)}")
             self.score_manager.write_highscore(player_name, self.score)
             self.next_view = "SCORE"
         else:

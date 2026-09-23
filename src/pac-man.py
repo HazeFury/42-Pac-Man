@@ -31,7 +31,7 @@ def main() -> None:
         game_engine = GameEngine()
 
         views = {
-            "MENU": MenuView(screen),
+            "MENU": MenuView(screen, game_engine),
             "GAME": GameView(screen, game_engine),
             "WIN": EndGameView(screen, game_engine, is_victory=True),
             "GAMEOVER": EndGameView(screen, game_engine, is_victory=False),

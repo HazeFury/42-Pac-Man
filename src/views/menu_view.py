@@ -2,6 +2,7 @@ import sys
 
 import pygame
 
+from core.game_engine import GameEngine
 from ui.box import Box
 from ui.button import Button
 from ui.sprite import Sprite
@@ -14,9 +15,11 @@ class MenuView(BaseView):
     The main menu view displaying the title and a start button.
     """
 
-    def __init__(self, screen: pygame.Surface) -> None:
+    def __init__(
+        self, screen: pygame.Surface, game_engine: GameEngine
+    ) -> None:
         super().__init__(screen)
-
+        self.game_engine = game_engine
         self.menu_box = Box(pos_y="center", pos_x="center", spacing=50)
 
         self.menu_box.add_child(
@@ -57,6 +60,7 @@ class MenuView(BaseView):
 
     def start_game(self) -> None:
         """Callback function assigned to the play button."""
+        self.game_engine.launch_new_game(is_from_menu=True)
         self.next_view = "GAME"
 
     def show_high_score(self) -> None:

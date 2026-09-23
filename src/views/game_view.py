@@ -2,8 +2,10 @@ import pygame
 
 from core.game_engine import GameEngine
 from core.ghost import Ghost
+from ui.box import Box
 from ui.button import Button
 from ui.sprite import Sprite
+from ui.text import Text
 from utils import game_config
 from views.base_view import BaseView
 
@@ -38,6 +40,10 @@ class GameView(BaseView):
             "assets/other/apple.png"
         ).convert_alpha()
 
+        self.data_box = Box(
+            pos_y="top", pos_x="right", spacing=30, layout="horizontal"
+        )
+
         self.back_button = Button(
             pos_y="top",
             pos_x="left",
@@ -47,23 +53,38 @@ class GameView(BaseView):
             size="small",
         )
 
-        self.test = Button(
-            pos_y="bottom",
-            pos_x="right",
-            text="WIN",
-            func=self.go_to_win_screen,
-            color="GREEN",
-            size="small",
+        self.level_txt = Text(
+            pos_y="top",
+            pos_x="center",
+            text=f"LEVEL : {str(self.game_engine.curr_level)}",
+            color="WHITE",
         )
 
-        self.score_button = Button(
-            pos_y="top",
-            pos_x="right",
-            text=str(self.pacman.score),
-            func=self.go_back,
-            color="RED",
-            size="small",
+        self.life_txt = Text(
+            pos_y="0",
+            pos_x="0",
+            text=f"LIFE : {str(self.game_engine.player.lives)}",
+            color="WHITE",
         )
+
+        self.time_txt = Text(
+            pos_y="0",
+            pos_x="0",
+            text=f"TIME : {str(self.game_engine.countdown)}",
+            color=f"{'RED' if self.game_engine.countdown < 10 else 'WHITE'}",
+        )
+
+        self.score_txt = Text(
+            pos_y="0",
+            pos_x="0",
+            text=f"SCORE : {str(self.pacman.score)}",
+            color="GREEN",
+        )
+
+        self.data_box.add_child(self.life_txt)
+        self.data_box.add_child(self.time_txt)
+        self.data_box.add_child(self.score_txt)
+
         x_offset, y_offset = self.maze_centering()
 
         self.player_x: int = self.pacman.x * 32 + x_offset + 9
@@ -119,7 +140,6 @@ class GameView(BaseView):
         """
         for event in events:
             self.back_button.handle_event(event)
-            self.test.handle_event(event)
 
     def update(self, dt: float = 0.024) -> None:
         """
@@ -146,11 +166,31 @@ class GameView(BaseView):
             normal_sprite.update_position(pos_x, pos_y)
             frightened_sprite.update_position(pos_x, pos_y)
 
-        # Update the UI score
-        self.score_button.text = str(self.pacman.score)
+        # Update the UI data
+        self.level_txt.update_text(
+            f"LEVEL : {str(self.game_engine.curr_level)}"
+        )
+        self.score_txt.update_text(f"SCORE : {str(self.pacman.score)}")
+        self.life_txt.update_text(
+            f"LIFE : {str(self.game_engine.player.lives)}"
+        )
+        self.time_txt.update_text(
+            f"TIME : {str(int(self.game_engine.countdown))}"
+        )
+        self.data_box.update_layout()
 
-        if self.game_engine.player.lives == 0:
+        if (
+            self.game_engine.player.lives == 0
+            or self.game_engine.countdown <= 0.0
+        ):
             self.next_view = "GAMEOVER"
+        elif (
+            self.game_engine.level_end() is True
+            and self.game_engine.curr_level == self.game_engine.total_levels
+        ):
+            self.next_view = "WIN"
+        else:
+            self.game_engine.check_is_game_finished()
 
     def draw_maze(self, screen: pygame.Surface, cell_size: int = 32) -> None:
         """
@@ -207,7 +247,8 @@ class GameView(BaseView):
     def draw(self) -> None:
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
-        self.test.draw(self.screen)
+        self.data_box.draw(self.screen)
+        self.level_txt.draw(self.screen)
         self.draw_maze(self.screen)
         self.pacman_sprite.draw(self.screen)
         for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
@@ -216,4 +257,3 @@ class GameView(BaseView):
                     frightened_sprite.draw(self.screen)
                 else:
                     normal_sprite.draw(self.screen)
-        self.score_button.draw(self.screen)
