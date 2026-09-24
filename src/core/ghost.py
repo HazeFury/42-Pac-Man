@@ -16,6 +16,8 @@ class Ghost:
         """
         self.x: int = 0
         self.y: int = 0
+        self.prev_x: int = self.x
+        self.prev_y: int = self.y
 
         # Grid coordinates
 
@@ -52,6 +54,22 @@ class Ghost:
                 return False
         return False
 
+    def get_visual_pos(self) -> tuple[float, float]:
+        """
+        Returns interpolated (x, y) coordinates between previous and current
+        tile positions for 60+ FPS smooth rendering.
+        """
+        if self.state == "DEAD":
+            return (float(self.x), float(self.y))
+
+        if self.move_delay > 0:
+            progress = min(1.0, max(0.0, self.timer / self.move_delay))
+        else:
+            progress = 1.0
+        vis_x = self.prev_x + (self.x - self.prev_x) * progress
+        vis_y = self.prev_y + (self.y - self.prev_y) * progress
+        return (vis_x, vis_y)
+
     def respawn(self, dt: float) -> bool:
         """
         Handle the respawn timer when the ghost is dead.
@@ -77,6 +95,8 @@ class Ghost:
         elif self.ghost_type == "CLYDE":
             self.spawn_x, self.spawn_y = w - 1, h - 1
         self.x, self.y = self.spawn_x, self.spawn_y
+        self.prev_x, self.prev_y = self.x, self.y
+        self.timer = 0.0
 
     def change_state(self, new_state: str) -> None:
         """
@@ -89,6 +109,8 @@ class Ghost:
         Reset the ghost back to its initial spawn position.
         """
         self.x, self.y = self.spawn_x, self.spawn_y
+        self.prev_x, self.prev_y = self.x, self.y
+        self.timer = 0.0
 
     def calculate_next_move(self, target_x: int, target_y: int) -> None:
         """
@@ -160,8 +182,10 @@ class Ghost:
                         if new_dist > current_dist:
                             flee_moves.append((nx, ny))
             if flee_moves:
+                self.prev_x, self.prev_y = self.x, self.y
                 self.x, self.y = random.choice(flee_moves)
             elif possible_moves:
+                self.prev_x, self.prev_y = self.x, self.y
                 self.x, self.y = random.choice(possible_moves)
             return
 
@@ -187,4 +211,5 @@ class Ghost:
             curr: tuple[int, int] = end
             while visited[curr] != start:
                 curr = visited[curr]
+            self.prev_x, self.prev_y = self.x, self.y
             self.x, self.y = curr
