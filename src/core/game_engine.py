@@ -170,11 +170,6 @@ class GameEngine:
             ghost.x, ghost.y = ghost.spawn_x, ghost.spawn_y
         self.death = True
 
-    def reset_entity_position(
-        self, entity: Player | Ghost, to: tuple[int, int]
-    ):
-        entity.x, entity.y = to
-
     def super_pacgum_timer(self, dt: float) -> None:
         if self.super_pacgum_time < 25:
             self.super_pacgum = True
