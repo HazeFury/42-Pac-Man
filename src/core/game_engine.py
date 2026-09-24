@@ -115,6 +115,8 @@ class GameEngine:
         # 3. Hit a wall, stop completely
         else:
             self.player.current_dir = "NONE"
+            self.player.prev_x = self.player.x
+            self.player.prev_y = self.player.y
 
     def _is_path_clear(self, cell: Cell, direction: str) -> bool:
         """
@@ -175,6 +177,8 @@ class GameEngine:
 
     def reset_position(self) -> None:
         self.player.x, self.player.y = self.player.spawn_x, self.player.spawn_y
+        self.player.prev_x, self.player.prev_y = self.player.x, self.player.y
+        self.player.timer = 0.0
         for ghost in self.ghosts:
             ghost.x, ghost.y = ghost.spawn_x, ghost.spawn_y
         self.death = True
