@@ -32,8 +32,9 @@ class GameEngine:
             Ghost(ghost_type="BLINKY"),
             Ghost(ghost_type="PINKY"),
             Ghost(ghost_type="INKY"),
-            Ghost(ghost_type="CLYDE",
-                  ),
+            Ghost(
+                ghost_type="CLYDE",
+            ),
         ]
 
         self.input_manager = InputManager()
@@ -43,6 +44,10 @@ class GameEngine:
         self.super_pacgum_time = 0
         self.pause_timer: float = 1.0
         self.countdown = config.level_max_time
+
+        from core.cheat_manager import CheatManager
+
+        self.cheat_manager: CheatManager | None = None
 
     def handle_input(self) -> None:
         """
@@ -71,15 +76,17 @@ class GameEngine:
 
         if self.player.update(dt):
             self._resolve_player_movement()
-        for ghost in self.ghosts:
-            if ghost.update_position(dt):
-                ghost.ghost_ai(
-                    self.maze,
-                    self.player.x,
-                    self.player.y,
-                    self.ghosts[0],
-                    self.player.next_dir,
-                )
+
+        if not (self.cheat_manager and self.cheat_manager.is_ghost_frozen):
+            for ghost in self.ghosts:
+                if ghost.update_position(dt):
+                    ghost.ghost_ai(
+                        self.maze,
+                        self.player.x,
+                        self.player.y,
+                        self.ghosts[0],
+                        self.player.next_dir,
+                    )
 
         self.pacman_vs_ghost()
         if self.super_pacgum:
@@ -146,6 +153,8 @@ class GameEngine:
                     self.player.add_score(config.points_per_ghost)
                     ghost.state = "DEAD"
                 elif ghost.state == "CHASE":
+                    if self.cheat_manager and self.cheat_manager.is_invincible:
+                        continue
                     self.player.lives -= 1
                     self.reset_position()
                     self.pause_timer = 1.0
@@ -196,6 +205,10 @@ class GameEngine:
             self.player.score = 0
             self.player.lives = config.lives
             self.ghost_start_position()
+            if self.cheat_manager:
+                self.cheat_manager.is_invincible = False
+                self.cheat_manager.is_ghost_frozen = False
+                self.cheat_manager.is_speed_boosted = False
 
         self.lvl_cfg = config.get_level(self.curr_level)
         self.reset_position()
