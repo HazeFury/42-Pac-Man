@@ -26,24 +26,16 @@ class GameEngine:
             h=self.lvl_cfg.height,
             pacgum=self.lvl_cfg.pacgum,
         )
-        self.player = Player(
-            start_x=(
-                (self.maze.w // 2)
-                if (self.maze.w % 2) != 0
-                else ((self.maze.w // 2) - 1)
-            ),
-            start_y=self.maze.h // 2,
-        )
+        self.player = Player()
+
         self.ghosts: list[Ghost] = [
-            Ghost(start_x=0, start_y=0, ghost_type="BLINKY"),
-            Ghost(start_x=self.maze.w - 1, start_y=0, ghost_type="PINKY"),
-            Ghost(start_x=0, start_y=self.maze.h - 1, ghost_type="INKY"),
-            Ghost(
-                start_x=self.maze.w - 1,
-                start_y=self.maze.h - 1,
-                ghost_type="CLYDE",
-            ),
+            Ghost(ghost_type="BLINKY"),
+            Ghost(ghost_type="PINKY"),
+            Ghost(ghost_type="INKY"),
+            Ghost(ghost_type="CLYDE",
+                  ),
         ]
+
         self.input_manager = InputManager()
         self.death = False
         self.is_game_over: bool = False
@@ -179,7 +171,7 @@ class GameEngine:
         self.death = True
 
     def super_pacgum_timer(self, dt: float) -> None:
-        if self.super_pacgum_time < 5:
+        if self.super_pacgum_time < 25:
             self.super_pacgum = True
             self.super_pacgum_time += dt
         else:
@@ -195,6 +187,7 @@ class GameEngine:
 
     def next_level(self):
         self.curr_level += 1
+
         self.launch_new_game(is_from_menu=False)
 
     def launch_new_game(self, is_from_menu: bool) -> None:
@@ -202,6 +195,7 @@ class GameEngine:
             self.curr_level = 1
             self.player.score = 0
             self.player.lives = config.lives
+            self.ghost_start_position()
 
         self.lvl_cfg = config.get_level(self.curr_level)
         self.reset_position()
@@ -211,8 +205,15 @@ class GameEngine:
             h=self.lvl_cfg.height,
             pacgum=self.lvl_cfg.pacgum,
         )
+        self.ghost_start_position()
         self.countdown = config.level_max_time
         self.player.current_dir = "NONE"
         self.player.next_dir = "NONE"
         # self.player.respawn() ## pourquoi pas mettre ca pour pas le prochain
         # niveau commence tout de suite et qu'il y ai du délai
+
+    def ghost_start_position(self):
+        for ghost in self.ghosts:
+            ghost.spawn(self.maze.w, self.maze.h)
+            ghost.state = "CHASE"
+        self.player.spawn(self.maze.w, self.maze.h)

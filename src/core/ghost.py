@@ -10,24 +10,24 @@ class Ghost:
     Tracks its position, spawn point, type, and current state.
     """
 
-    def __init__(self, start_x: int, start_y: int,
-                 ghost_type: str) -> None:
+    def __init__(self, ghost_type: str) -> None:
         """
         Initialize the ghost with its spawn position and type.
         """
+        self.x: int = 0
+        self.y: int = 0
+
         # Grid coordinates
-        self.x: int = start_x
-        self.y: int = start_y
 
         # Spawn coordinates to return to when eaten
-        self.spawn_x: int = start_x
-        self.spawn_y: int = start_y
+        self.spawn_x: int = self.x
+        self.spawn_y: int = self.y
 
         # "BLINKY", "PINKY", etc. Determines the AI behavior
         self.ghost_type: str = ghost_type
 
         # Speed expressed in engine ticks required to move
-        self.move_delay: float = 0.3
+        self.move_delay: float = 0.5
         self.timer: float = 0
         self.respawn_timer = 0
         self.respawn_cooldown = 2
@@ -66,6 +66,17 @@ class Ghost:
                 self.reset_position()
                 return True
         return False
+
+    def spawn(self, w: int, h: int) -> None:
+        if self.ghost_type == "BLINKY":
+            self.spawn_x, self.spawn_y = 0, 0
+        elif self.ghost_type == "PINKY":
+            self.spawn_x, self.spawn_y = w - 1, 0
+        elif self.ghost_type == "INKY":
+            self.spawn_x, self.spawn_y = 0, h - 1
+        elif self.ghost_type == "CLYDE":
+            self.spawn_x, self.spawn_y = w - 1, h - 1
+        self.x, self.y = self.spawn_x, self.spawn_y
 
     def change_state(self, new_state: str) -> None:
         """

@@ -8,14 +8,14 @@ class Player:
     Does NOT handle game logic or maze interaction.
     """
 
-    def __init__(self, start_x: int, start_y: int) -> None:
+    def __init__(self) -> None:
         self.config = config
 
-        self.x: int = start_x
-        self.y: int = start_y
+        self.x: int = 0
+        self.y: int = 0
 
-        self.spawn_x: int = start_x
-        self.spawn_y: int = start_y
+        self.spawn_x: int = self.x
+        self.spawn_y: int = self.y
 
         # Movement tracking (Buffer logic)
         self.current_dir: str = "NONE"
@@ -63,6 +63,12 @@ class Player:
 
     def add_score(self, score: int) -> None:
         self.score += score
+
+    def spawn(self, w: int, h: int) -> None:
+        self.spawn_x = ((w // 2) if (w % 2) != 0 else ((w // 2) - 1))
+        self.spawn_y = h // 2
+
+        self.x, self.y = self.spawn_x, self.spawn_y
 
     def respawn(self, dt) -> bool:
         if self.visible is False:
