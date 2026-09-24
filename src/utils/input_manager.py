@@ -37,3 +37,23 @@ class InputManager:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return True
         return False
+
+    def get_cheat_actions(self, events: list[pygame.event.Event]) -> list[str]:
+        """
+        Detects cheat key presses (F1 to F5) from the event loop.
+        Returns a list of triggered cheat action names.
+        """
+        actions: list[str] = []
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F1:
+                    actions.append("INVINCIBILITY")
+                elif event.key == pygame.K_F2:
+                    actions.append("FREEZE_GHOSTS")
+                elif event.key == pygame.K_F3:
+                    actions.append("SPEED_BOOST")
+                elif event.key == pygame.K_F4:
+                    actions.append("EXTRA_LIFE")
+                elif event.key == pygame.K_F5:
+                    actions.append("SKIP_LEVEL")
+        return actions

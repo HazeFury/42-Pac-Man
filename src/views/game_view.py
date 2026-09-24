@@ -71,7 +71,7 @@ class GameView(BaseView):
             pos_y="0",
             pos_x="0",
             text=f"TIME : {str(self.game_engine.countdown)}",
-            color=f"{'RED' if self.game_engine.countdown < 10 else 'WHITE'}",
+            color="WHITE",
         )
 
         self.score_txt = Text(
@@ -93,6 +93,52 @@ class GameView(BaseView):
             color="YELLOW",
             font_size=72,
         )
+
+        # Cheats HUD (Bottom-Left)
+        self.cheat_box = Box(
+            pos_y="bottom", pos_x="left", spacing=6, layout="vertical"
+        )
+        self.cheat_f1 = Text(
+            pos_y="0",
+            pos_x="0",
+            text="[F1] God : OFF",
+            color="RED",
+            font_size=30,
+        )
+        self.cheat_f2 = Text(
+            pos_y="0",
+            pos_x="0",
+            text="[F2] Freeze : OFF",
+            color="RED",
+            font_size=30,
+        )
+        self.cheat_f3 = Text(
+            pos_y="0",
+            pos_x="0",
+            text="[F5] Speed : OFF",
+            color="RED",
+            font_size=30,
+        )
+        self.cheat_f4 = Text(
+            pos_y="0",
+            pos_x="0",
+            text="[F4] +1 Life",
+            color="WHITE",
+            font_size=30,
+        )
+        self.cheat_f5 = Text(
+            pos_y="0",
+            pos_x="0",
+            text="[F3] Skip Level",
+            color="WHITE",
+            font_size=30,
+        )
+
+        self.cheat_box.add_child(self.cheat_f1)
+        self.cheat_box.add_child(self.cheat_f2)
+        self.cheat_box.add_child(self.cheat_f3)
+        self.cheat_box.add_child(self.cheat_f4)
+        self.cheat_box.add_child(self.cheat_f5)
 
         x_offset, y_offset = self.maze_centering()
 
@@ -205,9 +251,27 @@ class GameView(BaseView):
             f"LIFE : {str(self.game_engine.player.lives)}"
         )
         self.time_txt.update_text(
-            f"TIME : {str(int(self.game_engine.countdown))}"
+            f"TIME : {str(int(self.game_engine.countdown))}",
+            color="RED" if self.game_engine.countdown < 10 else "WHITE",
         )
         self.data_box.update_layout()
+
+        # Update Cheats HUD
+        cm = self.game_engine.cheat_manager
+        if cm:
+            self.cheat_f1.update_text(
+                f"[F1] God : {'ON' if cm.is_invincible else 'OFF'}",
+                color="GREEN" if cm.is_invincible else "RED",
+            )
+            self.cheat_f2.update_text(
+                f"[F2] Freeze : {'ON' if cm.is_ghost_frozen else 'OFF'}",
+                color="GREEN" if cm.is_ghost_frozen else "RED",
+            )
+            self.cheat_f3.update_text(
+                f"[F5] Speed : {'ON' if cm.is_speed_boosted else 'OFF'}",
+                color="GREEN" if cm.is_speed_boosted else "RED",
+            )
+            self.cheat_box.update_layout()
 
         if (
             self.game_engine.player.lives == 0
@@ -288,6 +352,8 @@ class GameView(BaseView):
                     frightened_sprite.draw(self.screen)
                 else:
                     normal_sprite.draw(self.screen)
+
+        self.cheat_box.draw(self.screen)
 
         if self.is_paused:
             self.pause_txt.draw(self.screen)

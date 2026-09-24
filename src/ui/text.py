@@ -56,11 +56,14 @@ class Text:
         else:  # default to "center"
             return (game_config.WINDOW_HEIGHT - self.height) // 2
 
-    def update_text(self, new_text: str) -> None:
+    def update_text(self, new_text: str, color: str | None = None) -> None:
         """
         Update the text surface and recalculate positions.
         Crucial for dynamic elements like score or timers.
         """
+        if color:
+            self.color = game_config.COLORS.get(color.upper(), self.color)
+
         # 1. Render the new text into an image (Surface)
         self.surface = self.font.render(new_text, True, self.color)
 

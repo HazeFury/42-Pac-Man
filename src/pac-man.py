@@ -2,6 +2,7 @@ import sys
 
 import pygame
 
+from core.cheat_manager import CheatManager
 from core.game_engine import GameEngine
 from utils import game_config
 from views.end_game_view import EndGameView
@@ -29,6 +30,8 @@ def main() -> None:
         # 3. Instantiate all our views (The Painters)
         # We pass the shared 'screen' to all of them.
         game_engine = GameEngine()
+        cheat_manager = CheatManager(game_engine)
+        game_engine.cheat_manager = cheat_manager
 
         views = {
             "MENU": MenuView(screen, game_engine),
@@ -55,6 +58,12 @@ def main() -> None:
                     running = False
 
             # --- B. Delegate work to the active view ---
+            # --- B. Handle Cheats in Game ---
+            if current_state == "GAME":
+                actions = game_engine.input_manager.get_cheat_actions(events)
+                cheat_manager.handle_actions(actions)
+
+            # --- C. Delegate work to the active view ---
             active_view.handle_events(events)
             active_view.update()
             active_view.draw()
