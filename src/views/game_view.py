@@ -183,14 +183,16 @@ class GameView(BaseView):
         if self.pacman.current_dir != "NONE":
             active_pacman_sprite.update_animation(dt)
 
-        # Calculate new pixel position based on grid coordinates
+        # Calculate new pixel position based on smooth interpolated coordinates
         x_offset, y_offset = self.maze_centering()
-        px = self.pacman.x * 32 + x_offset + 9
-        py = self.pacman.y * 32 + y_offset + 8
+        vis_x, vis_y = self.pacman.get_visual_pos()
+        px = int(vis_x * 32) + x_offset + 9
+        py = int(vis_y * 32) + y_offset + 8
         active_pacman_sprite.update_position(px, py)
         for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
-            pos_y = ghost.y * 32 + y_offset + 8
-            pos_x = ghost.x * 32 + x_offset + 9
+            g_vis_x, g_vis_y = ghost.get_visual_pos()
+            pos_x = int(g_vis_x * 32) + x_offset + 9
+            pos_y = int(g_vis_y * 32) + y_offset + 8
             normal_sprite.update_position(pos_x, pos_y)
             frightened_sprite.update_position(pos_x, pos_y)
 
