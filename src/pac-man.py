@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pygame
@@ -10,11 +11,32 @@ from views.highscore_view import HighScoreView
 from views.menu_view import MenuView
 
 
+def setup_working_directory() -> None:
+    """
+    Ensure the working directory is set to the application root
+    or bundle directory so assets and configurations load reliably.
+    """
+    if getattr(sys, "frozen", False):
+        exe_dir = os.path.dirname(sys.executable)
+        internal_dir = getattr(sys, "_MEIPASS", exe_dir)
+        if os.path.exists(os.path.join(exe_dir, "assets")):
+            base_dir = exe_dir
+        elif os.path.exists(os.path.join(internal_dir, "assets")):
+            base_dir = internal_dir
+        else:
+            base_dir = exe_dir
+    else:
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    os.chdir(base_dir)
+
+
 def main() -> None:
     """
     Main entry point of the application.
     Initializes the Pygame window and manages the view state machine.
     """
+    setup_working_directory()
     try:
         # 1. Initialize the Pygame engine
         pygame.init()

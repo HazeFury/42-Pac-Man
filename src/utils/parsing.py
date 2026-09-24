@@ -125,6 +125,15 @@ class Setup(BaseModel):
         clean_json = []
         if len(sys.argv) > 1:
             path = Path(sys.argv[1])
+        elif (
+            getattr(sys, "frozen", False)
+            and (Path(sys.executable).parent / "config.json").exists()
+        ):
+            path = Path(sys.executable).parent / "config.json"
+        else:
+            path = Path("config.json")
+
+        if path.exists():
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     lines = f.read().split("\n")

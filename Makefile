@@ -24,8 +24,13 @@ setup:
 		echo "Proceeding..."; \
 	fi
 
-build: install
-	@uv build
+exe: install
+	@chmod +x package.sh
+	@./package.sh exe
+
+package: install
+	@chmod +x package.sh
+	@./package.sh package
 
 run:
 	@uv run $(SRC_DIR)/$(MAIN) $(CONFIG_FILE)
@@ -35,7 +40,7 @@ debug:
 
 clean:
 	@echo "Removing temporary files or caches"
-	@rm -rf .mypy_cache .pytest_cache .pytest_cache src/*.egg-info
+	@rm -rf .mypy_cache .pytest_cache src/*.egg-info build
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
 
 fclean: clean
@@ -60,4 +65,4 @@ test:
 	@uv run pytest $(ARGS) -v
 
 
-.PHONY: all install setup run build debug clean fclean re lint lint-strict test
+.PHONY: all install setup exe run package debug clean fclean re lint lint-strict test

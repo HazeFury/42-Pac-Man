@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -7,8 +8,11 @@ from utils.parsing import Highscore, Player_score, config
 
 class HighScoreManager:
     def __init__(self) -> None:
-
-        self.score_path = Path(config.highscore_filename)
+        filename = config.highscore_filename
+        if getattr(sys, "frozen", False):
+            self.score_path = Path(sys.executable).parent / filename
+        else:
+            self.score_path = Path(filename)
 
     def read_highscore(self) -> Highscore:
         if not self.score_path.exists():
