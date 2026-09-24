@@ -90,18 +90,26 @@ class GameView(BaseView):
         self.player_x: int = self.pacman.x * 32 + x_offset + 9
         self.player_y: int = self.pacman.y * 32 + y_offset + 8
 
-        # Using kwargs (pos_y=..., pos_x=...) prevents mixing up coordinates!
-        self.pacman_sprite = Sprite(
-            pos_y=self.player_y,
-            pos_x=self.player_x,
-            image_paths=[
-                "assets/pacman-up/1.png",
-                "assets/pacman-up/2.png",
-                "assets/pacman-up/3.png",
-                "assets/pacman-up/2.png",
-            ],
-            animation_speed=0.1,
-        )
+        # Directional sprites for Pac-Man animations
+        pacman_frames = [
+            "assets/pacman-{dir}/1.png",
+            "assets/pacman-{dir}/2.png",
+            "assets/pacman-{dir}/3.png",
+            "assets/pacman-{dir}/2.png",
+        ]
+        self.pacman_sprites: dict[str, Sprite] = {
+            direction: Sprite(
+                pos_y=self.player_y,
+                pos_x=self.player_x,
+                image_paths=[
+                    template.format(dir=direction.lower())
+                    for template in pacman_frames
+                ],
+                animation_speed=0.1,
+            )
+            for direction in ("UP", "DOWN", "LEFT", "RIGHT")
+        }
+        self.last_pacman_dir: str = "RIGHT"
         ghost_assets = {
             "BLINKY": "assets/ghosts/blinky.png",
             "PINKY": "assets/ghosts/pinky.png",
@@ -153,13 +161,18 @@ class GameView(BaseView):
         self.game_engine.update()
 
         # 3. Synchronize visuals with the Engine's truth (The View part)
-        self.pacman_sprite.update_animation(dt)
+        if self.pacman.current_dir in self.pacman_sprites:
+            self.last_pacman_dir = self.pacman.current_dir
+
+        active_pacman_sprite = self.pacman_sprites[self.last_pacman_dir]
+        if self.pacman.current_dir != "NONE":
+            active_pacman_sprite.update_animation(dt)
 
         # Calculate new pixel position based on grid coordinates
         x_offset, y_offset = self.maze_centering()
         px = self.pacman.x * 32 + x_offset + 9
         py = self.pacman.y * 32 + y_offset + 8
-        self.pacman_sprite.update_position(px, py)
+        active_pacman_sprite.update_position(px, py)
         for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
             pos_y = ghost.y * 32 + y_offset + 8
             pos_x = ghost.x * 32 + x_offset + 9
@@ -250,7 +263,8 @@ class GameView(BaseView):
         self.data_box.draw(self.screen)
         self.level_txt.draw(self.screen)
         self.draw_maze(self.screen)
-        self.pacman_sprite.draw(self.screen)
+        active_pacman_sprite = self.pacman_sprites[self.last_pacman_dir]
+        active_pacman_sprite.draw(self.screen)
         for ghost, normal_sprite, frightened_sprite in self.ghost_sprite:
             if ghost.state != "DEAD":
                 if ghost.state == "FRIGHTENED":
