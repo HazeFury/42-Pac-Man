@@ -28,3 +28,12 @@ class InputManager:
             return "RIGHT"
 
         return "NONE"
+
+    def is_pause_pressed(self, events: list[pygame.event.Event]) -> bool:
+        """
+        Checks if the ESCAPE key was pressed in the given frame events.
+        """
+        for event in events:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return True
+        return False

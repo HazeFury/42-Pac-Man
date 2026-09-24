@@ -85,6 +85,15 @@ class GameView(BaseView):
         self.data_box.add_child(self.time_txt)
         self.data_box.add_child(self.score_txt)
 
+        self.is_paused: bool = False
+        self.pause_txt = Text(
+            pos_y="center",
+            pos_x="center",
+            text="PAUSE",
+            color="YELLOW",
+            font_size=72,
+        )
+
         x_offset, y_offset = self.maze_centering()
 
         self.player_x: int = self.pacman.x * 32 + x_offset + 9
@@ -146,6 +155,9 @@ class GameView(BaseView):
         Process standard UI events (like button clicks).
         Continuous keyboard state is handled in update().
         """
+        if self.game_engine.input_manager.is_pause_pressed(events):
+            self.is_paused = not self.is_paused
+
         for event in events:
             self.back_button.handle_event(event)
 
@@ -154,6 +166,9 @@ class GameView(BaseView):
         Acts as a bridge between the user inputs, the Game Engine, and the
         visual Sprites.
         """
+        if self.is_paused:
+            return
+
         # 1. the Engine capture user inputs (via the Controller Manager)
         self.game_engine.handle_input()
 
@@ -271,3 +286,6 @@ class GameView(BaseView):
                     frightened_sprite.draw(self.screen)
                 else:
                     normal_sprite.draw(self.screen)
+
+        if self.is_paused:
+            self.pause_txt.draw(self.screen)
