@@ -93,8 +93,8 @@ class GameEngine:
             self.super_pacgum_timer(dt)
 
         self._consume_items()
-        if self.player.lives == 0:
-            print("game over man")
+        # if self.player.lives == 0: # TODO: mettre la logique avec les etats
+        #     print("game over man")
         self.level_end()
 
     def _resolve_player_movement(self) -> None:

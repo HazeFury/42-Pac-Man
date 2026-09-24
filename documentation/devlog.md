@@ -58,3 +58,15 @@
 - ghost mangable lorsqu'on mange un super pacgum / réapparition des ghosts après le cooldown (gchmilew)
 - reset des positions de tout les movable lorsqu'on perd une vie (gchmilew)
 - algo des fuite des ghosts (gchmilew)
+
+
+### DAY 8
+
+- Mise à jour des sprites du pacman suivant sa direction réelle (marberge)
+- Système de fin de niveau (victoire et défaite) (marberge)
+- Ajout de l'option pause pendant une partie (marberge)
+- Système de cheat complet (marberge)
+- Animation plus smooth de déplacement pour les entités (gchmilew)
+- Ajustement divers : 
+	- super pacgums reset au changement de niveau (gchmilew)
+	- Révision du système de spawn des entités (level suivant ou new game) (gchmilew)
