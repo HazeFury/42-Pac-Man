@@ -125,27 +125,28 @@ class Setup(BaseModel):
         clean_json = []
         if len(sys.argv) > 1:
             path = Path(sys.argv[1])
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    lines = f.read().split("\n")
-                    for line in lines:
-                        if line.strip().startswith(forbiden_char):
-                            continue
-                        clean_json.append(line)
-
-                try:
-                    conf = "".join(clean_json)
-                    final_json = json.loads(conf)
-                    data = cls(**final_json)
-                except Exception:
-                    print("invalid json format using defaults value")
-                    data = cls()
-
-            except FileNotFoundError as e:
-                print(f"File {path} not found {e}")
-                data = cls()
         else:
+            path = Path("config.json")
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                lines = f.read().split("\n")
+                for line in lines:
+                    if line.strip().startswith(forbiden_char):
+                        continue
+                    clean_json.append(line)
+
+            try:
+                conf = "".join(clean_json)
+                final_json = json.loads(conf)
+                data = cls(**final_json)
+            except Exception:
+                print("invalid json format using defaults value")
+                data = cls()
+
+        except FileNotFoundError as e:
+            print(f"File {path} not found {e}")
             data = cls()
+
         return data
 
 

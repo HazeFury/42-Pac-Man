@@ -140,6 +140,7 @@ class GameEngine:
             cell.pacgum = False
         elif cell.super_pacgum:
             self.player.add_score(config.points_per_super_pacgum)
+            self.super_pacgum_time = 0
             cell.super_pacgum = False
             self.super_pacgum = True
             for ghost in self.ghosts:
@@ -207,6 +208,7 @@ class GameEngine:
         if is_from_menu is True:
             self.curr_level = 1
             self.player.score = 0
+            self.pause_timer = 1
             self.player.lives = config.lives
             self.ghost_start_position()
             if self.cheat_manager:
@@ -216,6 +218,7 @@ class GameEngine:
 
         self.lvl_cfg = config.get_level(self.curr_level)
         self.reset_position()
+        self.pause_timer = 1
         self.maze.generate_maze(
             seed=self.lvl_cfg.seed,
             w=self.lvl_cfg.width,
