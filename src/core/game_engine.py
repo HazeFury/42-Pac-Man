@@ -42,6 +42,7 @@ class GameEngine:
         self.super_pacgum_time = 0
         self.pause_timer: float = 1.0
         self.countdown = config.level_max_time
+        self.impact_pause = 0
 
         from core.cheat_manager import CheatManager
 
@@ -61,8 +62,17 @@ class GameEngine:
         """
         raw_dt = self.clock.tick() / 1000.0
         dt = min(raw_dt, 0.1)
+        if self.impact_pause > 0:
+            self.impact_pause -= dt
+            if self.impact_pause <= 0:
+                self.reset_position()
+                self.pause_timer = 1.5
+            return
         if self.pause_timer > 0:
             self.pause_timer -= dt
+            self.player.timer = min(0.5, self.player.timer + dt)
+            for ghost in self.ghosts:
+                ghost.timer = min(ghost.move_delay, ghost.timer + dt)
             return
         # Décrémentation du décompte
         if self.countdown > 0:
@@ -162,13 +172,12 @@ class GameEngine:
                 elif ghost.state == "CHASE":
                     if self.cheat_manager and self.cheat_manager.is_invincible:
                         continue
+                    self.impact_pause = 0.5
                     self.player.lives -= 1
                     self.super_pacgum = False
                     self.super_pacgum_time = 0
                     for ghost in self.ghosts:
                         ghost.state = "CHASE"
-                    self.reset_position()
-                    self.pause_timer = 1
 
     def level_end(self) -> bool:
 
@@ -181,9 +190,11 @@ class GameEngine:
         return self.player.score
 
     def reset_position(self) -> None:
+        self.player.prev_x, self.player.prev_y = self.player.get_visual_pos()
         self.player.x, self.player.y = self.player.spawn_x, self.player.spawn_y
-        self.player.prev_x, self.player.prev_y = self.player.x, self.player.y
         self.player.timer = 0.0
+        self.player.current_dir = "NONE"
+        self.player.next_dir = "NONE"
         for ghost in self.ghosts:
             ghost.prev_x, ghost.prev_y = ghost.get_visual_pos()
             ghost.x, ghost.y = ghost.spawn_x, ghost.spawn_y

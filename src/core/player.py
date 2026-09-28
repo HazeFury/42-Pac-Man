@@ -13,8 +13,8 @@ class Player:
 
         self.x: int = 0
         self.y: int = 0
-        self.prev_x: int = self.x
-        self.prev_y: int = self.y
+        self.prev_x: float = float(self.x)
+        self.prev_y: float = float(self.y)
 
         self.spawn_x: int = self.x
         self.spawn_y: int = self.y
@@ -48,11 +48,12 @@ class Player:
         tile positions for 60+ FPS smooth rendering.
         If stopped, returns exact grid coordinates.
         """
-        if self.current_dir == "NONE":
+        if self.prev_x == self.x and self.prev_y == self.y:
             return (float(self.x), float(self.y))
 
-        if self.move_delay > 0:
-            progress = min(1.0, max(0.0, self.timer / self.move_delay))
+        duration = 0.5 if self.current_dir == "NONE" else self.move_delay
+        if duration > 0:
+            progress = min(1.0, max(0.0, self.timer / duration))
         else:
             progress = 1.0
         vis_x = self.prev_x + (self.x - self.prev_x) * progress
