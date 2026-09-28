@@ -32,13 +32,11 @@ class GameEngine:
             Ghost(ghost_type="BLINKY"),
             Ghost(ghost_type="PINKY"),
             Ghost(ghost_type="INKY"),
-            Ghost(
-                ghost_type="CLYDE",
-            ),
+            Ghost(ghost_type="CLYDE",
+                  ),
         ]
 
         self.input_manager = InputManager()
-        self.death = False
         self.is_game_over: bool = False
         self.super_pacgum = False
         self.super_pacgum_time = 0
@@ -95,7 +93,6 @@ class GameEngine:
         self._consume_items()
         # if self.player.lives == 0: # TODO: mettre la logique avec les etats
         #     print("game over man")
-        self.level_end()
 
     def _resolve_player_movement(self) -> None:
         """
@@ -138,6 +135,7 @@ class GameEngine:
         if cell.pacgum:
             self.player.add_score(config.points_per_pacgum)
             cell.pacgum = False
+            self.maze.total_pacgum -= 1
         elif cell.super_pacgum:
             self.player.add_score(config.points_per_super_pacgum)
             self.super_pacgum_time = 0
@@ -159,16 +157,16 @@ class GameEngine:
                     if self.cheat_manager and self.cheat_manager.is_invincible:
                         continue
                     self.player.lives -= 1
+                    self.super_pacgum = False
+                    self.super_pacgum_time = 0
+                    for ghost in self.ghosts:
+                        ghost.state = "CHASE"
                     self.reset_position()
-                    self.pause_timer = 1.0
+                    self.pause_timer = 1
 
     def level_end(self) -> bool:
-        count = 0
-        for colum in self.maze.grid:
-            for cell in colum:
-                if cell.pacgum is True:
-                    count += 1
-        if count == 0:
+
+        if self.maze.total_pacgum == 0:
             return True
         else:
             return False
@@ -181,8 +179,9 @@ class GameEngine:
         self.player.prev_x, self.player.prev_y = self.player.x, self.player.y
         self.player.timer = 0.0
         for ghost in self.ghosts:
+            ghost.prev_x, ghost.prev_y = ghost.get_visual_pos()
             ghost.x, ghost.y = ghost.spawn_x, ghost.spawn_y
-        self.death = True
+            ghost.timer = 0.0
 
     def super_pacgum_timer(self, dt: float) -> None:
         if self.super_pacgum_time < 25:

@@ -50,7 +50,4 @@ class CheatManager:
         self.game_engine.player.lives += 1
 
     def skip_level(self) -> None:
-        for row in self.game_engine.maze.grid:
-            for cell in row:
-                cell.pacgum = False
-                cell.super_pacgum = False
+        self.game_engine.maze.total_pacgum = 0

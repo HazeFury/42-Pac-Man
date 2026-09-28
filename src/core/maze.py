@@ -35,6 +35,7 @@ class Maze:
         self.w: int = 0
         self.h: int = 0
         self.grid: list[list[Cell]] = []
+        self.total_pacgum: int = 0
 
     def generate_maze(
         self, seed: int = 42, w: int = 5, h: int = 5, pacgum: int = 42
@@ -77,7 +78,7 @@ class Maze:
         """
         Randomly places the requested number of pacgums across available cells.
         """
-
+        self.total_pacgum = 0
         if nb_pacgum > self.total_nb_cell():
             print("more pacgum than available Cell filling the whole maze")
             for line in self.grid:
@@ -85,6 +86,7 @@ class Maze:
                     if cell.super_pacgum is False:
                         if not all(cell.wall.values()):
                             cell.pacgum = True
+                            self.total_pacgum += 1
 
         else:
             for i in range(nb_pacgum):
@@ -99,6 +101,7 @@ class Maze:
                     ):
                         self.grid[y][x].pacgum = True
                         pacgum_assign = True
+            self.total_pacgum = nb_pacgum
 
     def total_nb_cell(self) -> int:
         """

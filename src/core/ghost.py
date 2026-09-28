@@ -16,8 +16,8 @@ class Ghost:
         """
         self.x: int = 0
         self.y: int = 0
-        self.prev_x: int = self.x
-        self.prev_y: int = self.y
+        self.prev_x: float = self.x
+        self.prev_y: float = self.y
 
         # Grid coordinates
 
