@@ -14,7 +14,7 @@ class GameEngine:
     """
 
     def __init__(self) -> None:
-
+        """Initialize game state, maze, entities, and timers."""
         self.clock = pygame.time.Clock()
         self.curr_level = 1
         self.lvl_cfg = config.get_level(self.curr_level)
@@ -176,6 +176,7 @@ class GameEngine:
                     ghost.state = "FRIGHTENED"
 
     def pacman_vs_ghost(self) -> None:
+        """Handle visual collisions between Pac-Man and ghosts."""
         p_vis_x, p_vis_y = self.player.get_visual_pos()
         for ghost in self.ghosts:
             if ghost.state == "DEAD":
@@ -197,16 +198,17 @@ class GameEngine:
                         ghost.state = "CHASE"
 
     def level_end(self) -> bool:
-
         if self.maze.total_pacgum == 0:
             return True
         else:
             return False
 
     def get_player_score(self) -> int:
+        """Return the player's current score."""
         return self.player.score
 
     def reset_position(self) -> None:
+        """Reset Pac-Man and ghost coordinates to prepare their respawn."""
         self.player.prev_x, self.player.prev_y = self.player.get_visual_pos()
         self.player.x, self.player.y = self.player.spawn_x, self.player.spawn_y
         self.player.timer = 0.0
@@ -218,6 +220,7 @@ class GameEngine:
             ghost.timer = 0.0
 
     def super_pacgum_timer(self, dt: float) -> None:
+        """Update super pacgum duration and revert ghosts once expired."""
         if self.super_pacgum_time < 25:
             self.super_pacgum = True
             self.super_pacgum_time += dt
@@ -229,15 +232,18 @@ class GameEngine:
                     ghost.state = "CHASE"
 
     def check_is_game_finished(self) -> None:
+        """Check if the current level is cleared and advance if applicable."""
         if self.level_end() is True and self.curr_level != self.total_levels:
             self.next_level()
 
     def next_level(self):
+        """Increment the level index and launch the new level."""
         self.curr_level += 1
 
         self.launch_new_game(is_from_menu=False)
 
     def launch_new_game(self, is_from_menu: bool) -> None:
+        """Initialize state for a new game session or a subsequent level."""
         if is_from_menu is True:
             self.curr_level = 1
             self.player.score = 0
@@ -266,6 +272,7 @@ class GameEngine:
         # niveau commence tout de suite et qu'il y ai du délai
 
     def ghost_start_position(self):
+        """Reset ghosts and player to their initial maze spawn locations."""
         for ghost in self.ghosts:
             ghost.spawn(self.maze.w, self.maze.h)
             ghost.state = "CHASE"

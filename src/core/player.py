@@ -9,6 +9,9 @@ class Player:
     """
 
     def __init__(self) -> None:
+        """
+        Initialize the player position, stats, movement state, and timer.
+        """
         self.config = config
 
         self.x: int = 0
@@ -35,6 +38,9 @@ class Player:
         self.score: int = 0
 
     def update(self, dt: float) -> bool:
+        """
+        Update the movement timer and return True if ready to move.
+        """
         self.timer += dt
         if self.timer >= self.move_delay:
             self.timer -= self.move_delay
@@ -72,6 +78,9 @@ class Player:
         self.ticks_per_move = 1
 
     def next_move(self, direction: str) -> None:
+        """
+        Save the previous position and advance coordinates in the given direction.
+        """
         self.prev_x = self.x
         self.prev_y = self.y
         if direction == "UP":
@@ -84,9 +93,15 @@ class Player:
             self.x += 1
 
     def add_score(self, score: int) -> None:
+        """
+        Add points to the player's total score.
+        """
         self.score += score
 
     def spawn(self, w: int, h: int) -> None:
+        """
+        Set initial and spawn coordinates at the center of the grid.
+        """
         self.spawn_x = ((w // 2) if (w % 2) != 0 else ((w // 2) - 1))
         self.spawn_y = h // 2
 

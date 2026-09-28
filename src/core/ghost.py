@@ -86,6 +86,7 @@ class Ghost:
         return False
 
     def spawn(self, w: int, h: int) -> None:
+        """Set corner spawn and visual coordinates according to ghost type."""
         if self.ghost_type == "BLINKY":
             self.spawn_x, self.spawn_y = 0, 0
         elif self.ghost_type == "PINKY":
