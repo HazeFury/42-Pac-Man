@@ -192,7 +192,8 @@ class Ghost:
         end = (target_x, target_y)
         queue = deque([start])
         visited: dict[tuple[int, int], tuple[int, int]] = {start: start}
-        while queue:
+        found = False
+        while queue and not found:
             cx, cy = queue.popleft()
             for dx, dy, direction in moves:
                 nx = cx + dx
@@ -205,11 +206,20 @@ class Ghost:
                 ):
                     visited[(nx, ny)] = (cx, cy)
                     if (nx, ny) == end:
+                        found = True
                         break
                     queue.append((nx, ny))
-        if end in visited:
+
+        # If target cell is unreachable (e.g. wall) or already reached,
+        # fallback to Pacman
+        if (end not in visited or end == start) and (x, y) in visited:
+            end = (x, y)
+
+        if end in visited and end != start:
             curr: tuple[int, int] = end
             while visited[curr] != start:
                 curr = visited[curr]
             self.prev_x, self.prev_y = self.x, self.y
             self.x, self.y = curr
+        else:
+            self.prev_x, self.prev_y = self.x, self.y

@@ -76,6 +76,11 @@ class GameEngine:
             self._resolve_player_movement()
 
         if not (self.cheat_manager and self.cheat_manager.is_ghost_frozen):
+            player_dir = (
+                self.player.current_dir
+                if self.player.current_dir != "NONE"
+                else self.player.next_dir
+            )
             for ghost in self.ghosts:
                 if ghost.update_position(dt):
                     ghost.ghost_ai(
@@ -83,7 +88,7 @@ class GameEngine:
                         self.player.x,
                         self.player.y,
                         self.ghosts[0],
-                        self.player.next_dir,
+                        player_dir,
                     )
 
         self.pacman_vs_ghost()
@@ -112,6 +117,7 @@ class GameEngine:
         # 3. Hit a wall, stop completely
         else:
             self.player.current_dir = "NONE"
+            self.player.next_dir = "NONE"
             self.player.prev_x = self.player.x
             self.player.prev_y = self.player.y
 
