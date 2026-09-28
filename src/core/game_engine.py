@@ -64,6 +64,11 @@ class GameEngine:
         dt = min(raw_dt, 0.1)
         if self.impact_pause > 0:
             self.impact_pause -= dt
+            self.player.timer = min(
+                self.player.move_delay,
+                self.player.timer + dt)
+            for ghost in self.ghosts:
+                ghost.timer = min(ghost.move_delay, ghost.timer + dt)
             if self.impact_pause <= 0:
                 self.reset_position()
                 self.pause_timer = 1.5
@@ -172,7 +177,7 @@ class GameEngine:
                 elif ghost.state == "CHASE":
                     if self.cheat_manager and self.cheat_manager.is_invincible:
                         continue
-                    self.impact_pause = 0.5
+                    self.impact_pause = 0.8
                     self.player.lives -= 1
                     self.super_pacgum = False
                     self.super_pacgum_time = 0
