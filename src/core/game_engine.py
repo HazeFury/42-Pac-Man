@@ -64,11 +64,6 @@ class GameEngine:
         dt = min(raw_dt, 0.1)
         if self.impact_pause > 0:
             self.impact_pause -= dt
-            self.player.timer = min(
-                self.player.move_delay,
-                self.player.timer + dt)
-            for ghost in self.ghosts:
-                ghost.timer = min(ghost.move_delay, ghost.timer + dt)
             if self.impact_pause <= 0:
                 self.reset_position()
                 self.pause_timer = 1.5
@@ -177,10 +172,13 @@ class GameEngine:
                     ghost.state = "FRIGHTENED"
 
     def pacman_vs_ghost(self) -> None:
-        p_x, p_y = self.player.x, self.player.y
+        p_vis_x, p_vis_y = self.player.get_visual_pos()
         for ghost in self.ghosts:
-            g_x, g_y = ghost.x, ghost.y
-            if p_x == g_x and p_y == g_y:
+            if ghost.state == "DEAD":
+                continue
+            g_vis_x, g_vis_y = ghost.get_visual_pos()
+            dist_sq = (p_vis_x - g_vis_x) ** 2 + (p_vis_y - g_vis_y) ** 2
+            if dist_sq < 0.1:
                 if ghost.state == "FRIGHTENED":
                     self.player.add_score(config.points_per_ghost)
                     ghost.state = "DEAD"
