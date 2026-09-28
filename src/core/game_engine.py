@@ -76,8 +76,18 @@ class GameEngine:
         if self.pause_timer > 0:
             self.pause_timer -= dt
             self.player.timer = min(0.5, self.player.timer + dt)
-            for ghost in self.ghosts:
-                ghost.timer = min(ghost.move_delay, ghost.timer + dt)
+            if self.pause_timer > 1.0:
+                self.player.timer = min(0.5, self.player.timer + dt)
+                for ghost in self.ghosts:
+                    ghost.timer = min(ghost.move_delay, ghost.timer + dt)
+            else:
+                self.player.timer = 0.0
+                self.player.prev_x = float(self.player.spawn_x)
+                self.player.prev_y = float(self.player.spawn_y)
+                for ghost in self.ghosts:
+                    ghost.timer = 0.0
+                    ghost.prev_x = float(ghost.spawn_x)
+                    ghost.prev_y = float(ghost.spawn_y)
             return
         # Décrémentation du décompte
         if self.countdown > 0:
