@@ -1,4 +1,4 @@
-from core.game_engine import GameEngine
+from src.core.game_engine import GameEngine
 
 
 class CheatManager:

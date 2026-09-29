@@ -6,14 +6,14 @@ if getattr(sys, "frozen", False):
 
 import pygame
 
-from core.cheat_manager import CheatManager
-from core.game_engine import GameEngine
-from utils import game_config
-from views.end_game_view import EndGameView
-from views.game_view import GameView
-from views.highscore_view import HighScoreView
-from views.menu_view import MenuView
-from views.rules_view import RulesView
+from src.core.cheat_manager import CheatManager
+from src.core.game_engine import GameEngine
+from src.utils import game_config
+from src.views.end_game_view import EndGameView
+from src.views.game_view import GameView
+from src.views.highscore_view import HighScoreView
+from src.views.menu_view import MenuView
+from src.views.rules_view import RulesView
 
 
 def main() -> None:

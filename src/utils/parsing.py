@@ -152,9 +152,8 @@ class Setup(BaseModel):
 
 class Player_score(BaseModel):
     name: str = Field(
-        max_length=10,
-        pattern=r"^[a-zA-Z0-9 ]+$",
-        default="BadName")
+        max_length=10, pattern=r"^[a-zA-Z0-9 ]+$", default="BadName"
+    )
     score: int = Field(ge=0, le=999999999, default=123)
 
     @field_validator("name", "score", mode="wrap")

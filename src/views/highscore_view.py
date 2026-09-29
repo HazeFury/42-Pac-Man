@@ -1,11 +1,11 @@
 import pygame
 
-from ui.box import Box
-from ui.button import Button
-from ui.text import Text
-from utils import game_config
-from utils.highscore import HighScoreManager
-from views.base_view import BaseView
+from src.ui.box import Box
+from src.ui.button import Button
+from src.ui.text import Text
+from src.utils import game_config
+from src.utils.highscore import HighScoreManager
+from src.views.base_view import BaseView
 
 
 class HighScoreView(BaseView):

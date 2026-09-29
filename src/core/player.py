@@ -1,4 +1,4 @@
-from utils.parsing import config
+from src.utils.parsing import config
 
 
 class Player:

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from utils.parsing import Highscore, Player_score, config
+from src.utils.parsing import Highscore, Player_score, config
 
 
 class HighScoreManager:

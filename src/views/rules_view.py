@@ -1,10 +1,10 @@
 import pygame
 
-from ui.box import Box
-from ui.button import Button
-from ui.text import Text
-from utils import game_config
-from views.base_view import BaseView
+from src.ui.box import Box
+from src.ui.button import Button
+from src.ui.text import Text
+from src.utils import game_config
+from src.views.base_view import BaseView
 
 
 class RulesView(BaseView):
