@@ -1,6 +1,9 @@
 import os
 import sys
 
+if getattr(sys, "frozen", False):
+    os.chdir(sys._MEIPASS)
+
 import pygame
 
 from core.cheat_manager import CheatManager
@@ -11,9 +14,6 @@ from views.game_view import GameView
 from views.highscore_view import HighScoreView
 from views.menu_view import MenuView
 from views.rules_view import RulesView
-
-if getattr(sys, "frozen", False):
-    os.chdir(sys._MEIPASS)
 
 
 def main() -> None:

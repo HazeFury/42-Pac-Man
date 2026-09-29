@@ -208,6 +208,7 @@ class GameView(BaseView):
     def go_back(self) -> None:
         """Callback to return to the menu."""
         self.next_view = "MENU"
+        self.is_paused = False
 
     def resume(self) -> None:
         self.is_paused = False
