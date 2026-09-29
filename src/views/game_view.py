@@ -115,7 +115,7 @@ class GameView(BaseView):
         self.cheat_f3 = Text(
             pos_y="0",
             pos_x="0",
-            text="[F5] Speed : OFF",
+            text="[F3] Speed : OFF",
             color="RED",
             font_size=30,
         )
@@ -129,7 +129,7 @@ class GameView(BaseView):
         self.cheat_f5 = Text(
             pos_y="0",
             pos_x="0",
-            text="[F3] Skip Level",
+            text="[F5] Skip Level",
             color="WHITE",
             font_size=30,
         )
