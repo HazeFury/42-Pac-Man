@@ -38,7 +38,12 @@ class Maze:
         self.total_pacgum: int = 0
 
     def generate_maze(
-        self, seed: int = 42, w: int = 5, h: int = 5, pacgum: int = 42
+        self,
+        seed: int = 42,
+        w: int = 5,
+        h: int = 5,
+        pacgum: int = 42,
+        is_perfect=False,
     ) -> None:
         """
         Generates the maze with given dimensions, seed, and pacgum count.
@@ -46,7 +51,7 @@ class Maze:
         self.w = w
         self.h = h
         self.grid = []
-        self.maze = MazeGenerator(size=(w, h), seed=seed)
+        self.maze = MazeGenerator(size=(w, h), seed=seed, perfect=is_perfect)
 
         self.maze_cell_init()
         self.Super_pacgum_placement()

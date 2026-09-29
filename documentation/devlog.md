@@ -70,3 +70,15 @@
 - Ajustement divers : 
 	- super pacgums reset au changement de niveau (gchmilew)
 	- Révision du système de spawn des entités (level suivant ou new game) (gchmilew)
+
+
+### DAY 9-10-11
+
+- Amélioration des différents timer et pause du jeu (gchmilew) 
+- Résolution d'affichage des ghosts lors de la défaite du joueur + respawn (gchmilew)
+- Collision visuelle améliorée (gchmilew)
+- Ajout d'une fenêtre pour les instructions du jeu (marberge)
+- Modification du menu pause (gchmilew)
+- Mise en place de la création du package final (marberge)
+- Refacto de plusieurs classes (game_engine, ghost, player) (gchmilew)
+- diverses amélioration mineures (gchmilew, marberge)
