@@ -5,10 +5,9 @@ a = Analysis(
     ['src/pac-man.py'],
     pathex=[],
     binaries=[],
-    datas=[
+	datas=[
 		('assets', 'assets'),
     	('config.json', '.'),
-		('INSTRUCTIONS.txt', '.'),
 	],
     hiddenimports=[],
     hookspath=[],
@@ -46,3 +45,12 @@ coll = COLLECT(
     upx_exclude=[],
     name='pac-man',
 )
+
+# --- Post-build Step: Copy INSTRUCTIONS.txt to the root of the executable folder ---
+import shutil
+import os
+
+dest_file = os.path.join('dist', 'pac-man', 'INSTRUCTIONS.txt')
+shutil.copy('INSTRUCTIONS.txt', dest_file)
+print(f"Copied INSTRUCTIONS.txt to {dest_file}")
+

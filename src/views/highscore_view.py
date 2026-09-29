@@ -43,16 +43,28 @@ class HighScoreView(BaseView):
         )
 
         # 3. Generate new Text components based on the updated data
-        for entry in self.scores:
+        if len(self.scores) == 0:
             self.menu_box.add_child(
                 Text(
                     pos_y="0",
                     pos_x="0",
-                    text=f"{entry.name} : {entry.score}",
+                    text="No high score on this PC. Start playing to "
+                    "register your score",
                     color="WHITE",
                     font_size=48,
                 )
             )
+        else:
+            for entry in self.scores:
+                self.menu_box.add_child(
+                    Text(
+                        pos_y="0",
+                        pos_x="0",
+                        text=f"{entry.name} : {entry.score}",
+                        color="WHITE",
+                        font_size=48,
+                    )
+                )
 
         # 4. Add the back button
         self.menu_box.add_child(
