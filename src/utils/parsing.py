@@ -152,7 +152,7 @@ class Setup(BaseModel):
 
 class Player_score(BaseModel):
     name: str = Field(max_length=10)
-    score: int = Field(ge=0, le=9999, default=123)
+    score: int = Field(ge=0, le=999999999, default=123)
 
     @field_validator("name", "score", mode="wrap")
     @classmethod

@@ -52,6 +52,16 @@ class MenuView(BaseView):
             Button(
                 pos_y="0",
                 pos_x="0",
+                text="INSTRUCTIONS",
+                func=self.show_rules,
+                color="YELLOW",
+            )
+        )
+
+        self.menu_box.add_child(
+            Button(
+                pos_y="0",
+                pos_x="0",
                 text="QUIT",
                 func=self.exit_game,
                 color="RED",
@@ -66,6 +76,10 @@ class MenuView(BaseView):
     def show_high_score(self) -> None:
         """Callback function assigned to the play button."""
         self.next_view = "SCORE"
+
+    def show_rules(self) -> None:
+        """Callback function assigned to the play button."""
+        self.next_view = "RULES"
 
     def exit_game(self) -> None:
         """Callback function assigned to the play button."""
