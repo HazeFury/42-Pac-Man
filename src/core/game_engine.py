@@ -166,7 +166,6 @@ class GameEngine:
         Process movement and AI pathfinding for each active ghost.
         Skipped if the ghost freeze cheat is active.
         """
-
         if self.cheat_manager and self.cheat_manager.is_ghost_frozen:
             return
 

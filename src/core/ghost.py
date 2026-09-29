@@ -19,14 +19,13 @@ class Ghost:
         self.prev_x: float = self.x
         self.prev_y: float = self.y
 
-        # Grid coordinates
-
         # Spawn coordinates to return to when eaten
         self.spawn_x: int = self.x
         self.spawn_y: int = self.y
 
-        # "BLINKY", "PINKY", etc. Determines the AI behavior
+        # "BLINKY", "PINKY", "INKY", "CLYDE"
         self.ghost_type: str = ghost_type
+        self.clyde_is_fleeing: bool = False
 
         # Speed expressed in engine ticks required to move
         self.move_delay: float = 0.5
@@ -45,13 +44,14 @@ class Ghost:
         Returns True if the ghost is ready to move, False otherwise.
         """
         self.respawn(dt)
-        if self.state != "DEAD":
-            self.timer += dt
-            if self.timer >= self.move_delay:
-                self.timer -= self.move_delay
-                return True
-            else:
-                return False
+        if self.state == "DEAD":
+            return False
+
+        self.timer += dt
+        if self.timer >= self.move_delay:
+            self.timer -= self.move_delay
+            return True
+
         return False
 
     def get_visual_pos(self) -> tuple[float, float]:
@@ -107,108 +107,161 @@ class Ghost:
         self.prev_x, self.prev_y = self.x, self.y
         self.timer = 0.0
 
-    def ghost_ai(self, map: Maze, x: int, y: int,
-                 blinky: "Ghost", direction: str) -> None:
+    def ghost_ai(self, maze: Maze, pacman_x: int, pacman_y: int,
+                 blinky: "Ghost", pacman_dir: str) -> None:
         """
-        Find and move to the next cell using BFS pathfinding.
+        Execute ghost decision-making: flee if frightened,
+         otherwise pathfind to target.
+        """
+        if self.state == "DEAD":
+            return
+        # 1. Frightened state: random flee movement
+        if self.state == "FRIGHTENED":
+            self._move_frightened(maze, pacman_x, pacman_y)
+            return
+        # 2. Chase state: compute personality target
+        target = self._get_chase_target(
+            maze, pacman_x, pacman_y, pacman_dir, blinky)
+        # 3. Pathfinding: compute next step via BFS
+        next_step = self._bfs_next_step(
+            maze, target, fallback=(
+                pacman_x, pacman_y))
 
-        Computes a target based on the ghost type and player position.
+        self.prev_x, self.prev_y = self.x, self.y
+        self.x, self.y = next_step
+
+    def _get_chase_target(
+        self,
+        maze: Maze,
+        pacman_x: int,
+        pacman_y: int,
+        pacman_dir: str,
+        blinky: "Ghost",
+    ) -> tuple[int, int]:
+        """
+        Calculate target tile based on individual ghost personality:
+        - BLINKY: Aggressive, directly targets Pac-Man.
+        - PINKY: Ambush, targets 2 tiles ahead of Pac-Man.
+        - INKY: Flanker, mirrors Blinky's vector across pivot.
+        - CLYDE: Cowardly, chases if far, flees to corner if close.
+        """
+        offsets = {
+            "UP": (0, -2),
+            "DOWN": (0, 2),
+            "LEFT": (-2, 0),
+            "RIGHT": (2, 0),
+        }
+        dx, dy = offsets.get(pacman_dir, (0, 0))
+
+        # BLINKY: Direct chase
+        if self.ghost_type == "BLINKY":
+            return (pacman_x, pacman_y)
+
+        # PINKY: Ambush 2 tiles ahead
+        if self.ghost_type == "PINKY":
+            return (
+                max(0, min(maze.w - 1, pacman_x + dx)),
+                max(0, min(maze.h - 1, pacman_y + dy)),
+            )
+
+        # INKY: Vector from Blinky to 2 tiles ahead
+        if self.ghost_type == "INKY":
+            pivot_x = pacman_x + dx
+            pivot_y = pacman_y + dy
+            raw_x = 2 * pivot_x - blinky.x
+            raw_y = 2 * pivot_y - blinky.y
+            return (
+                max(0, min(maze.w - 1, raw_x)),
+                max(0, min(maze.h - 1, raw_y)),
+            )
+
+        # CLYDE: Run away to bottom-right corner if closer than ~5.6 tiles
+        if self.ghost_type == "CLYDE":
+            dist_sq = (self.x - pacman_x) ** 2 + (self.y - pacman_y) ** 2
+            if dist_sq < 32:
+                self.clyde_is_fleeing = True
+            elif dist_sq > 58:
+                self.clyde_is_fleeing = False
+
+            if self.clyde_is_fleeing:
+                return (maze.w - 1, maze.h - 1)
+            return (pacman_x, pacman_y)
+
+        return (pacman_x, pacman_y)
+
+    def _move_frightened(
+        self, maze: Maze, pacman_x: int, pacman_y: int
+    ) -> None:
+        """
+        Pick a valid neighbouring cell, prioritizing directions
+        moving away from Pac-Man.
         """
         moves = [(0, -1, "N"), (1, 0, "E"), (0, 1, "S"), (-1, 0, "W")]
-        maze = map
-        target_x, target_y = x, y
-        start = (self.x, self.y)
-        if self.state == "CHASE":
-            if self.ghost_type == "PINKY":
-                target_x, target_y = x, y
-                p_dir = direction
-                if p_dir == "UP":
-                    target_y = max(0, target_y - 2)
-                elif p_dir == "DOWN":
-                    target_y = min(maze.h - 1, target_y + 2)
-                elif p_dir == "LEFT":
-                    target_x = max(0, target_x - 2)
-                elif p_dir == "RIGHT":
-                    target_x = min(maze.w - 1, target_x + 2)
-            if self.ghost_type == "INKY":
-                target_x, target_y = x, y
-                p_dir = direction
-                g_x = blinky.x
-                g_y = blinky.y
-                pivot_x = target_x
-                pivot_y = target_y
-                if p_dir == "UP":
-                    pivot_y = target_y - 2
-                elif p_dir == "DOWN":
-                    pivot_y = target_y + 2
-                elif p_dir == "LEFT":
-                    pivot_x = target_x - 2
-                elif p_dir == "RIGHT":
-                    pivot_x = target_x + 2
-                raw_target_x = 2 * pivot_x - g_x
-                raw_target_y = 2 * pivot_y - g_y
-                target_x = max(0, min(maze.w - 1, raw_target_x))
-                target_y = max(0, min(maze.h - 1, raw_target_y))
-            if self.ghost_type == "CLYDE":
-                target_x, target_y = x, y
-                distance = (self.x - target_x) ** 2 + (
-                    self.y - target_y
-                ) ** 2
-                if distance < 32:
-                    target_x = 0
-                    target_y = maze.h - 1
-        if self.state == "FRIGHTENED":
-            possible_moves = []
-            current_dist = (self.x - x) ** 2 + (self.y - y) ** 2
-            flee_moves = []
-            for dx, dy, direction in moves:
-                nx = self.x + dx
-                ny = self.y + dy
-                if 0 <= nx < maze.w and 0 <= ny < maze.h:
-                    if not maze.grid[self.y][self.x].wall[direction]:
-                        possible_moves.append((nx, ny))
-                        new_dist = (nx - x) ** 2 + (ny - y) ** 2
-                        if new_dist > current_dist:
-                            flee_moves.append((nx, ny))
-            if flee_moves:
-                self.prev_x, self.prev_y = self.x, self.y
-                self.x, self.y = random.choice(flee_moves)
-            elif possible_moves:
-                self.prev_x, self.prev_y = self.x, self.y
-                self.x, self.y = random.choice(possible_moves)
-            return
+        curr_dist = (self.x - pacman_x) ** 2 + (self.y - pacman_y) ** 2
+        possible_moves = []
+        flee_moves = []
 
-        end = (target_x, target_y)
+        for dx, dy, direction in moves:
+            next_x, next_y = self.x + dx, self.y + dy
+            if 0 <= next_x < maze.w and 0 <= next_y < maze.h:
+                if not maze.grid[self.y][self.x].wall[direction]:
+                    possible_moves.append((next_x, next_y))
+                    if (
+                        (next_x - pacman_x) ** 2 + (next_y - pacman_y) ** 2
+                        > curr_dist
+                    ):
+                        flee_moves.append((next_x, next_y))
+
+        chosen = random.choice(flee_moves) if flee_moves else (
+            random.choice(possible_moves) if possible_moves else (
+                self.x, self.y
+            )
+        )
+        self.prev_x, self.prev_y = self.x, self.y
+        self.x, self.y = chosen
+
+    def _bfs_next_step(
+        self, maze: Maze, target: tuple[int, int], fallback: tuple[int, int]
+    ) -> tuple[int, int]:
+        """
+        Run Breadth-First Search (BFS) to find the immediate
+        next step towards target.
+        Falls back to Pac-Man position if target is
+        inside a wall / unreachable.
+        """
+        start = (self.x, self.y)
+        moves = [(0, -1, "N"), (1, 0, "E"), (0, 1, "S"), (-1, 0, "W")]
         queue = deque([start])
         visited: dict[tuple[int, int], tuple[int, int]] = {start: start}
         found = False
+
         while queue and not found:
-            cx, cy = queue.popleft()
+            curr_x, curr_y = queue.popleft()
             for dx, dy, direction in moves:
-                nx = cx + dx
-                ny = cy + dy
+                next_x = curr_x + dx
+                next_y = curr_y + dy
                 if (
-                    0 <= nx < maze.w
-                    and 0 <= ny < maze.h
-                    and not (maze.grid[cy][cx].wall[direction])
-                    and (nx, ny) not in visited
+                    0 <= next_x < maze.w
+                    and 0 <= next_y < maze.h
+                    and not maze.grid[curr_y][curr_x].wall[direction]
+                    and (next_x, next_y) not in visited
                 ):
-                    visited[(nx, ny)] = (cx, cy)
-                    if (nx, ny) == end:
+                    visited[(next_x, next_y)] = (curr_x, curr_y)
+                    if (next_x, next_y) == target:
                         found = True
                         break
-                    queue.append((nx, ny))
+                    queue.append((next_x, next_y))
 
-        # If target cell is unreachable (e.g. wall) or already reached,
-        # fallback to Pacman
-        if (end not in visited or end == start) and (x, y) in visited:
-            end = (x, y)
+        # Target unreachable or already there: fallback
+        end = target
+        if (end not in visited or end == start) and fallback in visited:
+            end = fallback
 
+        # Trace back to immediate next tile
         if end in visited and end != start:
-            curr: tuple[int, int] = end
+            curr = end
             while visited[curr] != start:
                 curr = visited[curr]
-            self.prev_x, self.prev_y = self.x, self.y
-            self.x, self.y = curr
-        else:
-            self.prev_x, self.prev_y = self.x, self.y
+            return curr
+
+        return (self.x, self.y)
