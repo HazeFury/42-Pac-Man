@@ -86,13 +86,30 @@ class GameView(BaseView):
         self.data_box.add_child(self.score_txt)
 
         self.is_paused: bool = False
-        self.pause_txt = Text(
+        self.pause_box = Box(
             pos_y="center",
             pos_x="center",
-            text="PAUSE",
-            color="YELLOW",
-            font_size=72,
+            layout="vertical",
+            spacing=20,
         )
+        self.pause_resume_btn = Button(
+            pos_y="0",
+            pos_x="0",
+            text="RESUME",
+            func=self.resume,
+            color="GREEN",
+            size="medium",
+        )
+        self.pause_menu_btn = Button(
+            pos_y="0",
+            pos_x="0",
+            text="MAIN MENU",
+            func=self.go_back,
+            color="RED",
+            size="medium",
+        )
+        self.pause_box.add_child(self.pause_resume_btn)
+        self.pause_box.add_child(self.pause_menu_btn)
 
         # Cheats HUD (Bottom-Left)
         self.cheat_box = Box(
@@ -192,6 +209,9 @@ class GameView(BaseView):
         """Callback to return to the menu."""
         self.next_view = "MENU"
 
+    def resume(self) -> None:
+        self.is_paused = False
+
     def go_to_win_screen(self) -> None:
         """Callback to go to win screen."""
         self.next_view = "WIN"
@@ -206,6 +226,8 @@ class GameView(BaseView):
 
         for event in events:
             self.back_button.handle_event(event)
+            if self.is_paused:
+                self.pause_box.handle_event(event)
 
     def update(self, dt: float = 0.024) -> None:
         """
@@ -268,7 +290,7 @@ class GameView(BaseView):
                 color="GREEN" if cm.is_ghost_frozen else "RED",
             )
             self.cheat_f3.update_text(
-                f"[F5] Speed : {'ON' if cm.is_speed_boosted else 'OFF'}",
+                f"[F3 Speed : {'ON' if cm.is_speed_boosted else 'OFF'}",
                 color="GREEN" if cm.is_speed_boosted else "RED",
             )
             self.cheat_box.update_layout()
@@ -348,4 +370,4 @@ class GameView(BaseView):
         self.cheat_box.draw(self.screen)
 
         if self.is_paused:
-            self.pause_txt.draw(self.screen)
+            self.pause_box.draw(self.screen)
