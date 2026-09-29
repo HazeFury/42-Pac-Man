@@ -12,8 +12,6 @@ class Player:
         """
         Initialize the player position, stats, movement state, and timer.
         """
-        self.config = config
-
         self.x: int = 0
         self.y: int = 0
         self.prev_x: float = float(self.x)
@@ -28,11 +26,7 @@ class Player:
 
         # Speed expressed in engine ticks required to move
         self.move_delay: float = 0.1
-        self.timer: float = 0
-
-        self.death = False
-        self.death_timer = 0
-        self.death_pause = 1
+        self.timer: float = 0.0
 
         self.lives: int = config.lives
         self.score: int = 0
@@ -45,8 +39,7 @@ class Player:
         if self.timer >= self.move_delay:
             self.timer -= self.move_delay
             return True
-        else:
-            return False
+        return False
 
     def get_visual_pos(self) -> tuple[float, float]:
         """
@@ -62,6 +55,7 @@ class Player:
             progress = min(1.0, max(0.0, self.timer / duration))
         else:
             progress = 1.0
+
         vis_x = self.prev_x + (self.x - self.prev_x) * progress
         vis_y = self.prev_y + (self.y - self.prev_y) * progress
         return (vis_x, vis_y)
@@ -73,16 +67,13 @@ class Player:
         if direction in ("UP", "DOWN", "LEFT", "RIGHT"):
             self.next_dir = direction
 
-    def enable_cheat_speed(self) -> None:
-        """Cheat mode: Pac-Man moves every single engine tick!"""
-        self.ticks_per_move = 1
-
     def next_move(self, direction: str) -> None:
         """
-        Save the previous position and advance coordinates in the given direction.
+        Save previous position and advance coordinates in given direction.
         """
-        self.prev_x = self.x
-        self.prev_y = self.y
+        self.prev_x = float(self.x)
+        self.prev_y = float(self.y)
+
         if direction == "UP":
             self.y -= 1
         elif direction == "DOWN":
@@ -106,15 +97,4 @@ class Player:
         self.spawn_y = h // 2
 
         self.x, self.y = self.spawn_x, self.spawn_y
-        self.prev_x, self.prev_y = self.x, self.y
-
-    # def respawn(self, dt) -> bool:
-    #     if self.visible is False:
-    #         self.respawn_timer += dt
-    #         if self.death_pause < self.death_timer:
-    #             self.respawn_timer = 0
-
-    #             return True
-    #         else:
-    #             self.respawn_timer += dt
-    #     return False
+        self.prev_x, self.prev_y = float(self.x), float(self.y)
