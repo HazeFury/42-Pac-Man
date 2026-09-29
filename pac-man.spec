@@ -8,6 +8,7 @@ a = Analysis(
     datas=[
 		('assets', 'assets'),
     	('config.json', '.'),
+		('INSTRUCTIONS.txt', '.'),
 	],
     hiddenimports=[],
     hookspath=[],

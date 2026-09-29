@@ -1,0 +1,47 @@
+================================================================================
+                                PAC-MAN 42
+================================================================================
+
+1. CONTROLS
+-----------
+- Move Up:       Up Arrow / W / Z
+- Move Down:     Down Arrow / S
+- Move Left:     Left Arrow / A / Q
+- Move Right:    Right Arrow / D
+- Pause / Back:  Escape (ESC)
+
+In Menu & HighScore:
+- Click on buttons with Mouse Left-Click.
+- Type player name using keyboard, then press Enter or click submit.
+
+2. GAMEPLAY & OBJECTIVES
+------------------------
+- Navigate through the procedural maze.
+- Eat all normal pacgums to complete the level.
+- Avoid the ghosts (Blinky, Pinky, Inky, Clyde).
+- Eat a super pacgum to turn ghosts frightened and vulnerable.
+- Reach the highest score and enter your name in the Hall of Fame!
+
+3. OPTIONS & CONFIGURATION (config.json)
+----------------------------------------
+You can customize the game settings by editing the 'config.json' file located
+alongside the game executable:
+
+- "highscore_filename": (string) Path to the highscores file (default: "highscore.json").
+- "lives": (int) Number of starting lives for Pac-Man (default: 3).
+- "points_per_pacgum": (int) Score awarded for eating a normal pacgum (default: 10).
+- "points_per_super_pacgum": (int) Score for eating a super pacgum (default: 50).
+- "points_per_ghost": (int) Score for capturing a frightened ghost (default: 200).
+- "level_max_time": (int) Time limit in seconds per level (default: 90).
+- "levels": (object) Map configuration for each level:
+    * "width":  Grid width (minimum 10)
+    * "height": Grid height (minimum 10)
+    * "pacgum": Pacgum density / distribution mode
+    * "seed":   Random seed for procedural maze generation
+
+4. HOW TO RUN
+-------------
+- Graphical: Double-click the 'pac-man' executable from your file manager.
+- Terminal:  ./pac-man [optional_custom_config.json]
+
+================================================================================
