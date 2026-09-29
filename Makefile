@@ -25,7 +25,7 @@ setup:
 	fi
 
 build: install
-	@uv build
+	@pyinstaller pac-man.spec
 
 run:
 	@uv run $(SRC_DIR)/$(MAIN) $(CONFIG_FILE)
@@ -42,6 +42,7 @@ fclean: clean
 	@echo "Removing virtual environment and distribution files"
 	@rm -rf $(VENV)
 	@rm -rf dist/
+	@rm -rf build/
 
 re: fclean all
 
