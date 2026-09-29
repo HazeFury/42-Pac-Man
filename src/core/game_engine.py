@@ -14,7 +14,7 @@ class GameEngine:
     """
 
     def __init__(self) -> None:
-
+        """Initialize game state, maze, entities, and timers."""
         self.clock = pygame.time.Clock()
         self.curr_level = 1
         self.lvl_cfg = config.get_level(self.curr_level)
@@ -32,18 +32,17 @@ class GameEngine:
             Ghost(ghost_type="BLINKY"),
             Ghost(ghost_type="PINKY"),
             Ghost(ghost_type="INKY"),
-            Ghost(
-                ghost_type="CLYDE",
-            ),
+            Ghost(ghost_type="CLYDE",
+                  ),
         ]
 
         self.input_manager = InputManager()
-        self.death = False
         self.is_game_over: bool = False
         self.super_pacgum = False
         self.super_pacgum_time = 0
         self.pause_timer: float = 1.0
         self.countdown = config.level_max_time
+        self.impact_pause = 0
 
         from core.cheat_manager import CheatManager
 
@@ -63,8 +62,31 @@ class GameEngine:
         """
         raw_dt = self.clock.tick() / 1000.0
         dt = min(raw_dt, 0.1)
+        if self.impact_pause > 0:
+            self.impact_pause -= dt
+            if self.impact_pause <= 0:
+                self.reset_position()
+                self.pause_timer = 1.5
+            return
         if self.pause_timer > 0:
             self.pause_timer -= dt
+            if self.pause_timer > 1.0:
+                self.player.timer = min(0.5, self.player.timer + dt)
+                for ghost in self.ghosts:
+                    ghost.timer = min(ghost.move_delay, ghost.timer + dt)
+            else:
+                self.player.timer = 0.0
+                self.player.prev_x = float(self.player.spawn_x)
+                self.player.prev_y = float(self.player.spawn_y)
+                for ghost in self.ghosts:
+                    ghost.timer = 0.0
+                    ghost.prev_x = float(ghost.spawn_x)
+                    ghost.prev_y = float(ghost.spawn_y)
+
+            if self.pause_timer <= 0:
+                self.player.timer = self.player.move_delay
+                for ghost in self.ghosts:
+                    ghost.timer = ghost.move_delay
             return
         # Décrémentation du décompte
         if self.countdown > 0:
@@ -78,6 +100,11 @@ class GameEngine:
             self._resolve_player_movement()
 
         if not (self.cheat_manager and self.cheat_manager.is_ghost_frozen):
+            player_dir = (
+                self.player.current_dir
+                if self.player.current_dir != "NONE"
+                else self.player.next_dir
+            )
             for ghost in self.ghosts:
                 if ghost.update_position(dt):
                     ghost.ghost_ai(
@@ -85,7 +112,7 @@ class GameEngine:
                         self.player.x,
                         self.player.y,
                         self.ghosts[0],
-                        self.player.next_dir,
+                        player_dir,
                     )
 
         self.pacman_vs_ghost()
@@ -95,7 +122,6 @@ class GameEngine:
         self._consume_items()
         # if self.player.lives == 0: # TODO: mettre la logique avec les etats
         #     print("game over man")
-        self.level_end()
 
     def _resolve_player_movement(self) -> None:
         """
@@ -115,6 +141,7 @@ class GameEngine:
         # 3. Hit a wall, stop completely
         else:
             self.player.current_dir = "NONE"
+            self.player.next_dir = "NONE"
             self.player.prev_x = self.player.x
             self.player.prev_y = self.player.y
 
@@ -138,6 +165,7 @@ class GameEngine:
         if cell.pacgum:
             self.player.add_score(config.points_per_pacgum)
             cell.pacgum = False
+            self.maze.total_pacgum -= 1
         elif cell.super_pacgum:
             self.player.add_score(config.points_per_super_pacgum)
             self.super_pacgum_time = 0
@@ -148,43 +176,51 @@ class GameEngine:
                     ghost.state = "FRIGHTENED"
 
     def pacman_vs_ghost(self) -> None:
-        p_x, p_y = self.player.x, self.player.y
+        """Handle visual collisions between Pac-Man and ghosts."""
+        p_vis_x, p_vis_y = self.player.get_visual_pos()
         for ghost in self.ghosts:
-            g_x, g_y = ghost.x, ghost.y
-            if p_x == g_x and p_y == g_y:
+            if ghost.state == "DEAD":
+                continue
+            g_vis_x, g_vis_y = ghost.get_visual_pos()
+            dist_sq = (p_vis_x - g_vis_x) ** 2 + (p_vis_y - g_vis_y) ** 2
+            if dist_sq < 0.1:
                 if ghost.state == "FRIGHTENED":
                     self.player.add_score(config.points_per_ghost)
                     ghost.state = "DEAD"
                 elif ghost.state == "CHASE":
                     if self.cheat_manager and self.cheat_manager.is_invincible:
                         continue
+                    self.impact_pause = 0.8
                     self.player.lives -= 1
-                    self.reset_position()
-                    self.pause_timer = 1.0
+                    self.super_pacgum = False
+                    self.super_pacgum_time = 0
+                    for ghost in self.ghosts:
+                        ghost.state = "CHASE"
 
     def level_end(self) -> bool:
-        count = 0
-        for colum in self.maze.grid:
-            for cell in colum:
-                if cell.pacgum is True:
-                    count += 1
-        if count == 0:
+        if self.maze.total_pacgum == 0:
             return True
         else:
             return False
 
     def get_player_score(self) -> int:
+        """Return the player's current score."""
         return self.player.score
 
     def reset_position(self) -> None:
+        """Reset Pac-Man and ghost coordinates to prepare their respawn."""
+        self.player.prev_x, self.player.prev_y = self.player.get_visual_pos()
         self.player.x, self.player.y = self.player.spawn_x, self.player.spawn_y
-        self.player.prev_x, self.player.prev_y = self.player.x, self.player.y
         self.player.timer = 0.0
+        self.player.current_dir = "NONE"
+        self.player.next_dir = "NONE"
         for ghost in self.ghosts:
+            ghost.prev_x, ghost.prev_y = ghost.get_visual_pos()
             ghost.x, ghost.y = ghost.spawn_x, ghost.spawn_y
-        self.death = True
+            ghost.timer = 0.0
 
     def super_pacgum_timer(self, dt: float) -> None:
+        """Update super pacgum duration and revert ghosts once expired."""
         if self.super_pacgum_time < 25:
             self.super_pacgum = True
             self.super_pacgum_time += dt
@@ -196,15 +232,18 @@ class GameEngine:
                     ghost.state = "CHASE"
 
     def check_is_game_finished(self) -> None:
+        """Check if the current level is cleared and advance if applicable."""
         if self.level_end() is True and self.curr_level != self.total_levels:
             self.next_level()
 
     def next_level(self):
+        """Increment the level index and launch the new level."""
         self.curr_level += 1
 
         self.launch_new_game(is_from_menu=False)
 
     def launch_new_game(self, is_from_menu: bool) -> None:
+        """Initialize state for a new game session or a subsequent level."""
         if is_from_menu is True:
             self.curr_level = 1
             self.player.score = 0
@@ -233,6 +272,7 @@ class GameEngine:
         # niveau commence tout de suite et qu'il y ai du délai
 
     def ghost_start_position(self):
+        """Reset ghosts and player to their initial maze spawn locations."""
         for ghost in self.ghosts:
             ghost.spawn(self.maze.w, self.maze.h)
             ghost.state = "CHASE"

@@ -16,8 +16,8 @@ class Ghost:
         """
         self.x: int = 0
         self.y: int = 0
-        self.prev_x: int = self.x
-        self.prev_y: int = self.y
+        self.prev_x: float = self.x
+        self.prev_y: float = self.y
 
         # Grid coordinates
 
@@ -86,6 +86,7 @@ class Ghost:
         return False
 
     def spawn(self, w: int, h: int) -> None:
+        """Set corner spawn and visual coordinates according to ghost type."""
         if self.ghost_type == "BLINKY":
             self.spawn_x, self.spawn_y = 0, 0
         elif self.ghost_type == "PINKY":
@@ -192,7 +193,8 @@ class Ghost:
         end = (target_x, target_y)
         queue = deque([start])
         visited: dict[tuple[int, int], tuple[int, int]] = {start: start}
-        while queue:
+        found = False
+        while queue and not found:
             cx, cy = queue.popleft()
             for dx, dy, direction in moves:
                 nx = cx + dx
@@ -205,11 +207,20 @@ class Ghost:
                 ):
                     visited[(nx, ny)] = (cx, cy)
                     if (nx, ny) == end:
+                        found = True
                         break
                     queue.append((nx, ny))
-        if end in visited:
+
+        # If target cell is unreachable (e.g. wall) or already reached,
+        # fallback to Pacman
+        if (end not in visited or end == start) and (x, y) in visited:
+            end = (x, y)
+
+        if end in visited and end != start:
             curr: tuple[int, int] = end
             while visited[curr] != start:
                 curr = visited[curr]
             self.prev_x, self.prev_y = self.x, self.y
             self.x, self.y = curr
+        else:
+            self.prev_x, self.prev_y = self.x, self.y

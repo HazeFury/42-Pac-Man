@@ -9,12 +9,15 @@ class Player:
     """
 
     def __init__(self) -> None:
+        """
+        Initialize the player position, stats, movement state, and timer.
+        """
         self.config = config
 
         self.x: int = 0
         self.y: int = 0
-        self.prev_x: int = self.x
-        self.prev_y: int = self.y
+        self.prev_x: float = float(self.x)
+        self.prev_y: float = float(self.y)
 
         self.spawn_x: int = self.x
         self.spawn_y: int = self.y
@@ -35,6 +38,9 @@ class Player:
         self.score: int = 0
 
     def update(self, dt: float) -> bool:
+        """
+        Update the movement timer and return True if ready to move.
+        """
         self.timer += dt
         if self.timer >= self.move_delay:
             self.timer -= self.move_delay
@@ -48,11 +54,12 @@ class Player:
         tile positions for 60+ FPS smooth rendering.
         If stopped, returns exact grid coordinates.
         """
-        if self.current_dir == "NONE":
+        if self.prev_x == self.x and self.prev_y == self.y:
             return (float(self.x), float(self.y))
 
-        if self.move_delay > 0:
-            progress = min(1.0, max(0.0, self.timer / self.move_delay))
+        duration = 0.5 if self.current_dir == "NONE" else self.move_delay
+        if duration > 0:
+            progress = min(1.0, max(0.0, self.timer / duration))
         else:
             progress = 1.0
         vis_x = self.prev_x + (self.x - self.prev_x) * progress
@@ -71,6 +78,9 @@ class Player:
         self.ticks_per_move = 1
 
     def next_move(self, direction: str) -> None:
+        """
+        Save the previous position and advance coordinates in the given direction.
+        """
         self.prev_x = self.x
         self.prev_y = self.y
         if direction == "UP":
@@ -83,22 +93,28 @@ class Player:
             self.x += 1
 
     def add_score(self, score: int) -> None:
+        """
+        Add points to the player's total score.
+        """
         self.score += score
 
     def spawn(self, w: int, h: int) -> None:
+        """
+        Set initial and spawn coordinates at the center of the grid.
+        """
         self.spawn_x = ((w // 2) if (w % 2) != 0 else ((w // 2) - 1))
         self.spawn_y = h // 2
 
         self.x, self.y = self.spawn_x, self.spawn_y
         self.prev_x, self.prev_y = self.x, self.y
 
-    def respawn(self, dt) -> bool:
-        if self.visible is False:
-            self.respawn_timer += dt
-            if self.death_pause < self.death_timer:
-                self.respawn_timer = 0
+    # def respawn(self, dt) -> bool:
+    #     if self.visible is False:
+    #         self.respawn_timer += dt
+    #         if self.death_pause < self.death_timer:
+    #             self.respawn_timer = 0
 
-                return True
-            else:
-                self.respawn_timer += dt
-        return False
+    #             return True
+    #         else:
+    #             self.respawn_timer += dt
+    #     return False

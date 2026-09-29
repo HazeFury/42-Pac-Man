@@ -8,6 +8,7 @@ class CheatManager:
     """
 
     def __init__(self, game_engine: GameEngine) -> None:
+        """Initialize cheat states, references, and speed presets."""
         self.game_engine = game_engine
 
         # Cheat states (toggles)
@@ -34,12 +35,15 @@ class CheatManager:
                 self.toggle_speed_boost()
 
     def toggle_invincibility(self) -> None:
+        """Toggle Pac-Man invincibility on or off."""
         self.is_invincible = not self.is_invincible
 
     def toggle_freeze_ghosts(self) -> None:
+        """Toggle ghost movement freeze on or off."""
         self.is_ghost_frozen = not self.is_ghost_frozen
 
     def toggle_speed_boost(self) -> None:
+        """Toggle Pac-Man speed boost on or off."""
         self.is_speed_boosted = not self.is_speed_boosted
         if self.is_speed_boosted:
             self.game_engine.player.move_delay = self.boosted_move_delay
@@ -47,10 +51,9 @@ class CheatManager:
             self.game_engine.player.move_delay = self.normal_move_delay
 
     def add_extra_life(self) -> None:
+        """Add one extra life to the player."""
         self.game_engine.player.lives += 1
 
     def skip_level(self) -> None:
-        for row in self.game_engine.maze.grid:
-            for cell in row:
-                cell.pacgum = False
-                cell.super_pacgum = False
+        """Instantly complete the level by clearing remaining pacgums."""
+        self.game_engine.maze.total_pacgum = 0
