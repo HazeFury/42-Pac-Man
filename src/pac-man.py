@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pygame
@@ -9,6 +10,9 @@ from views.end_game_view import EndGameView
 from views.game_view import GameView
 from views.highscore_view import HighScoreView
 from views.menu_view import MenuView
+
+if getattr(sys, "frozen", False):
+    os.chdir(sys._MEIPASS)
 
 
 def main() -> None:

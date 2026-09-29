@@ -25,7 +25,7 @@ setup:
 	fi
 
 build: install
-	@pyinstaller pac-man.spec
+	@uv run pyinstaller pac-man.spec --noconfirm
 
 run:
 	@uv run $(SRC_DIR)/$(MAIN) $(CONFIG_FILE)
