@@ -1,6 +1,6 @@
 import random
 from collections import deque
-from core.maze import Maze
+from src.core.maze import Maze
 
 
 class Ghost:

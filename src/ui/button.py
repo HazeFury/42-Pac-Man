@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 import pygame
 
-from utils import game_config
+from src.utils import game_config
 
 
 class Button:

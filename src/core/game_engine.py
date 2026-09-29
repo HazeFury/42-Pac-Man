@@ -1,10 +1,10 @@
 import pygame
 
-from core.ghost import Ghost
-from core.maze import Cell, Maze
-from core.player import Player
-from utils.input_manager import InputManager
-from utils.parsing import config
+from src.core.ghost import Ghost
+from src.core.maze import Cell, Maze
+from src.core.player import Player
+from src.utils.input_manager import InputManager
+from src.utils.parsing import config
 
 
 class GameEngine:
@@ -32,8 +32,9 @@ class GameEngine:
             Ghost(ghost_type="BLINKY"),
             Ghost(ghost_type="PINKY"),
             Ghost(ghost_type="INKY"),
-            Ghost(ghost_type="CLYDE",
-                  ),
+            Ghost(
+                ghost_type="CLYDE",
+            ),
         ]
 
         self.input_manager = InputManager()
@@ -43,7 +44,7 @@ class GameEngine:
         self.countdown = config.level_max_time
         self.death_collision_pause = 0
 
-        from core.cheat_manager import CheatManager
+        from src.core.cheat_manager import CheatManager
 
         self.cheat_manager: CheatManager | None = None
 
@@ -121,8 +122,7 @@ class GameEngine:
         if self.pause_timer > 1.0:
             self.player.timer = min(0.5, self.player.timer + dt)
             for ghost in self.ghosts:
-                ghost.timer = min(
-                    ghost.move_delay, ghost.timer + dt)
+                ghost.timer = min(ghost.move_delay, ghost.timer + dt)
 
         # Frozen on spawn waiting for go
         else:

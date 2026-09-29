@@ -1,7 +1,6 @@
 NAME = PROJECT
 VERSION = 0.1.0
 VENV = .venv
-SRC_DIR = src
 MAIN = pac-man.py
 CONFIG_FILE = config.json
 
@@ -28,10 +27,10 @@ build: install
 	@uv run pyinstaller pac-man.spec --noconfirm
 
 run:
-	@uv run $(SRC_DIR)/$(MAIN) $(CONFIG_FILE)
+	@uv run $(MAIN) $(CONFIG_FILE)
 
 debug:
-	@uv run python3 -m pdb $(SRC_DIR)/$(MAIN)
+	@uv run python3 -m pdb $(MAIN)
 
 clean:
 	@echo "Removing temporary files or caches"

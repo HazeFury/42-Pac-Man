@@ -2,12 +2,12 @@ import sys
 
 import pygame
 
-from core.game_engine import GameEngine
-from ui.box import Box
-from ui.button import Button
-from ui.sprite import Sprite
-from utils import game_config
-from views.base_view import BaseView
+from src.core.game_engine import GameEngine
+from src.ui.box import Box
+from src.ui.button import Button
+from src.ui.sprite import Sprite
+from src.utils import game_config
+from src.views.base_view import BaseView
 
 
 class MenuView(BaseView):
