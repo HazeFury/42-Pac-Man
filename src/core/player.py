@@ -108,13 +108,3 @@ class Player:
         self.x, self.y = self.spawn_x, self.spawn_y
         self.prev_x, self.prev_y = self.x, self.y
 
-    # def respawn(self, dt) -> bool:
-    #     if self.visible is False:
-    #         self.respawn_timer += dt
-    #         if self.death_pause < self.death_timer:
-    #             self.respawn_timer = 0
-
-    #             return True
-    #         else:
-    #             self.respawn_timer += dt
-    #     return False

@@ -37,16 +37,19 @@ class GameEngine:
         ]
 
         self.input_manager = InputManager()
-        self.is_game_over: bool = False
         self.super_pacgum = False
         self.super_pacgum_time = 0
         self.pause_timer: float = 1.0
         self.countdown = config.level_max_time
-        self.impact_pause = 0
+        self.death_collision_pause = 0
 
         from core.cheat_manager import CheatManager
 
         self.cheat_manager: CheatManager | None = None
+
+        # Game lifecycle state: "PLAYING", "VICTORY",
+        # "GAMEOVER"
+        self.game_state: str = "PLAYING"
 
     def handle_input(self) -> None:
         """
@@ -57,71 +60,84 @@ class GameEngine:
 
     def update(self) -> None:
         """
-        Accumulates delta time and triggers a game tick when the
-        threshold is met.
+        Accumulates delta time and triggers a game tick
         """
         raw_dt = self.clock.tick() / 1000.0
         dt = min(raw_dt, 0.1)
-        if self.impact_pause > 0:
-            self.impact_pause -= dt
-            if self.impact_pause <= 0:
-                self.reset_position()
-                self.pause_timer = 1.5
-            return
-        if self.pause_timer > 0:
-            self.pause_timer -= dt
-            if self.pause_timer > 1.0:
-                self.player.timer = min(0.5, self.player.timer + dt)
-                for ghost in self.ghosts:
-                    ghost.timer = min(ghost.move_delay, ghost.timer + dt)
-            else:
-                self.player.timer = 0.0
-                self.player.prev_x = float(self.player.spawn_x)
-                self.player.prev_y = float(self.player.spawn_y)
-                for ghost in self.ghosts:
-                    ghost.timer = 0.0
-                    ghost.prev_x = float(ghost.spawn_x)
-                    ghost.prev_y = float(ghost.spawn_y)
 
-            if self.pause_timer <= 0:
-                self.player.timer = self.player.move_delay
-                for ghost in self.ghosts:
-                    ghost.timer = ghost.move_delay
+        # Handles both impact freeze and respawn pause
+        if self._start_pause(dt):
             return
-        # Décrémentation du décompte
-        if self.countdown > 0:
-            self.countdown = max(0.0, self.countdown - dt)
-            if self.countdown == 0:
-                # Optionnel : déclencher la fin du niveau ou le game over
-                # par manque de temps
-                pass
 
         if self.player.update(dt):
             self._resolve_player_movement()
 
-        if not (self.cheat_manager and self.cheat_manager.is_ghost_frozen):
-            player_dir = (
-                self.player.current_dir
-                if self.player.current_dir != "NONE"
-                else self.player.next_dir
-            )
-            for ghost in self.ghosts:
-                if ghost.update_position(dt):
-                    ghost.ghost_ai(
-                        self.maze,
-                        self.player.x,
-                        self.player.y,
-                        self.ghosts[0],
-                        player_dir,
-                    )
+        self._update_ghosts(dt)
+        self._update_gameplay_timer(dt)
+        self._resolve_ghost_collisions()
+        self._consume_items()
+        self._check_game_state()
 
-        self.pacman_vs_ghost()
+    def _start_pause(self, dt: float) -> bool:
+        """
+        Handle all blocking pause states (hit impact and respawn countdown).
+        Returns True if the engine tick should be skipped.
+        """
+
+        # Death impact freeze
+        if self.death_collision_pause > 0:
+            self.death_collision_pause -= dt
+            if self.death_collision_pause <= 0:
+                self.reset_position()
+                self.pause_timer = 1.5
+            return True
+
+        # Respawn sequence
+        if self.pause_timer > 0:
+            self.update_respawn_delay(dt)
+            return True
+
+        return False
+
+    def _update_gameplay_timer(self, dt: float) -> None:
+        """
+        Advance active gameplay clocks (level time limit
+          and super pacgum duration).
+        """
+
+        if self.countdown > 0:
+            self.countdown = max(0.0, self.countdown - dt)
+
         if self.super_pacgum:
             self.super_pacgum_timer(dt)
 
-        self._consume_items()
-        # if self.player.lives == 0: # TODO: mettre la logique avec les etats
-        #     print("game over man")
+    def update_respawn_delay(self, dt: float) -> None:
+        """
+        Update the 1.5s respawn animation sequence.
+        """
+        self.pause_timer -= dt
+
+        # Slide back to spawn
+        if self.pause_timer > 1.0:
+            self.player.timer = min(0.5, self.player.timer + dt)
+            for ghost in self.ghosts:
+                ghost.timer = min(
+                    ghost.move_delay, ghost.timer + dt)
+
+        # Frozen on spawn waiting for go
+        else:
+            self.player.timer = 0.0
+            self.player.prev_x = float(self.player.spawn_x)
+            self.player.prev_y = float(self.player.spawn_y)
+            for ghost in self.ghosts:
+                ghost.timer = 0.0
+                ghost.prev_x = float(ghost.spawn_x)
+                ghost.prev_y = float(ghost.spawn_y)
+
+        if self.pause_timer <= 0:
+            self.player.timer = self.player.move_delay
+            for ghost in self.ghosts:
+                ghost.timer = ghost.move_delay
 
     def _resolve_player_movement(self) -> None:
         """
@@ -145,6 +161,30 @@ class GameEngine:
             self.player.prev_x = self.player.x
             self.player.prev_y = self.player.y
 
+    def _update_ghosts(self, dt: float) -> None:
+        """
+        Process movement and AI pathfinding for each active ghost.
+        Skipped if the ghost freeze cheat is active.
+        """
+
+        if self.cheat_manager and self.cheat_manager.is_ghost_frozen:
+            return
+
+        player_dir = (
+            self.player.current_dir
+            if self.player.current_dir != "NONE"
+            else self.player.next_dir
+        )
+        for ghost in self.ghosts:
+            if ghost.update_position(dt):
+                ghost.ghost_ai(
+                    self.maze,
+                    self.player.x,
+                    self.player.y,
+                    self.ghosts[0],
+                    player_dir,
+                )
+
     def _is_path_clear(self, cell: Cell, direction: str) -> bool:
         """
         Checks if the movement is blocked by a wall in the given direction.
@@ -161,7 +201,6 @@ class GameEngine:
         """
         cell = self.maze.grid[self.player.y][self.player.x]
 
-        # We assume subject points for pacgums are 10 and 50 respectively
         if cell.pacgum:
             self.player.add_score(config.points_per_pacgum)
             cell.pacgum = False
@@ -175,7 +214,7 @@ class GameEngine:
                 if ghost.state != "DEAD":
                     ghost.state = "FRIGHTENED"
 
-    def pacman_vs_ghost(self) -> None:
+    def _resolve_ghost_collisions(self) -> None:
         """Handle visual collisions between Pac-Man and ghosts."""
         p_vis_x, p_vis_y = self.player.get_visual_pos()
         for ghost in self.ghosts:
@@ -190,18 +229,12 @@ class GameEngine:
                 elif ghost.state == "CHASE":
                     if self.cheat_manager and self.cheat_manager.is_invincible:
                         continue
-                    self.impact_pause = 0.8
+                    self.death_collision_pause = 0.8
                     self.player.lives -= 1
                     self.super_pacgum = False
                     self.super_pacgum_time = 0
                     for ghost in self.ghosts:
                         ghost.state = "CHASE"
-
-    def level_end(self) -> bool:
-        if self.maze.total_pacgum == 0:
-            return True
-        else:
-            return False
 
     def get_player_score(self) -> int:
         """Return the player's current score."""
@@ -231,17 +264,6 @@ class GameEngine:
                 if ghost.state == "FRIGHTENED":
                     ghost.state = "CHASE"
 
-    def check_is_game_finished(self) -> None:
-        """Check if the current level is cleared and advance if applicable."""
-        if self.level_end() is True and self.curr_level != self.total_levels:
-            self.next_level()
-
-    def next_level(self):
-        """Increment the level index and launch the new level."""
-        self.curr_level += 1
-
-        self.launch_new_game(is_from_menu=False)
-
     def launch_new_game(self, is_from_menu: bool) -> None:
         """Initialize state for a new game session or a subsequent level."""
         if is_from_menu is True:
@@ -250,6 +272,7 @@ class GameEngine:
             self.pause_timer = 1
             self.player.lives = config.lives
             self.ghost_start_position()
+            self.game_state = "PLAYING"
             if self.cheat_manager:
                 self.cheat_manager.is_invincible = False
                 self.cheat_manager.is_ghost_frozen = False
@@ -268,8 +291,6 @@ class GameEngine:
         self.countdown = config.level_max_time
         self.player.current_dir = "NONE"
         self.player.next_dir = "NONE"
-        # self.player.respawn() ## pourquoi pas mettre ca pour pas le prochain
-        # niveau commence tout de suite et qu'il y ai du délai
 
     def ghost_start_position(self):
         """Reset ghosts and player to their initial maze spawn locations."""
@@ -277,3 +298,25 @@ class GameEngine:
             ghost.spawn(self.maze.w, self.maze.h)
             ghost.state = "CHASE"
         self.player.spawn(self.maze.w, self.maze.h)
+
+    def _check_game_state(self) -> None:
+
+        if self.level_end():
+            if self.curr_level >= self.total_levels:
+                self.game_state = "VICTORY"
+            else:
+                self.next_level()
+
+        if self.countdown <= 0 or self.player.lives == 0:
+            self.game_state = "GAMEOVER"
+
+    def level_end(self) -> bool:
+        if self.maze.total_pacgum == 0:
+            return True
+        else:
+            return False
+
+    def next_level(self):
+        """Increment the level index and launch the new level."""
+        self.curr_level += 1
+        self.launch_new_game(is_from_menu=False)

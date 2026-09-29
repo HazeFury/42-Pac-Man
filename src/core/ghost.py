@@ -34,7 +34,7 @@ class Ghost:
         self.respawn_timer = 0
         self.respawn_cooldown = 2
 
-        # States could be: "CHASE", "SCATTER", "FRIGHTENED", "DEAD"
+        # States could be: "CHASE", "FRIGHTENED", "DEAD"
         self.state: str = "CHASE"
         self.direction: str = "STOP"
 
@@ -99,12 +99,6 @@ class Ghost:
         self.prev_x, self.prev_y = self.x, self.y
         self.timer = 0.0
 
-    def change_state(self, new_state: str) -> None:
-        """
-        Change the current state of the ghost (e.g. CHASE, DEAD).
-        """
-        pass
-
     def reset_position(self) -> None:
         """
         Reset the ghost back to its initial spawn position.
@@ -112,12 +106,6 @@ class Ghost:
         self.x, self.y = self.spawn_x, self.spawn_y
         self.prev_x, self.prev_y = self.x, self.y
         self.timer = 0.0
-
-    def calculate_next_move(self, target_x: int, target_y: int) -> None:
-        """
-        Calculate the next position towards the target coordinates.
-        """
-        pass
 
     def ghost_ai(self, map: Maze, x: int, y: int,
                  blinky: "Ghost", direction: str) -> None:
