@@ -67,12 +67,13 @@ class GameEngine:
         dt = min(raw_dt, 0.1)
 
         # Handles both impact freeze and respawn pause
-        self._update_gameplay_timer(dt)
         if self._start_pause(dt):
             return
 
         if self.player.update(dt):
             self._resolve_player_movement()
+
+        self._update_gameplay_timer(dt)
 
         self._update_ghosts(dt)
         self._consume_items()
@@ -143,6 +144,7 @@ class GameEngine:
         """
         Applies automatic continuous movement and buffered inputs.
         """
+        self._consume_items()
         current_cell = self.maze.grid[self.player.y][self.player.x]
 
         # 1. Try to turn into the requested buffered direction
