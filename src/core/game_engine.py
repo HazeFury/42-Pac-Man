@@ -74,10 +74,11 @@ class GameEngine:
         if self.player.update(dt):
             self._resolve_player_movement()
 
-        self._update_ghosts(dt)
         self._update_gameplay_timer(dt)
-        self._resolve_ghost_collisions()
+
+        self._update_ghosts(dt)
         self._consume_items()
+        self._resolve_ghost_collisions()
         self._check_game_state()
 
     def _start_pause(self, dt: float) -> bool:
@@ -144,6 +145,7 @@ class GameEngine:
         """
         Applies automatic continuous movement and buffered inputs.
         """
+        self._consume_items()
         current_cell = self.maze.grid[self.player.y][self.player.x]
 
         # 1. Try to turn into the requested buffered direction
@@ -161,6 +163,7 @@ class GameEngine:
             self.player.next_dir = "NONE"
             self.player.prev_x = self.player.x
             self.player.prev_y = self.player.y
+            self.player.timer = self.player.move_delay
 
     def _update_ghosts(self, dt: float) -> None:
         """
@@ -200,19 +203,23 @@ class GameEngine:
         Handles score calculation and removes pacgums from the maze.
         """
         cell = self.maze.grid[self.player.y][self.player.x]
+        p_vis_x, p_vis_y = self.player.get_visual_pos()
+        dist_sq = (p_vis_x - cell.x) ** 2 + (p_vis_y - cell.y) ** 2
 
         if cell.pacgum:
-            self.player.add_score(config.points_per_pacgum)
-            cell.pacgum = False
-            self.maze.total_pacgum -= 1
+            if dist_sq < 0.2:
+                self.player.add_score(config.points_per_pacgum)
+                cell.pacgum = False
+                self.maze.total_pacgum -= 1
         elif cell.super_pacgum:
-            self.player.add_score(config.points_per_super_pacgum)
-            self.super_pacgum_time = 0
-            cell.super_pacgum = False
-            self.super_pacgum = True
-            for ghost in self.ghosts:
-                if ghost.state != "DEAD":
-                    ghost.state = "FRIGHTENED"
+            if dist_sq < 0.2:
+                self.player.add_score(config.points_per_super_pacgum)
+                self.super_pacgum_time = 0
+                cell.super_pacgum = False
+                self.super_pacgum = True
+                for ghost in self.ghosts:
+                    if ghost.state != "DEAD":
+                        ghost.state = "FRIGHTENED"
 
     def _resolve_ghost_collisions(self) -> None:
         """Handle visual collisions between Pac-Man and ghosts."""
@@ -233,8 +240,9 @@ class GameEngine:
                     self.player.lives -= 1
                     self.super_pacgum = False
                     self.super_pacgum_time = 0
-                    for ghost in self.ghosts:
-                        ghost.state = "CHASE"
+                    for g in self.ghosts:
+                        g.state = "CHASE"
+                    break
 
     def get_player_score(self) -> int:
         """Return the player's current score."""
@@ -279,6 +287,7 @@ class GameEngine:
                 self.cheat_manager.is_invincible = False
                 self.cheat_manager.is_ghost_frozen = False
                 self.cheat_manager.is_speed_boosted = False
+                self.player.move_delay = self.cheat_manager.normal_move_delay
 
         self.lvl_cfg = config.get_level(self.curr_level)
         self.reset_position()
@@ -308,7 +317,7 @@ class GameEngine:
             else:
                 self.next_level()
 
-        if self.countdown <= 0 or self.player.lives == 0:
+        if self.countdown <= 0 or self.player.lives <= 0:
             self.game_state = "GAMEOVER"
 
     def level_end(self) -> bool:

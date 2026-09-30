@@ -1,7 +1,9 @@
 import random
 from dataclasses import dataclass, field
-
-from mazegenerator import MazeGenerator
+try:
+    from mazegenerator import MazeGenerator
+except Exception:
+    print("No maze generator")
 
 
 @dataclass
@@ -51,7 +53,9 @@ class Maze:
         self.w = w
         self.h = h
         self.grid = []
-        self.maze = MazeGenerator(size=(w, h), seed=seed, perfect=is_perfect)
+
+        self.maze = MazeGenerator(
+            size=(w, h), seed=seed, perfect=is_perfect)
 
         self.maze_cell_init()
         self.super_pacgum_placement()
