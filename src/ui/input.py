@@ -97,7 +97,11 @@ class TextInput:
                 # Subject rule: Max 10 characters
                 if len(self.text) < self.max_length:
                     # Subject rule: Alphanumeric and spaces only
-                    if event.unicode.isalnum() or event.unicode == " ":
+                    if (
+                        event.unicode.isascii()
+                        and event.unicode.isalnum()
+                        or event.unicode == " "
+                    ):
                         self.text += event.unicode
 
             # Re-render the text surface immediately after any modification

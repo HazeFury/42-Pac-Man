@@ -30,7 +30,7 @@ ERROR_MESSAGE = {
 class LevelConfig(BaseModel):
     width: int = Field(default_factory=lambda: random.randint(10, 35), ge=10)
     height: int = Field(default_factory=lambda: random.randint(10, 35), ge=10)
-    pacgum: int = Field(default_factory=lambda: random.randint(1, 1), ge=0)
+    pacgum: int = Field(default_factory=lambda: random.randint(15, 100), ge=0)
     seed: int = Field(default_factory=lambda: random.randint(0, 1000), ge=0)
 
     @field_validator("width", "height", "pacgum", "seed", mode="wrap")
@@ -62,10 +62,10 @@ class Setup(BaseModel):
 
     highscore_filename: str = Field(default="highscore.json")
     lives: int = Field(default=3, ge=1)
-    points_per_pacgum: int = Field(default=10, ge=10)
-    points_per_super_pacgum: int = Field(default=50, ge=10)
-    points_per_ghost: int = Field(default=200, ge=10)
-    level_max_time: int = Field(default=90, ge=10)
+    points_per_pacgum: int = Field(default=10, ge=10, le=30)
+    points_per_super_pacgum: int = Field(default=50, ge=50, le=500)
+    points_per_ghost: int = Field(default=200, ge=200, le=1000)
+    level_max_time: int = Field(default=90, ge=90, le=200)
     levels: dict[str, LevelConfig] = Field(default_factory=default_levels)
 
     def get_level(self, level: int = 1) -> LevelConfig:
