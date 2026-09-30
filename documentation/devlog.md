@@ -82,3 +82,12 @@
 - Mise en place de la création du package final (marberge)
 - Refacto de plusieurs classes (game_engine, ghost, player) (gchmilew)
 - diverses amélioration mineures (gchmilew, marberge)
+
+### DAY 12
+
+- Écriture du readme (marberge)
+- Les niveaux 2 à 10 sont maintenant vraiment aléatoire (seed) (marberge)
+- correction visuelle des pacman mangé en décalé (gchmilew) 
+- débug de l'impact du pac man dans le mur (gchmilew)
+- Correction avec MyPy et ajout des docstrings manquantes  (gchmilew)
+- diverses amélioration mineures (gchmilew, marberge)
