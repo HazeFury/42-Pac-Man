@@ -19,7 +19,7 @@ class GameEngine:
         self.clock = pygame.time.Clock()
         self.curr_level: int = 1
         self.lvl_cfg = config.get_level(self.curr_level)
-        self.total_levels = config.get_amount_of_level()
+        self.total_levels = max(10, config.get_amount_of_level())
         self.maze = Maze()
         self.maze.generate_maze(
             seed=self.lvl_cfg.seed,

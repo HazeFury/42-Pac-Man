@@ -38,7 +38,7 @@ class GameView(BaseView):
             "assets/other/dot.png"
         ).convert_alpha()
         self.SUPER_PACGUM_SPRITE = pygame.image.load(
-            "assets/other/apple.png"
+            "assets/other/strawberry.png"
         ).convert_alpha()
 
         self.data_box = Box(
@@ -313,8 +313,12 @@ class GameView(BaseView):
                 px_y = cell.y * cell_size + y_offset
 
                 # 2. Draw walls based on the boolean dictionary
-                if (cell.wall["N"] and cell.wall["E"] and cell.wall["W"]
-                        and cell.wall["S"]):
+                if (
+                    cell.wall["N"]
+                    and cell.wall["E"]
+                    and cell.wall["W"]
+                    and cell.wall["S"]
+                ):
                     screen.blit(self.WALL_SPRITES["A"], (px_x, px_y))
 
                 if cell.wall["N"]:

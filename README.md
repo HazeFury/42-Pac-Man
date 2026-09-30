@@ -67,15 +67,11 @@ This project is fully automated using Make. Here is the complete list of availab
 - ```make setup```: Checks your Python version and presence of the uv package manager. Exit if both check are not valid.
 
 **Execution & Debugging**
-- ```make run```: Executes the main entry point (src/main.py) inside the isolated virtual environment.
 - ```make run```: Executes the main entry point (pac-man.py) inside the isolated virtual environment.
 - ```make debug```: Launches the project using the Python Debugger (pdb), allowing you to step through your code line by line.
 
 **Quality & Testing**
 - ```make lint```: Runs flake8 for style checking and mypy for static type checking to ensure code quality.
-- ```make lint-strict```: Runs the linters but enforces strict typing rules with mypy.
-- ```make test```: Runs the entire test suite using pytest.
-- ```make test-file ARGS=path/to/test.py```: Runs a specific test file. Replace the FILE variable with your target.
 
 **Building & Cleaning**
 - ```make build```: Packages the project into distributable files inside a dist/ directory.
@@ -112,7 +108,7 @@ In `src/core/maze.py`, the `MazeGenerator` generates a grid encoded in bitmasks.
 
 ### Implementation
 Key technical highlights of our implementation include:
-- **Custom Build System:** A fully automated Makefile managing virtual environments (via `uv`), linting (`flake8`, `mypy`), testing (`pytest`), and executable packaging (`PyInstaller`).
+- **Custom Build System:** A fully automated Makefile managing virtual environments (via `uv`), linting (`flake8`, `mypy`) and executable packaging (`PyInstaller`).
 - **Cheat Mode:** A developer cheat system (F1-F5) to toggle god mode, freeze ghosts, skip levels, add lives, and boost speed for easy grading and debugging.
 - **Data Validation:** Extensive use of `Pydantic` to ensure that data read from external JSON files (configuration and highscores) is strictly validated and safe.
 
