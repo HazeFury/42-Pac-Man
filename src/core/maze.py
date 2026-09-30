@@ -54,8 +54,12 @@ class Maze:
         self.h = h
         self.grid = []
 
-        self.maze = MazeGenerator(
-            size=(w, h), seed=seed, perfect=is_perfect)
+        try:
+            self.maze = MazeGenerator(
+                size=(self.w, self.h), seed=seed, perfect=is_perfect
+            )
+        except Exception as e:
+            raise RuntimeError(f"External MazeGenerator failed: {e}")
 
         self.maze_cell_init()
         self.super_pacgum_placement()
