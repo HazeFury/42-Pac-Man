@@ -25,7 +25,7 @@ class Player:
         self.next_dir: str = "NONE"
 
         # Speed expressed in engine ticks required to move
-        self.move_delay: float = 0.5
+        self.move_delay: float = 0.3
         self.timer: float = 0.0
 
         self.lives: int = config.lives
@@ -93,7 +93,7 @@ class Player:
         """
         Set initial and spawn coordinates at the center of the grid.
         """
-        self.spawn_x = ((w // 2) if (w % 2) != 0 else ((w // 2) - 1))
+        self.spawn_x = (w // 2) if (w % 2) != 0 else ((w // 2) - 1)
         self.spawn_y = h // 2
 
         self.x, self.y = self.spawn_x, self.spawn_y
