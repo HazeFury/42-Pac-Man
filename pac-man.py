@@ -3,17 +3,19 @@ import sys
 
 if getattr(sys, "frozen", False):
     os.chdir(getattr(sys, "_MEIPASS", "."))
+try:
+    import pygame
 
-import pygame
-
-from src.core.cheat_manager import CheatManager
-from src.core.game_engine import GameEngine
-from src.utils import game_config
-from src.views.end_game_view import EndGameView
-from src.views.game_view import GameView
-from src.views.highscore_view import HighScoreView
-from src.views.menu_view import MenuView
-from src.views.rules_view import RulesView
+    from src.core.cheat_manager import CheatManager
+    from src.core.game_engine import GameEngine
+    from src.utils import game_config
+    from src.views.end_game_view import EndGameView
+    from src.views.game_view import GameView
+    from src.views.highscore_view import HighScoreView
+    from src.views.menu_view import MenuView
+    from src.views.rules_view import RulesView
+except Exception as e:
+    print(f"[Error] missing file: {e}")
 
 
 def main() -> None:
