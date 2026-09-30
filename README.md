@@ -7,21 +7,47 @@ _This project has been created as part of the 42 curriculum by marberge , gchmil
   <br>
 </div>
 
-# [PROJECT TITLE]
+# Pac Man
 
-![Language](https://img.shields.io/badge/Language-python-blue)
+<div align="center">
 
-<!-- ![Grade](https://img.shields.io/badge/Grade-125%2F100-brightgreen)
-![Tag](https://img.shields.io/badge/TOCHANGE-grey) -->
+<img src="https://img.shields.io/badge/Project-000000?style=for-the-badge&logo=42&logoColor=white" alt="42" />
+	<img src="https://img.shields.io/badge/Language-Python-00599C?style=for-the-badge&logo=&logoColor=white" alt="C" />
+	<img src="https://img.shields.io/badge/Score-0/100-yellow?style=for-the-badge&logoColor=white" alt="C" />
+	<br>
+	<img src="https://img.shields.io/badge/GAME-darkviolet?style=for-the-badge" alt="GAME" />
+<img src="https://img.shields.io/badge/Algorithms_&_IA-darkviolet?style=for-the-badge" alt="Algorithms" />
+	<img src="https://img.shields.io/badge/Pathfinding-darkviolet?style=for-the-badge" alt="Pathfinding" />
+	<img src="https://img.shields.io/badge/GUI-darkviolet?style=for-the-badge" alt="GUI" />
+	<img src="https://img.shields.io/badge/Parsing-darkviolet?style=for-the-badge" alt="Parsing" />
+
+</div>
+
+<div align="center">
+	<br>
+	<br>
+	<br>
+	  <img src="assets/pac-man_title.png" alt="pac-man logo" width="700" />
+	<br>
+	<br>
+
+  <br>
+</div>
 
 ## I. Description
 
-To define.
+### Goal
+
+TODO
+
+### Overview
+
+TODO
 
 ## II. Instructions
 
 ### Prerequisites
-Before using this template, ensure you have the following installed on your system:
+In order to run this project, ensure you have the following installed on your system:
 - **Python 3.10+**
 - **uv 0.10.12+**
 
@@ -55,10 +81,34 @@ This project is fully automated using Make. Here is the complete list of availab
 
 ***
 
-## III. Resources
-
-To define.
 
 ## IV. Additional sections
 
-To define.
+### Configuration
+
+TODO
+
+### Highscore
+
+TODO
+
+### Maze Generation
+
+TODO
+
+### Implementation
+
+TODO
+
+### General Software Architecture
+
+TODO
+
+### Project Management
+
+TODO
+
+
+## III. Resources
+
+TODO
