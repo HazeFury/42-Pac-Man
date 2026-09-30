@@ -30,7 +30,7 @@ class Ghost:
         # Speed expressed in engine ticks required to move
         self.move_delay: float = 0.5
         self.timer: float = 0
-        self.respawn_timer = 0
+        self.respawn_timer: float = 0
         self.respawn_cooldown = 2
 
         # States could be: "CHASE", "FRIGHTENED", "DEAD"

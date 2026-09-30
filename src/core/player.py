@@ -25,7 +25,7 @@ class Player:
         self.next_dir: str = "NONE"
 
         # Speed expressed in engine ticks required to move
-        self.move_delay: float = 0.1
+        self.move_delay: float = 0.5
         self.timer: float = 0.0
 
         self.lives: int = config.lives

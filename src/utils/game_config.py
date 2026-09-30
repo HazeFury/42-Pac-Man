@@ -1,11 +1,6 @@
-"""
-Game configuration constants.
-"""
-
-WINDOW_WIDTH = 1920
-WINDOW_HEIGHT = 1080
+WINDOW_WIDTH = 1900
+WINDOW_HEIGHT = 1000
 FPS = 60
-LEVEL_TIME_LIMIT = 10  # Time limit in seconds
 
 # RGB Colors
 BACKGROUND_COLOR = (10, 10, 10)

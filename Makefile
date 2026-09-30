@@ -1,6 +1,7 @@
 NAME = PROJECT
 VERSION = 0.1.0
 VENV = .venv
+SRC_DIR = ./src
 MAIN = pac-man.py
 CONFIG_FILE = config.json
 

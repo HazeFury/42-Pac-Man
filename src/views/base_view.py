@@ -9,6 +9,7 @@ class BaseView(ABC):
     """
 
     def __init__(self, screen: pygame.Surface) -> None:
+        """Initialize the base view with a shared Pygame screen."""
         self.screen = screen
         # Variable to tell the main loop if we need to switch view
         self.next_view: str | None = None

@@ -16,7 +16,7 @@ class GameEngine:
     def __init__(self) -> None:
         """Initialize game state, maze, entities, and timers."""
         self.clock = pygame.time.Clock()
-        self.curr_level = 1
+        self.curr_level: int = 1
         self.lvl_cfg = config.get_level(self.curr_level)
         self.total_levels = config.get_amount_of_level()
         self.maze = Maze()
@@ -39,10 +39,10 @@ class GameEngine:
 
         self.input_manager = InputManager()
         self.super_pacgum = False
-        self.super_pacgum_time = 0
+        self.super_pacgum_time: float = 0
         self.pause_timer: float = 1.0
-        self.countdown = config.level_max_time
-        self.death_collision_pause = 0
+        self.countdown: float = config.level_max_time
+        self.death_collision_pause: float = 0
 
         from src.core.cheat_manager import CheatManager
 
@@ -291,7 +291,7 @@ class GameEngine:
         self.player.current_dir = "NONE"
         self.player.next_dir = "NONE"
 
-    def ghost_start_position(self):
+    def ghost_start_position(self) -> None:
         """Reset ghosts and player to their initial maze spawn locations."""
         for ghost in self.ghosts:
             ghost.spawn(self.maze.w, self.maze.h)
@@ -299,7 +299,6 @@ class GameEngine:
         self.player.spawn(self.maze.w, self.maze.h)
 
     def _check_game_state(self) -> None:
-
         if self.level_end():
             if self.curr_level >= self.total_levels:
                 self.game_state = "VICTORY"
@@ -310,12 +309,13 @@ class GameEngine:
             self.game_state = "GAMEOVER"
 
     def level_end(self) -> bool:
+        """Return True if all pacgums have been consumed."""
         if self.maze.total_pacgum == 0:
             return True
         else:
             return False
 
-    def next_level(self):
+    def next_level(self) -> None:
         """Increment the level index and launch the new level."""
         self.curr_level += 1
         self.launch_new_game(is_from_menu=False)

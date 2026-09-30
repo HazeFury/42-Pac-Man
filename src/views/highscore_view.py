@@ -5,6 +5,7 @@ from src.ui.button import Button
 from src.ui.text import Text
 from src.utils import game_config
 from src.utils.highscore import HighScoreManager
+from src.utils.parsing import PlayerScore
 from src.views.base_view import BaseView
 
 
@@ -14,6 +15,7 @@ class HighScoreView(BaseView):
     """
 
     def __init__(self, screen: pygame.Surface) -> None:
+        """Initialize the highscore view and build the initial UI."""
         super().__init__(screen)
 
         self.menu_box = Box(pos_y="center", pos_x="center", spacing=30)
@@ -85,12 +87,16 @@ class HighScoreView(BaseView):
         """Callback function assigned to the back button."""
         self.next_view = "MENU"
 
-    def get_sorted_scores(self) -> list:
+    def get_sorted_scores(self) -> list[PlayerScore]:
+        """Read scores and return the top 10 sorted entries."""
         score_list = self.score_manager.read_highscore()
         result = self.sort_score_list(score_list.scores)
         return result
 
-    def sort_score_list(self, score_list: list) -> list:
+    def sort_score_list(
+        self, score_list: list[PlayerScore]
+    ) -> list[PlayerScore]:
+        """Filter and sort scores descending, returning top 10."""
         valid_scores = [entry for entry in score_list if entry.name != ""]
 
         sorted_scores = sorted(
@@ -100,6 +106,7 @@ class HighScoreView(BaseView):
         return sorted_scores[:10]
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """Forward Pygame events to the highscore menu box."""
         for event in events:
             self.menu_box.handle_event(event)
 
@@ -114,5 +121,6 @@ class HighScoreView(BaseView):
             self._build_ui()
 
     def draw(self) -> None:
+        """Render the highscore screen background and UI components."""
         self.screen.fill(game_config.BACKGROUND_COLOR)
         self.menu_box.draw(self.screen)

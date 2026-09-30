@@ -18,6 +18,7 @@ class MenuView(BaseView):
     def __init__(
         self, screen: pygame.Surface, game_engine: GameEngine
     ) -> None:
+        """Initialize main menu with title image and navigation buttons."""
         super().__init__(screen)
         self.game_engine = game_engine
         self.menu_box = Box(pos_y="center", pos_x="center", spacing=50)
@@ -87,13 +88,15 @@ class MenuView(BaseView):
         sys.exit()
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """Forward Pygame events to the menu box buttons."""
         for event in events:
             self.menu_box.handle_event(event)
 
     def update(self) -> None:
-        # No specific background logic to update in the menu for now
+        """Update menu state (no background update required)."""
         pass
 
     def draw(self) -> None:
+        """Render the background and menu UI onto the screen."""
         self.screen.fill(game_config.BACKGROUND_COLOR)
         self.menu_box.draw(self.screen)

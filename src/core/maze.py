@@ -31,7 +31,7 @@ class Maze:
         """
         Initializes an empty maze without parameters.
         """
-        self.maze: MazeGenerator | None = None
+        self.maze: MazeGenerator
         self.w: int = 0
         self.h: int = 0
         self.grid: list[list[Cell]] = []
@@ -43,7 +43,7 @@ class Maze:
         w: int = 5,
         h: int = 5,
         pacgum: int = 42,
-        is_perfect=False,
+        is_perfect: bool = False,
     ) -> None:
         """
         Generates the maze with given dimensions, seed, and pacgum count.
@@ -54,7 +54,7 @@ class Maze:
         self.maze = MazeGenerator(size=(w, h), seed=seed, perfect=is_perfect)
 
         self.maze_cell_init()
-        self.Super_pacgum_placement()
+        self.super_pacgum_placement()
         self.pacgum_placement(pacgum)
 
     def maze_cell_init(self) -> None:
@@ -94,11 +94,10 @@ class Maze:
                             self.total_pacgum += 1
 
         else:
-            for i in range(nb_pacgum):
+            for _ in range(nb_pacgum):
                 pacgum_assign = False
                 while pacgum_assign is False:
                     x, y = (random.randrange(self.w), random.randrange(self.h))
-                    self.grid[y][x]
                     if (
                         self.grid[y][x].pacgum is False
                         and self.grid[y][x].super_pacgum is False
@@ -119,7 +118,7 @@ class Maze:
                     total_cell += 1
         return total_cell - 4
 
-    def Super_pacgum_placement(self) -> None:
+    def super_pacgum_placement(self) -> None:
         """
         Places super pacgums in the four corners of the grid.
         """

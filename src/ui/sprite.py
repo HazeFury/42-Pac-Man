@@ -19,7 +19,7 @@ class Sprite:
         image_paths: List[str],
         animation_speed: float = 0.1,  # Time in seconds between each frame
     ) -> None:
-
+        """Initialize sprite frames, size, position, and animation speed."""
         # 1. Load all images from the provided paths
         self.frames: List[pygame.Surface] = []
         for path in image_paths:
@@ -46,8 +46,6 @@ class Sprite:
         self.height = self.image.get_height()
 
         # 2. Position handling (UI keywords or absolute coordinates)
-        self._pos_x_raw = pos_x
-        self._pos_y_raw = pos_y
         self.x = self._resolve_x(pos_x)
         self.y = self._resolve_y(pos_y)
 

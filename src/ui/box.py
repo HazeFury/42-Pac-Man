@@ -16,9 +16,13 @@ class UIElement(Protocol):
     width: int
     height: int
 
-    def draw(self, screen: pygame.Surface) -> None: ...
+    def draw(self, screen: pygame.Surface) -> None:
+        """Draw the element onto the provided screen surface."""
+        ...
 
-    def handle_event(self, event: pygame.event.Event) -> None: ...
+    def handle_event(self, event: pygame.event.Event) -> None:
+        """Process a Pygame event for this element."""
+        ...
 
 
 class Box:
@@ -33,6 +37,7 @@ class Box:
         layout: str = "vertical",
         spacing: int = 20,
     ) -> None:
+        """Initialize flexbox container with position and layout style."""
         self._pos_x_keyword = pos_x
         self._pos_y_keyword = pos_y
         self.layout = layout
