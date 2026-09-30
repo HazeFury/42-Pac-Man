@@ -1,5 +1,3 @@
-"""Game engine module managing state, entities, and gameplay loop."""
-
 import pygame
 
 from src.core.ghost import Ghost

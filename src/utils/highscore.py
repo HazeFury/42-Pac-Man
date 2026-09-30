@@ -1,5 +1,3 @@
-"""Highscore manager module handling reading and writing scores."""
-
 import sys
 from pathlib import Path
 

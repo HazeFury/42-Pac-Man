@@ -1,5 +1,3 @@
-"""Input manager module translating keyboard events into game actions."""
-
 import pygame
 
 

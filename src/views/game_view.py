@@ -1,5 +1,3 @@
-"""Main gameplay view handling rendering and visual sprite updates."""
-
 import pygame
 
 from src.core.game_engine import GameEngine
@@ -33,6 +31,7 @@ class GameView(BaseView):
             "E": pygame.image.load("assets/walls/right.png").convert_alpha(),
             "W": pygame.image.load("assets/walls/left.png").convert_alpha(),
             "F": pygame.image.load("assets/walls/fix.png").convert_alpha(),
+            "A": pygame.image.load("assets/walls/4walls.png").convert_alpha(),
         }
 
         self.PACGUM_SPRITE = pygame.image.load(
@@ -314,6 +313,10 @@ class GameView(BaseView):
                 px_y = cell.y * cell_size + y_offset
 
                 # 2. Draw walls based on the boolean dictionary
+                if (cell.wall["N"] and cell.wall["E"] and cell.wall["W"]
+                        and cell.wall["S"]):
+                    screen.blit(self.WALL_SPRITES["A"], (px_x, px_y))
+
                 if cell.wall["N"]:
                     screen.blit(self.WALL_SPRITES["N"], (px_x, px_y))
                 if cell.wall["W"]:

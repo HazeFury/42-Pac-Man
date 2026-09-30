@@ -1,5 +1,3 @@
-"""Main entry point for Pac-Man game application."""
-
 import os
 import sys
 

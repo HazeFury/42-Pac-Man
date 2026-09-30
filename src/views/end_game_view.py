@@ -1,5 +1,3 @@
-"""End game view module displaying game over or victory screen."""
-
 import pygame
 
 from src.core.game_engine import GameEngine

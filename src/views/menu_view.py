@@ -1,5 +1,3 @@
-"""Main menu view module providing navigation to game modes."""
-
 import sys
 
 import pygame

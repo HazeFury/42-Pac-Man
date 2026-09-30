@@ -1,5 +1,3 @@
-"""Maze representation and procedural generation module."""
-
 import random
 from dataclasses import dataclass, field
 
@@ -119,7 +117,6 @@ class Maze:
                 if not all(cell.wall.values()):
                     total_cell += 1
         return total_cell - 4
-
 
     def super_pacgum_placement(self) -> None:
         """

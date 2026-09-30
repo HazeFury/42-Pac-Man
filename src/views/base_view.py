@@ -1,5 +1,3 @@
-"""Base view abstract interface for all game screens."""
-
 from abc import ABC, abstractmethod
 
 import pygame

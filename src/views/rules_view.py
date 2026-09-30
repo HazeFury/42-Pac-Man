@@ -1,5 +1,3 @@
-"""Rules and instructions view module."""
-
 import pygame
 
 from src.ui.box import Box

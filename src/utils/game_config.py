@@ -1,7 +1,3 @@
-"""
-Game configuration constants.
-"""
-
 WINDOW_WIDTH = 1900
 WINDOW_HEIGHT = 1000
 FPS = 60

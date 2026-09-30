@@ -1,5 +1,3 @@
-"""Configuration parsing and validation module using Pydantic."""
-
 import json
 import random
 import sys
@@ -75,7 +73,7 @@ class Setup(BaseModel):
     points_per_pacgum: int = Field(default=10, ge=10, le=30)
     points_per_super_pacgum: int = Field(default=50, ge=50, le=500)
     points_per_ghost: int = Field(default=200, ge=200, le=1000)
-    level_max_time: int = Field(default=90, ge=90, le=200)
+    level_max_time: int = Field(default=90, ge=5, le=200)
     levels: dict[str, LevelConfig] = Field(default_factory=default_levels)
 
     def get_level(self, level: int = 1) -> LevelConfig:

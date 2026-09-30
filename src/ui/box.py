@@ -1,5 +1,3 @@
-"""UI Box container module providing flexible layout alignment."""
-
 from typing import Protocol
 
 import pygame

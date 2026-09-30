@@ -1,5 +1,3 @@
-"""Highscore view module displaying top player scores."""
-
 import pygame
 
 from src.ui.box import Box
@@ -89,7 +87,6 @@ class HighScoreView(BaseView):
         """Callback function assigned to the back button."""
         self.next_view = "MENU"
 
-
     def get_sorted_scores(self) -> list[PlayerScore]:
         """Read scores and return the top 10 sorted entries."""
         score_list = self.score_manager.read_highscore()
@@ -99,31 +96,31 @@ class HighScoreView(BaseView):
     def sort_score_list(
         self, score_list: list[PlayerScore]
     ) -> list[PlayerScore]:
-    """Filter and sort scores descending, returning top 10."""
-        valid_scores= [entry for entry in score_list if entry.name != ""]
+        """Filter and sort scores descending, returning top 10."""
+        valid_scores = [entry for entry in score_list if entry.name != ""]
 
-        sorted_scores= sorted(
-     valid_scores, key = lambda entry: entry.score, reverse = True
-      )
+        sorted_scores = sorted(
+            valid_scores, key=lambda entry: entry.score, reverse=True
+        )
 
-       return sorted_scores[:10]
+        return sorted_scores[:10]
 
-       def handle_events(self, events: list[pygame.event.Event]) -> None:
-       """Forward Pygame events to the highscore menu box."""
-       for event in events:
-        self.menu_box.handle_event(event)
+    def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """Forward Pygame events to the highscore menu box."""
+        for event in events:
+            self.menu_box.handle_event(event)
 
-       def update(self) -> None:
+    def update(self) -> None:
         """
         Checks for data changes. Rebuilds the UI if a new score was added.
         """
-            new_score_list = self.get_sorted_scores()
+        new_score_list = self.get_sorted_scores()
 
-       if self.scores != new_score_list:
-       self.scores = new_score_list
-       self._build_ui()
+        if self.scores != new_score_list:
+            self.scores = new_score_list
+            self._build_ui()
 
-       def draw(self) -> None:
-       """Render the highscore screen background and UI components."""
-            self.screen.fill(game_config.BACKGROUND_COLOR)
-            self.menu_box.draw(self.screen)
+    def draw(self) -> None:
+        """Render the highscore screen background and UI components."""
+        self.screen.fill(game_config.BACKGROUND_COLOR)
+        self.menu_box.draw(self.screen)

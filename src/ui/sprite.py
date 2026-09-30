@@ -1,5 +1,3 @@
-"""UI and gameplay Sprite component module supporting animations."""
-
 from typing import List, Union
 
 import pygame
