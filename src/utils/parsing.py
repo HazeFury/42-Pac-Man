@@ -31,11 +31,11 @@ class LevelConfig(BaseModel):
     """Configuration schema and validation for an individual level."""
 
     width: int = Field(
-        default_factory=lambda: random.randint(
-            10, 40), ge=10, le=40)
+        default_factory=lambda: random.randint(10, 40), ge=10, le=40
+    )
     height: int = Field(
-        default_factory=lambda: random.randint(
-            10, 25), ge=10, le=25)
+        default_factory=lambda: random.randint(10, 25), ge=10, le=25
+    )
     pacgum: int = Field(default_factory=lambda: random.randint(15, 100), ge=0)
     seed: int = Field(default_factory=lambda: random.randint(0, 1000), ge=0)
 
@@ -169,8 +169,9 @@ class PlayerScore(BaseModel):
 
     @field_validator("name", "score", mode="wrap")
     @classmethod
-    def score_checker(cls, value: Any, handler: Any,
-                      info: ValidationInfo) -> Any:
+    def score_checker(
+        cls, value: Any, handler: Any, info: ValidationInfo
+    ) -> Any:
         """Validate fields, falling back to defaults on error."""
         try:
             return handler(value)

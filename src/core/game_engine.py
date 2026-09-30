@@ -5,6 +5,7 @@ from src.core.maze import Cell, Maze
 from src.core.player import Player
 from src.utils.input_manager import InputManager
 from src.utils.parsing import config
+from src.utils.random import get_random_int
 
 
 class GameEngine:
@@ -273,7 +274,9 @@ class GameEngine:
 
     def launch_new_game(self, is_from_menu: bool) -> None:
         """Initialize state for a new game session or a subsequent level."""
+        new_seed = get_random_int()
         if is_from_menu is True:
+            new_seed = 42
             self.curr_level = 1
             self.player.score = 0
             self.pause_timer = 1
@@ -290,7 +293,7 @@ class GameEngine:
         self.reset_position()
         self.pause_timer = 1
         self.maze.generate_maze(
-            seed=self.lvl_cfg.seed,
+            seed=new_seed,
             w=self.lvl_cfg.width,
             h=self.lvl_cfg.height,
             pacgum=self.lvl_cfg.pacgum,
