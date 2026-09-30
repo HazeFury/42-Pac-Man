@@ -28,8 +28,12 @@ ERROR_MESSAGE = {
 
 
 class LevelConfig(BaseModel):
-    width: int = Field(default_factory=lambda: random.randint(10, 35), ge=10)
-    height: int = Field(default_factory=lambda: random.randint(10, 35), ge=10)
+    width: int = Field(
+        default_factory=lambda: random.randint(
+            10, 40), ge=10, le=40)
+    height: int = Field(
+        default_factory=lambda: random.randint(
+            10, 25), ge=10, le=25)
     pacgum: int = Field(default_factory=lambda: random.randint(15, 100), ge=0)
     seed: int = Field(default_factory=lambda: random.randint(0, 1000), ge=0)
 
