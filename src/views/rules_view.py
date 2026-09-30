@@ -1,3 +1,5 @@
+"""Rules and instructions view module."""
+
 import pygame
 
 from src.ui.box import Box
@@ -9,10 +11,11 @@ from src.views.base_view import BaseView
 
 class RulesView(BaseView):
     """
-    The main menu view displaying the title and a start button.
+    View displaying gameplay instructions and control keybindings.
     """
 
     def __init__(self, screen: pygame.Surface) -> None:
+        """Initialize rules view with control guide and back button."""
         super().__init__(screen)
         self.instruct_box = Box(pos_y="center", pos_x="center", spacing=20)
 
@@ -24,7 +27,7 @@ class RulesView(BaseView):
             color="RED",
         )
 
-        # Toutes les instructions ici
+        # All instructions here
         self.instruct_box.add_child(
             Text(
                 pos_y="0",
@@ -90,14 +93,16 @@ class RulesView(BaseView):
         self.next_view = "MENU"
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """Forward Pygame events to the back button."""
         for event in events:
             self.exit_btn.handle_event(event)
 
     def update(self) -> None:
-        # No specific background logic to update in the menu for now
+        """Update rules view state (no background update required)."""
         pass
 
     def draw(self) -> None:
+        """Render the background, back button, and instruction box."""
         self.screen.fill(game_config.BACKGROUND_COLOR)
         self.exit_btn.draw(self.screen)
         self.instruct_box.draw(self.screen)

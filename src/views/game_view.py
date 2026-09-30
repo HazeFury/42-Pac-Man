@@ -1,3 +1,5 @@
+"""Main gameplay view handling rendering and visual sprite updates."""
+
 import pygame
 
 from src.core.game_engine import GameEngine
@@ -18,10 +20,10 @@ class GameView(BaseView):
     def __init__(
         self, screen: pygame.Surface, game_engine: GameEngine
     ) -> None:
+        """Initialize sprites, HUD elements, pause menu, and engine refs."""
         super().__init__(screen)
         self.game_engine = game_engine
         self.pacman = self.game_engine.player
-        self.ghost = self.game_engine.ghosts
 
         # Assuming you load your images somewhere in your initialization
         # This dictionary maps the wall direction to the loaded Pygame Surface
@@ -211,11 +213,8 @@ class GameView(BaseView):
         self.is_paused = False
 
     def resume(self) -> None:
+        """Unpause and resume the active game."""
         self.is_paused = False
-
-    def go_to_win_screen(self) -> None:
-        """Callback to go to win screen."""
-        self.next_view = "WIN"
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
         """
@@ -317,10 +316,6 @@ class GameView(BaseView):
                 # 2. Draw walls based on the boolean dictionary
                 if cell.wall["N"]:
                     screen.blit(self.WALL_SPRITES["N"], (px_x, px_y))
-                # if cell.wall["S"]:
-                #     screen.blit(self.WALL_SPRITES["S"], (px_x, px_y))
-                # if cell.wall["E"]:
-                #     screen.blit(self.WALL_SPRITES["E"], (px_x, px_y))
                 if cell.wall["W"]:
                     screen.blit(self.WALL_SPRITES["W"], (px_x, px_y))
 
@@ -347,6 +342,7 @@ class GameView(BaseView):
                     screen.blit(self.PACGUM_SPRITE, (px_x + 11, px_y + 11))
 
     def maze_centering(self) -> tuple[int, int]:
+        """Calculate (x, y) pixel offsets to center the maze on screen."""
         maze_pixel_w = self.game_engine.maze.w * 32
         maze_pixel_h = self.game_engine.maze.h * 32
         x_offset = (game_config.WINDOW_WIDTH - maze_pixel_w) // 2
@@ -354,6 +350,7 @@ class GameView(BaseView):
         return (x_offset, y_offset)
 
     def draw(self) -> None:
+        """Render the maze, active sprites, HUD elements, and pause overlay."""
         self.screen.fill(game_config.BLACK)
         self.back_button.draw(self.screen)
         self.data_box.draw(self.screen)

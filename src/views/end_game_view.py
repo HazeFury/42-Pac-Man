@@ -1,3 +1,5 @@
+"""End game view module displaying game over or victory screen."""
+
 import pygame
 
 from src.core.game_engine import GameEngine
@@ -12,12 +14,13 @@ from src.views.base_view import BaseView
 
 class EndGameView(BaseView):
     """
-    The main menu view displaying the title and a start button.
+    The end game view displaying game outcome and score submission.
     """
 
     def __init__(
         self, screen: pygame.Surface, game_engine: GameEngine, is_victory: bool
     ) -> None:
+        """Initialize end game view with score display, inputs, and buttons."""
         super().__init__(screen)
         self.game_engine = game_engine
         self.score_manager = HighScoreManager()
@@ -94,10 +97,6 @@ class EndGameView(BaseView):
         """Callback function assigned to the go back button."""
         self.next_view = "MENU"
 
-    def go_to_score_view(self) -> None:
-        """Callback function assigned to the save score button."""
-        self.next_view = "SCORE"
-
     def save_score(self) -> None:
         """Save the current score to the highscore.json file."""
         player_name = self.player_name_input.get_value()
@@ -109,10 +108,12 @@ class EndGameView(BaseView):
             self.player_name_input.change_color(is_error=True)
 
     def handle_events(self, events: list[pygame.event.Event]) -> None:
+        """Forward Pygame events to the end game UI box."""
         for event in events:
             self.menu_box.handle_event(event)
 
     def update(self) -> None:
+        """Check for score changes and refresh the score display."""
         new_score: int = self.game_engine.get_player_score()
 
         if new_score != self.score:
@@ -122,5 +123,6 @@ class EndGameView(BaseView):
             self.menu_box.update_layout()
 
     def draw(self) -> None:
+        """Render the background and end game UI components."""
         self.screen.fill(game_config.BACKGROUND_COLOR)
         self.menu_box.draw(self.screen)

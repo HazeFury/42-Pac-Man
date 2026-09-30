@@ -1,3 +1,5 @@
+"""Input manager module translating keyboard events into game actions."""
+
 import pygame
 
 
@@ -8,7 +10,7 @@ class InputManager:
     """
 
     def __init__(self) -> None:
-        # We could initialize gamepad support here in the future
+        """Initialize input manager."""
         pass
 
     def get_movement_intention(self) -> str:

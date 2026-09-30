@@ -1,8 +1,10 @@
+"""Main entry point for Pac-Man game application."""
+
 import os
 import sys
 
 if getattr(sys, "frozen", False):
-    os.chdir(sys._MEIPASS)
+    os.chdir(getattr(sys, "_MEIPASS", "."))
 
 import pygame
 

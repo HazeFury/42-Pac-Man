@@ -1,3 +1,5 @@
+"""Configuration parsing and validation module using Pydantic."""
+
 import json
 import random
 import sys
@@ -28,6 +30,8 @@ ERROR_MESSAGE = {
 
 
 class LevelConfig(BaseModel):
+    """Configuration schema and validation for an individual level."""
+
     width: int = Field(
         default_factory=lambda: random.randint(
             10, 40), ge=10, le=40)
@@ -45,6 +49,7 @@ class LevelConfig(BaseModel):
         handler: ValidatorFunctionWrapHandler,
         info: ValidationInfo,
     ) -> int:
+        """Validate integer level field, falling back to default on error."""
         field_name = info.field_name or ""
         try:
             return cast(int, handler(value))
@@ -56,6 +61,7 @@ class LevelConfig(BaseModel):
 
 
 def default_levels() -> dict[str, LevelConfig]:
+    """Generate default level configurations for 10 levels."""
     return {str(i): LevelConfig() for i in range(1, 11)}
 
 
@@ -80,6 +86,7 @@ class Setup(BaseModel):
         return self.levels.get(str(level), LevelConfig())
 
     def get_amount_of_level(self) -> int:
+        """Return the total number of configured levels."""
         return len(self.levels)
 
     @field_validator("highscore_filename", mode="before")
@@ -124,7 +131,7 @@ class Setup(BaseModel):
 
     @classmethod
     def from_json_file(cls) -> "Setup":
-
+        """Parse and load setup configuration from a JSON file."""
         forbiden_char = ("#", "//", "*/", "/*")
         clean_json = []
         if len(sys.argv) > 1:
@@ -154,7 +161,9 @@ class Setup(BaseModel):
         return data
 
 
-class Player_score(BaseModel):
+class PlayerScore(BaseModel):
+    """Validation model for a single player highscore entry."""
+
     name: str = Field(
         max_length=10, pattern=r"^[a-zA-Z0-9 ]+$", default="BadName"
     )
@@ -162,7 +171,9 @@ class Player_score(BaseModel):
 
     @field_validator("name", "score", mode="wrap")
     @classmethod
-    def score_checker(cls, value: Any, handler: Any, info: ValidationInfo):
+    def score_checker(cls, value: Any, handler: Any,
+                      info: ValidationInfo) -> Any:
+        """Validate fields, falling back to defaults on error."""
         try:
             return handler(value)
         except Exception:
@@ -171,8 +182,14 @@ class Player_score(BaseModel):
             return value
 
 
+# Backward compatibility alias
+Player_score = PlayerScore
+
+
 class Highscore(BaseModel):
-    scores: list[Player_score] = Field(default_factory=list)
+    """Container model holding a list of player highscore entries."""
+
+    scores: list[PlayerScore] = Field(default_factory=list)
 
 
 config = Setup.from_json_file()
