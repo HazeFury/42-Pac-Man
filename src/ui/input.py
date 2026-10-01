@@ -17,6 +17,7 @@ class TextInput:
         height: int = 50,
         max_length: int = 10,
     ) -> None:
+        """Initialize text input position, dimensions, and character limit."""
         self.text: str = ""
         self.max_length: int = max_length
         self.active: bool = True

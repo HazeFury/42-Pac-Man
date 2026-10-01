@@ -152,6 +152,7 @@ class Setup(BaseModel):
     @field_validator("levels", mode="before")
     @classmethod
     def validate_levels_dict(cls, value: Any) -> dict[str, LevelConfig]:
+        """Validate levels dictionary, falling back to defaults if invalid."""
         if isinstance(value, dict):
             return value
         print(ERROR_MESSAGE["level"])
@@ -191,6 +192,9 @@ class Setup(BaseModel):
                     "using default values."
                 )
                 return cls()
+            if not final_json:
+                print("[Error] Configuration file is"
+                      " empty, using default values.")
             data = cls(**final_json)
         except (
             FileNotFoundError,

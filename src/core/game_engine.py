@@ -311,6 +311,7 @@ class GameEngine:
         self.player.spawn(self.maze.w, self.maze.h)
 
     def _check_game_state(self) -> None:
+        """Evaluate victory, level completion, and game over conditions."""
         if self.level_end():
             if self.curr_level >= self.total_levels:
                 self.game_state = "VICTORY"
