@@ -11,10 +11,11 @@ from pydantic import (
     ValidationInfo,
     ValidatorFunctionWrapHandler,
     field_validator,
+    model_validator,
 )
 
 ERROR_MESSAGE = {
-    "level": "[Error] level format is wrong use a dict",
+    "level": "[Error] levels format is wrong use a dict",
     "width": "[Error] width value wrong",
     "height": "[Error] height value wrong",
     "lives": "[Error] lives value wrong",
@@ -24,6 +25,16 @@ ERROR_MESSAGE = {
     "points_per_ghost": "[Error] points_per_ghost value wrong",
     "seed": "[Error] seed value wrong",
     "level_max_time": "[Error] level_max_time value wrong",
+}
+
+MISSING_ERROR_MESSAGE = {
+    "highscore_filename": "[Error] highscore_filename is missing",
+    "lives": "[Error] lives is missing",
+    "points_per_pacgum": "[Error] points_per_pacgum is missing",
+    "points_per_super_pacgum": "[Error] points_per_super_pacgum is missing",
+    "points_per_ghost": "[Error] points_per_ghost is missing",
+    "level_max_time": "[Error] level_max_time is missing",
+    "levels": "[Error] levels is missing",
 }
 
 
@@ -86,6 +97,16 @@ class Setup(BaseModel):
     def get_amount_of_level(self) -> int:
         """Return the total number of configured levels."""
         return len(self.levels)
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_missing_fields(cls, data: Any) -> Any:
+        """Verify that all main configuration fields are present."""
+        if isinstance(data, dict):
+            for field_name, msg in MISSING_ERROR_MESSAGE.items():
+                if field_name not in data:
+                    print(msg)
+        return data
 
     @field_validator("highscore_filename", mode="before")
     @classmethod
