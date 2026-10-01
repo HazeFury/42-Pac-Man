@@ -17,6 +17,7 @@ class Text:
         color: str,
         font_size: int = 36,
     ) -> None:
+        """Initialize text position, content, color, and font size."""
         self._pos_x_keyword = pos_x
         self._pos_y_keyword = pos_y
         self.color = game_config.COLORS.get(color.upper(), game_config.WHITE)
