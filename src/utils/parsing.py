@@ -14,7 +14,7 @@ from pydantic import (
 )
 
 ERROR_MESSAGE = {
-    "level": "level format is wrong use a dict",
+    "level": "[Error] level format is wrong use a dict",
     "width": "[Error] width value wrong",
     "height": "[Error] height value wrong",
     "lives": "[Error] lives value wrong",
@@ -95,7 +95,8 @@ class Setup(BaseModel):
         """
         if not isinstance(value, str) or not value.endswith(".json"):
             print(
-                "invalid data for highscore_filename using default path",
+                "[Error] invalid data for"
+                " highscore_filename using default path",
                 file=sys.stderr,
             )
             return "highscore.json"
