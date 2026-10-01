@@ -121,7 +121,7 @@ The software follows a modular **MVC (Model-View-Controller)** pattern:
 
 ### Project Management
 
-We worked as a team of two using an Agile-inspired approach. We used **Trello** to create and track tickets for features, refactoring, and bug fixes. To ensure constant synchronization, we held **daily stand-up meetings** every morning to plan the day, and evening wrap-ups to review progress. All our daily achievements and technical decisions are thoroughly documented in our devlog at `documentation/devlog.md`.
+We worked as a team of two using an Agile-inspired approach. We used **Trello** to create and track tickets for features, refactoring, and bug fixes. To ensure constant synchronization, we held **daily stand-up meetings** every morning to plan the day, and evening wrap-ups to review progress. You can learn more about our project management at [documentation/management.md](documentation/management.md).
 
 
 <br>

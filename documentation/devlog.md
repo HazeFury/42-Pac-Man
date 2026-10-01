@@ -1,93 +1,94 @@
 # Devlog
 
-## Explaination of what we build day after day on this project.
-
+## Explanation of what we built day after day on this project.
 
 ### Day 1
 
-- Découverte et analyse du sujet en équipe (tous les deux)
-- Mise en place du Trello et discussion autour de l'organisation du projet (tous les deux)
-- Création du repo et mise au point des processus de travail collaboratif (tous les deux)
-- Découverte de Pygame avec des exemples simples (marberge)
+- Discovery and analysis of the subject as a team (**both**)
+- Setup of the Trello board and discussion about project organization (**both**)
+- Repository creation and establishment of collaborative workflow processes (**both**)
+- Discovery of Pygame using simple examples (**marberge**)
 
 ### Day 2
 
-- Parsing du fichier de configuration (gchmilew)
-- Création d'un menu simple avec pygame (marberge)
-- Création de composant ui réutilisable et de vues pour simplifier le developpement (marberge)
-- Découverte et prise en main du MazeGenerator (gchmilew)
+- Parsing the configuration file (**gchmilew**)
+- Creation of a simple menu using Pygame (**marberge**)
+- Creation of reusable UI components and views to streamline development (**marberge**)
+- Discovery and familiarization with MazeGenerator (**gchmilew**)
 
 ### Day 3
 
-- Création de la classe Cell symbolisant chaque cellule du labyrinthe (gchmilew)
-- Création de la classe Maze pour générer une matrice de Cell formant le labyrinthe (gchmilew)
-- Algorithme d'ajout des pac-gums sur la grille (gchmilew)
-- affichage visuel du labyrinthe, des pac-gums et super pac-gums (marberge)
+- Creation of the Cell class representing each maze cell (**gchmilew**)
+- Creation of the Maze class to generate a matrix of Cells forming the maze (**gchmilew**)
+- Algorithm for adding pac-gums to the grid (**gchmilew**)
+- Visual rendering of the maze, pac-gums, and super pac-gums (**marberge**)
 
 ### Day 4
 
-- Alignement du pacman sur la grille et déplacement dans les cellules plutôt que déplacement libre (gchmilew)
-- rajout des collisions dans les murs (gchmilew)
-- rajout du score lorsque pacman mange des pacgums (et les pacgums disparaissent de l'écran) (gchmilew)
-- refacto du code pour le GameEngine soit au coeur de la logique (marberge)
-- affichage des ghosts (pas encore de déplacement) (gchmilew)
-
+- Alignment of Pac-Man on the grid and movement strictly within cells rather than free movement (**gchmilew**)
+- Addition of wall collisions (**gchmilew**)
+- Addition of score tracking when Pac-Man eats pac-gums (with pac-gums disappearing from the screen) (**gchmilew**)
+- Code refactoring to put the GameEngine at the core of the logic (**marberge**)
+- Ghost rendering (no movement yet) (**gchmilew**)
 
 ### Day 5
 
-- Détection de collision entre pacman et ghost (print uniquement pour l'instant) (gchmilew)
-- IA des ghost => algorithme BFS pour chaque ghost (gchmilew)
-- remplacement des valeurs en dure par celles du fichier de config (gchmilew)
-- ajout du EndGameView pour la fin de la partie (marberge)
-- ajout du HighScoreView pour afficher le top 10 des scores (marberge)
-
+- Collision detection between Pac-Man and ghosts (print only for now) (**gchmilew**)
+- Ghost AI => BFS algorithm for each ghost (**gchmilew**)
+- Replacement of hardcoded values with those from the config file (**gchmilew**)
+- Addition of the EndGameView for the end of the game (**marberge**)
+- Addition of the HighScoreView to display the top 10 scores (**marberge**)
 
 ### Day 6
 
-- refacto du GameEngine (réattribution d'une partie du code dans les classes concernés (Ghost, Player, HighScore)) (gchmilew)
-- merge du la GameOverView et la WinView en un seul fichier : EndGameView (marberge)
-- ajout du score du joueur au fichier des scores. (marberge)
+- GameEngine refactoring (reassignment of code logic to the appropriate classes: Ghost, Player, HighScore) (**gchmilew**)
+- Merging GameOverView and WinView into a single file: EndGameView (**marberge**)
+- Addition of the player's score to the highscore file (**marberge**)
+
+### Day 7
+
+- Displaying the score at the end of the game (**marberge**)
+- Displaying the top 10 scores by reading the "highscore.json" file (**marberge**)
+- Updating the config file to include levels (**marberge**, **gchmilew**)
+- Updating the parser to match the new config (**gchmilew**)
+- Ghosts become edible when eating a super pac-gum / ghosts respawn after the cooldown (**gchmilew**)
+- Resetting positions of all movable entities when a life is lost (**gchmilew**)
+- Ghost flee algorithm (**gchmilew**)
+
+### Day 8
+
+- Updating Pac-Man sprites according to his actual direction (**marberge**)
+- End-of-level system (victory and defeat) (**marberge**)
+- Addition of the pause option during a game (**marberge**)
+- Complete cheat system implementation (**marberge**)
+- Smoother movement animation for entities (**gchmilew**)
+- Various adjustments: 
+	- Super pac-gums reset on level change (**gchmilew**)
+	- Revision of the entity spawn system (next level or new game) (**gchmilew**)
+
+### Day 9-10-11
+
+- Improvement of various timers and game pause logic (**gchmilew**)
+- Fixing ghost rendering upon player defeat and respawn (**gchmilew**)
+- Improved visual collisions (**gchmilew**)
+- Addition of a game instructions window (**marberge**)
+- Modification of the pause menu (**gchmilew**)
+- Setup of the final package creation (**marberge**)
+- Refactoring of multiple classes (game_engine, ghost, player) (**gchmilew**)
+- Various minor improvements (**gchmilew**, **marberge**)
+
+### Day 12
+
+- Writing the README (**marberge**)
+- Levels 2 to 10 are now truly random (seed-based) (**marberge**)
+- Visual fix for desynchronized Pac-Man death animations (**gchmilew**) 
+- Debugging Pac-Man's impact against walls (**gchmilew**)
+- MyPy corrections and addition of missing docstrings (**gchmilew**)
+- Various minor improvements (**gchmilew**, **marberge**)
 
 
-### DAY 7
+### DAY 13
 
-- affichage du score en fin de partie (marberge)
-- affichage du top 10 score en lisant le fichier " highscore.json" (marberge)
-- mise à jour du fichier de config pour avoir des niveaux (marberge, gchmilew)
-- mise à jour du parser pour s'adapter à la config (gchmilew)
-- ghost mangable lorsqu'on mange un super pacgum / réapparition des ghosts après le cooldown (gchmilew)
-- reset des positions de tout les movable lorsqu'on perd une vie (gchmilew)
-- algo des fuite des ghosts (gchmilew)
-
-
-### DAY 8
-
-- Mise à jour des sprites du pacman suivant sa direction réelle (marberge)
-- Système de fin de niveau (victoire et défaite) (marberge)
-- Ajout de l'option pause pendant une partie (marberge)
-- Système de cheat complet (marberge)
-- Animation plus smooth de déplacement pour les entités (gchmilew)
-- Ajustement divers : 
-	- super pacgums reset au changement de niveau (gchmilew)
-	- Révision du système de spawn des entités (level suivant ou new game) (gchmilew)
-
-
-### DAY 9-10-11
-
-- Amélioration des différents timer et pause du jeu (gchmilew) 
-- Résolution d'affichage des ghosts lors de la défaite du joueur + respawn (gchmilew)
-- Collision visuelle améliorée (gchmilew)
-- Ajout d'une fenêtre pour les instructions du jeu (marberge)
-- Modification du menu pause (gchmilew)
-- Mise en place de la création du package final (marberge)
-- Refacto de plusieurs classes (game_engine, ghost, player) (gchmilew)
-- diverses amélioration mineures (gchmilew, marberge)
-
-### DAY 12
-
-- Écriture du readme (marberge)
-- Les niveaux 2 à 10 sont maintenant vraiment aléatoire (seed) (marberge)
-- correction visuelle des pacman mangé en décalé (gchmilew) 
-- débug de l'impact du pac man dans le mur (gchmilew)
-- Correction avec MyPy et ajout des docstrings manquantes  (gchmilew)
-- diverses amélioration mineures (gchmilew, marberge)
+- Fixing various minor issues (**gchmilew**)
+- Update project management files (**marberge**)
+- Deployed to itch.io (**marberge**)
