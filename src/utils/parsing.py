@@ -14,7 +14,7 @@ from pydantic import (
 )
 
 ERROR_MESSAGE = {
-    "level": "[Error] level value wrong",
+    "level": "level format is wrong use a dict",
     "width": "[Error] width value wrong",
     "height": "[Error] height value wrong",
     "lives": "[Error] lives value wrong",
@@ -126,6 +126,14 @@ class Setup(BaseModel):
         except ValidationError:
             print(ERROR_MESSAGE[field_name])
             return cast(int, cls.model_fields[field_name].default)
+
+    @field_validator("levels", mode="before")
+    @classmethod
+    def validate_levels_dict(cls, value: Any) -> dict[str, LevelConfig]:
+        if isinstance(value, dict):
+            return value
+        print(ERROR_MESSAGE["level"])
+        return default_levels()
 
     @classmethod
     def from_json_file(cls) -> "Setup":
