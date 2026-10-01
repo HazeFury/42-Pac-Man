@@ -19,7 +19,7 @@ In Menu & HighScore:
 - Navigate through the procedural maze.
 - Eat all normal pacgums to complete the level.
 - Avoid the ghosts (Blinky, Pinky, Inky, Clyde).
-- Eat a super pacgum to turn ghosts frightened and vulnerable.
+- Eat a super pacgum (fruit) to turn ghosts frightened and vulnerable.
 - Reach the highest score and enter your name in the Hall of Fame!
 
 3. OPTIONS & CONFIGURATION (config.json)
@@ -37,11 +37,11 @@ alongside the game executable:
     * "width":  Grid width (minimum 10)
     * "height": Grid height (minimum 10)
     * "pacgum": Pacgum density / distribution mode
-    * "seed":   Random seed for procedural maze generation
+ 
 
 4. HOW TO RUN
 -------------
 - Graphical: Double-click the 'pac-man' executable from your file manager.
-- Terminal:  ./pac-man [optional_custom_config.json]
+- Terminal:  ./pac-man [custom_config.json]
 
 ================================================================================
