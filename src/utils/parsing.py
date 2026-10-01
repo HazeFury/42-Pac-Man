@@ -102,7 +102,7 @@ class Setup(BaseModel):
     @classmethod
     def check_missing_fields(cls, data: Any) -> Any:
         """Verify that all main configuration fields are present."""
-        if isinstance(data, dict):
+        if isinstance(data, dict) and data:
             for field_name, msg in MISSING_ERROR_MESSAGE.items():
                 if field_name not in data:
                     print(msg)
@@ -162,10 +162,19 @@ class Setup(BaseModel):
         """Parse and load setup configuration from a JSON file."""
         forbiden_char = ("#", "//", "*/", "/*")
         clean_json = []
-        if len(sys.argv) > 1:
-            path = Path(sys.argv[1])
+
+        if len(sys.argv) != 2:
+            print(
+                "[Error] Program expects exactly one argument: "
+                "python3 pac-man.py <config.json>"
+            )
+            sys.exit(1)
+        elif not sys.argv[1].endswith(".json"):
+            print("[Error] Configuration file must be a .json file.")
+            sys.exit(1)
         else:
-            path = Path("config.json")
+            path = Path(sys.argv[1])
+
         try:
             with open(path, "r", encoding="utf-8") as f:
                 lines = f.read().split("\n")
@@ -174,16 +183,35 @@ class Setup(BaseModel):
                         continue
                     clean_json.append(line)
 
-            try:
-                conf = "".join(clean_json)
-                final_json = json.loads(conf)
-                data = cls(**final_json)
-            except Exception:
-                print("invalid json format using defaults value")
-                data = cls()
-
-        except FileNotFoundError as e:
-            print(f"File {path} not found {e}")
+            conf = "\n".join(clean_json)
+            final_json = json.loads(conf)
+            if not isinstance(final_json, dict):
+                print(
+                    "[Error] Invalid configuration format, "
+                    "using default values."
+                )
+                return cls()
+            data = cls(**final_json)
+        except (
+            FileNotFoundError,
+            PermissionError,
+            IsADirectoryError,
+            UnicodeDecodeError,
+            OSError,
+        ) as e:
+            print(
+                f"[Error] Could not read configuration file '{path}': {e}, "
+                "using default values."
+            )
+            data = cls()
+        except json.JSONDecodeError:
+            print("[Error] Invalid JSON format, using default values.")
+            data = cls()
+        except Exception as e:
+            print(
+                f"[Error] Failed to parse configuration: {e}, "
+                "using default values."
+            )
             data = cls()
 
         return data

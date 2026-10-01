@@ -16,6 +16,7 @@ try:
     from src.views.rules_view import RulesView
 except Exception as e:
     print(f"[Error] missing file: {e}")
+    sys.exit(1)
 
 
 def main() -> None:
