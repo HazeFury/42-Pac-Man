@@ -1,8 +1,9 @@
 NAME = PROJECT
 VERSION = 0.1.0
 VENV = .venv
-SRC_DIR = src/
-MAIN = app/main.py
+SRC_DIR = ./src
+MAIN = pac-man.py
+CONFIG_FILE = config.json
 
 
 all: install
@@ -24,23 +25,24 @@ setup:
 	fi
 
 build: install
-	@uv build
+	@uv run pyinstaller pac-man.spec --noconfirm
 
 run:
-	@uv run $(SRC_DIR)$(MAIN)
+	@uv run $(MAIN) $(CONFIG_FILE)
 
 debug:
-	@uv run python3 -m pdb $(SRC_DIR)$(MAIN)
+	@uv run python3 -m pdb $(MAIN)
 
 clean:
 	@echo "Removing temporary files or caches"
-	@rm -rf .mypy_cache .pytest_cache .pytest_cache src/*.egg-info
+	@rm -rf .mypy_cache .pytest_cache src/*.egg-info build
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
 
 fclean: clean
 	@echo "Removing virtual environment and distribution files"
 	@rm -rf $(VENV)
 	@rm -rf dist/
+	@rm -rf build/
 
 re: fclean all
 
@@ -54,9 +56,5 @@ lint-strict:
 	@uv run flake8 $(SRC_DIR)
 	@uv run mypy $(SRC_DIR) --strict
 
-test:
-	@echo "Running test suite..."
-	@uv run pytest $(ARGS) -v
 
-
-.PHONY: all install setup run build debug clean fclean re lint lint-strict test
+.PHONY: all install setup build run debug clean fclean re lint lint-strict

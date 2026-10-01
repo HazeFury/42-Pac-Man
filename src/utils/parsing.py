@@ -1,0 +1,256 @@
+import json
+import random
+import sys
+from pathlib import Path
+from typing import Any, cast
+
+from pydantic import (
+    BaseModel,
+    Field,
+    ValidationError,
+    ValidationInfo,
+    ValidatorFunctionWrapHandler,
+    field_validator,
+    model_validator,
+)
+
+ERROR_MESSAGE = {
+    "level": "[Error] levels format is wrong use a dict",
+    "width": "[Error] width value wrong",
+    "height": "[Error] height value wrong",
+    "lives": "[Error] lives value wrong",
+    "pacgum": "[Error] pacgum value wrong",
+    "points_per_pacgum": "[Error] points_per_pacgum value wrong",
+    "points_per_super_pacgum": "[Error] points_per_super_pacgum value wrong",
+    "points_per_ghost": "[Error] points_per_ghost value wrong",
+    "seed": "[Error] seed value wrong",
+    "level_max_time": "[Error] level_max_time value wrong",
+}
+
+MISSING_ERROR_MESSAGE = {
+    "highscore_filename": "[Error] highscore_filename is missing",
+    "lives": "[Error] lives is missing",
+    "points_per_pacgum": "[Error] points_per_pacgum is missing",
+    "points_per_super_pacgum": "[Error] points_per_super_pacgum is missing",
+    "points_per_ghost": "[Error] points_per_ghost is missing",
+    "level_max_time": "[Error] level_max_time is missing",
+    "levels": "[Error] levels is missing",
+}
+
+
+class LevelConfig(BaseModel):
+    """Configuration schema and validation for an individual level."""
+
+    width: int = Field(
+        default_factory=lambda: random.randint(10, 40), ge=10, le=40
+    )
+    height: int = Field(
+        default_factory=lambda: random.randint(10, 25), ge=10, le=25
+    )
+    pacgum: int = Field(default_factory=lambda: random.randint(15, 100), ge=0)
+    seed: int = Field(default_factory=lambda: random.randint(0, 1000), ge=0)
+
+    @field_validator("width", "height", "pacgum", "seed", mode="wrap")
+    @classmethod
+    def validate_level_field(
+        cls,
+        value: Any,
+        handler: ValidatorFunctionWrapHandler,
+        info: ValidationInfo,
+    ) -> int:
+        """Validate integer level field, falling back to default on error."""
+        field_name = info.field_name or ""
+        try:
+            return cast(int, handler(value))
+        except ValidationError:
+            if field_name in ERROR_MESSAGE:
+                print(ERROR_MESSAGE[field_name])
+            field = cls.model_fields[field_name]
+            return cast(int, field.get_default(call_default_factory=True))
+
+
+def default_levels() -> dict[str, LevelConfig]:
+    """Generate default level configurations for 10 levels."""
+    return {str(i): LevelConfig() for i in range(1, 11)}
+
+
+class Setup(BaseModel):
+    """
+    Configuration schema and validation for game settings.
+    """
+
+    highscore_filename: str = Field(default="highscore.json")
+    lives: int = Field(default=3, ge=1)
+    points_per_pacgum: int = Field(default=10, ge=10, le=30)
+    points_per_super_pacgum: int = Field(default=50, ge=50, le=500)
+    points_per_ghost: int = Field(default=200, ge=200, le=1000)
+    level_max_time: int = Field(default=90, ge=5, le=200)
+    levels: dict[str, LevelConfig] = Field(default_factory=default_levels)
+
+    def get_level(self, level: int = 1) -> LevelConfig:
+        """
+        Returns the configuration for a specific level, falling back to
+        default.
+        """
+        return self.levels.get(str(level), LevelConfig())
+
+    def get_amount_of_level(self) -> int:
+        """Return the total number of configured levels."""
+        return len(self.levels)
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_missing_fields(cls, data: Any) -> Any:
+        """Verify that all main configuration fields are present."""
+        if isinstance(data, dict) and data:
+            for field_name, msg in MISSING_ERROR_MESSAGE.items():
+                if field_name not in data:
+                    print(msg)
+        return data
+
+    @field_validator("highscore_filename", mode="before")
+    @classmethod
+    def highscore_file_check(cls, value: Any) -> str:
+        """
+        Validates the highscore file path, falling back to default if invalid.
+        """
+        if not isinstance(value, str) or not value.endswith(".json"):
+            print(
+                "[Error] invalid data for"
+                " highscore_filename using default path",
+                file=sys.stderr,
+            )
+            return "highscore.json"
+        return value
+
+    @field_validator(
+        "lives",
+        "points_per_pacgum",
+        "points_per_super_pacgum",
+        "points_per_ghost",
+        "level_max_time",
+        mode="wrap",
+    )
+    @classmethod
+    def validate_field(
+        cls,
+        value: Any,
+        handler: ValidatorFunctionWrapHandler,
+        info: ValidationInfo,
+    ) -> int:
+        """
+        Validates integer fields and falls back to the default value upon
+        error.
+        """
+        field_name = info.field_name or ""
+        try:
+            return cast(int, handler(value))
+        except ValidationError:
+            print(ERROR_MESSAGE[field_name])
+            return cast(int, cls.model_fields[field_name].default)
+
+    @field_validator("levels", mode="before")
+    @classmethod
+    def validate_levels_dict(cls, value: Any) -> dict[str, LevelConfig]:
+        """Validate levels dictionary, falling back to defaults if invalid."""
+        if isinstance(value, dict):
+            return value
+        print(ERROR_MESSAGE["level"])
+        return default_levels()
+
+    @classmethod
+    def from_json_file(cls) -> "Setup":
+        """Parse and load setup configuration from a JSON file."""
+        forbiden_char = ("#", "//", "*/", "/*")
+        clean_json = []
+
+        if len(sys.argv) != 2:
+            print(
+                "[Error] Program expects exactly one argument: "
+                "python3 pac-man.py <config.json>"
+            )
+            sys.exit(1)
+        elif not sys.argv[1].endswith(".json"):
+            print("[Error] Configuration file must be a .json file.")
+            sys.exit(1)
+        else:
+            path = Path(sys.argv[1])
+
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                lines = f.read().split("\n")
+                for line in lines:
+                    if line.strip().startswith(forbiden_char):
+                        continue
+                    clean_json.append(line)
+
+            conf = "\n".join(clean_json)
+            final_json = json.loads(conf)
+            if not isinstance(final_json, dict):
+                print(
+                    "[Error] Invalid configuration format, "
+                    "using default values."
+                )
+                return cls()
+            if not final_json:
+                print("[Error] Configuration file is"
+                      " empty, using default values.")
+            data = cls(**final_json)
+        except (
+            FileNotFoundError,
+            PermissionError,
+            IsADirectoryError,
+            UnicodeDecodeError,
+            OSError,
+        ) as e:
+            print(
+                f"[Error] Could not read configuration file '{path}': {e}, "
+                "using default values."
+            )
+            data = cls()
+        except json.JSONDecodeError:
+            print("[Error] Invalid JSON format, using default values.")
+            data = cls()
+        except Exception as e:
+            print(
+                f"[Error] Failed to parse configuration: {e}, "
+                "using default values."
+            )
+            data = cls()
+
+        return data
+
+
+class PlayerScore(BaseModel):
+    """Validation model for a single player highscore entry."""
+
+    name: str = Field(
+        max_length=10, pattern=r"^[a-zA-Z0-9 ]+$", default="BadName"
+    )
+    score: int = Field(ge=0, le=999999999, default=123)
+
+    @field_validator("name", "score", mode="wrap")
+    @classmethod
+    def score_checker(
+        cls, value: Any, handler: Any, info: ValidationInfo
+    ) -> Any:
+        """Validate fields, falling back to defaults on error."""
+        try:
+            return handler(value)
+        except Exception:
+            if info.field_name:
+                return cls.model_fields[info.field_name].default
+            return value
+
+
+# Backward compatibility alias
+Player_score = PlayerScore
+
+
+class Highscore(BaseModel):
+    """Container model holding a list of player highscore entries."""
+
+    scores: list[PlayerScore] = Field(default_factory=list)
+
+
+config = Setup.from_json_file()
