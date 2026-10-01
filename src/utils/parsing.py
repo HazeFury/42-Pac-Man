@@ -163,8 +163,10 @@ class Setup(BaseModel):
         """Parse and load setup configuration from a JSON file."""
         forbiden_char = ("#", "//", "*/", "/*")
         clean_json = []
+        if getattr(sys, "frozen", False):
+            path = Path("config.json")
 
-        if len(sys.argv) != 2:
+        elif len(sys.argv) != 2:
             print(
                 "[Error] Program expects exactly one argument: "
                 "python3 pac-man.py <config.json>"
