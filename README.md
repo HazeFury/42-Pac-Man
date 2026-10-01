@@ -44,6 +44,10 @@ The goal of this project is to recreate the classic arcade game Pac-Man. The pla
 
 The project features a fully playable game loop, score tracking, a decrementing timer, multiple randomly generated levels with increasing difficulty, and a cheat mode for evaluation. It uses `pygame` for the graphical interface and `pydantic` for strict configuration validation.
 
+You can download the game on *itch.io*
+- **Link** : https://hazefury.itch.io/pac-man-42
+- **Password** : 42Lyon
+
 <br>
 <br>
 
@@ -96,6 +100,8 @@ Default values include:
 - `level_max_time`: 90 seconds. 
 
 It also stores settings for up to 10 dynamically generated levels, each with randomly assigned width, height, pacgum count, and maze generation seed. If the file is missing or corrupted, the game safely falls back to these default values.
+
+Please note that the attributes in the configuration file have minimum and maximum values ​​(exceeding these limits will revert the settings to their default values).
 
 ### Highscore
 The highscore system records the best performances in a JSON file (`highscore.json`). Implemented in `src/utils/highscore.py`, it uses Pydantic to strictly validate the score structure: the player name must match the regex `^[a-zA-Z0-9 ]+$` and be under 10 characters, and the score must be between 0 and 999999999. We decided to implement it this way because this robust approach prevents file corruption, avoids crashes from manual file edits, and ensures fair competition by gracefully discarding invalid entries.

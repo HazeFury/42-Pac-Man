@@ -56,9 +56,5 @@ lint-strict:
 	@uv run flake8 $(SRC_DIR)
 	@uv run mypy $(SRC_DIR) --strict
 
-test:
-	@echo "Running test suite..."
-	@uv run pytest $(ARGS) -v
 
-
-.PHONY: all install setup exe run package debug clean fclean re lint lint-strict test
+.PHONY: all install setup build run debug clean fclean re lint lint-strict

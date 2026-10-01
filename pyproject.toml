@@ -1,6 +1,6 @@
 [project]
 name = "Pac-Man"
-version = "0.1.0"
+version = "1.0.0"
 description = "The famous arcade game Pac-Man with a modern Python codebase, a clean project structure, and a deployable build."
 readme = "README.md"
 requires-python = ">=3.10"
