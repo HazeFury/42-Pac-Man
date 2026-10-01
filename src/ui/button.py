@@ -20,6 +20,7 @@ class Button:
         color: str,
         size: str = "medium",
     ) -> None:
+        """Initialize button position, label, action callback, and style."""
         self.text = text
         self.func = func
 

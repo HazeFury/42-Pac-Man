@@ -11,10 +11,11 @@ from pydantic import (
     ValidationInfo,
     ValidatorFunctionWrapHandler,
     field_validator,
+    model_validator,
 )
 
 ERROR_MESSAGE = {
-    "level": "[Error] level format is wrong use a dict",
+    "level": "[Error] levels format is wrong use a dict",
     "width": "[Error] width value wrong",
     "height": "[Error] height value wrong",
     "lives": "[Error] lives value wrong",
@@ -24,6 +25,16 @@ ERROR_MESSAGE = {
     "points_per_ghost": "[Error] points_per_ghost value wrong",
     "seed": "[Error] seed value wrong",
     "level_max_time": "[Error] level_max_time value wrong",
+}
+
+MISSING_ERROR_MESSAGE = {
+    "highscore_filename": "[Error] highscore_filename is missing",
+    "lives": "[Error] lives is missing",
+    "points_per_pacgum": "[Error] points_per_pacgum is missing",
+    "points_per_super_pacgum": "[Error] points_per_super_pacgum is missing",
+    "points_per_ghost": "[Error] points_per_ghost is missing",
+    "level_max_time": "[Error] level_max_time is missing",
+    "levels": "[Error] levels is missing",
 }
 
 
@@ -87,6 +98,16 @@ class Setup(BaseModel):
         """Return the total number of configured levels."""
         return len(self.levels)
 
+    @model_validator(mode="before")
+    @classmethod
+    def check_missing_fields(cls, data: Any) -> Any:
+        """Verify that all main configuration fields are present."""
+        if isinstance(data, dict) and data:
+            for field_name, msg in MISSING_ERROR_MESSAGE.items():
+                if field_name not in data:
+                    print(msg)
+        return data
+
     @field_validator("highscore_filename", mode="before")
     @classmethod
     def highscore_file_check(cls, value: Any) -> str:
@@ -131,6 +152,7 @@ class Setup(BaseModel):
     @field_validator("levels", mode="before")
     @classmethod
     def validate_levels_dict(cls, value: Any) -> dict[str, LevelConfig]:
+        """Validate levels dictionary, falling back to defaults if invalid."""
         if isinstance(value, dict):
             return value
         print(ERROR_MESSAGE["level"])
@@ -141,10 +163,19 @@ class Setup(BaseModel):
         """Parse and load setup configuration from a JSON file."""
         forbiden_char = ("#", "//", "*/", "/*")
         clean_json = []
-        if len(sys.argv) > 1:
-            path = Path(sys.argv[1])
+
+        if len(sys.argv) != 2:
+            print(
+                "[Error] Program expects exactly one argument: "
+                "python3 pac-man.py <config.json>"
+            )
+            sys.exit(1)
+        elif not sys.argv[1].endswith(".json"):
+            print("[Error] Configuration file must be a .json file.")
+            sys.exit(1)
         else:
-            path = Path("config.json")
+            path = Path(sys.argv[1])
+
         try:
             with open(path, "r", encoding="utf-8") as f:
                 lines = f.read().split("\n")
@@ -153,16 +184,38 @@ class Setup(BaseModel):
                         continue
                     clean_json.append(line)
 
-            try:
-                conf = "".join(clean_json)
-                final_json = json.loads(conf)
-                data = cls(**final_json)
-            except Exception:
-                print("invalid json format using defaults value")
-                data = cls()
-
-        except FileNotFoundError as e:
-            print(f"File {path} not found {e}")
+            conf = "\n".join(clean_json)
+            final_json = json.loads(conf)
+            if not isinstance(final_json, dict):
+                print(
+                    "[Error] Invalid configuration format, "
+                    "using default values."
+                )
+                return cls()
+            if not final_json:
+                print("[Error] Configuration file is"
+                      " empty, using default values.")
+            data = cls(**final_json)
+        except (
+            FileNotFoundError,
+            PermissionError,
+            IsADirectoryError,
+            UnicodeDecodeError,
+            OSError,
+        ) as e:
+            print(
+                f"[Error] Could not read configuration file '{path}': {e}, "
+                "using default values."
+            )
+            data = cls()
+        except json.JSONDecodeError:
+            print("[Error] Invalid JSON format, using default values.")
+            data = cls()
+        except Exception as e:
+            print(
+                f"[Error] Failed to parse configuration: {e}, "
+                "using default values."
+            )
             data = cls()
 
         return data
